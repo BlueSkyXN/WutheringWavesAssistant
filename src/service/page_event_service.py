@@ -1772,7 +1772,7 @@ class PageEventAbstractService(PageEventService, ABC):
             self._control_service.esc()
             return
         # random_click(1374, 1038)
-        self._control_service.click(1374, 1038)
+        self._control_service.click(915, 686)
         time.sleep(2)
         tomorrow = self._ocr_service.wait_text("^次日$", timeout=5)
         if not tomorrow:
@@ -1781,6 +1781,15 @@ class PageEventAbstractService(PageEventService, ABC):
             return
         self.click_position(tomorrow)
         time.sleep(1)
+
+        self._control_service.click(1180, 377)
+        time.sleep(0.3)
+        self._control_service.click(1180, 377)
+        time.sleep(0.3)
+        self._control_service.click(1180, 377)
+        time.sleep(0.3)
+
+
         confirm_text = self._ocr_service.find_text("确定")
         self.click_position(confirm_text)
         time.sleep(2)
