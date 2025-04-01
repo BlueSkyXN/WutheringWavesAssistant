@@ -10,7 +10,6 @@ import ctypes
 import logging
 import re
 import time
-import traceback
 from ctypes import windll
 
 import psutil
@@ -180,7 +179,7 @@ def enable_dpi_awareness():
     try:
         ctypes.windll.shcore.SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE)
     except Exception:
-        logger.error("Failed to enable DPI awareness: %s", traceback.format_exc())
+        logger.exception("Failed to enable DPI awareness")
 
 
 # 窗口的大小和位置在不同的缩放设置下可能会分为“实际大小”和“逻辑大小”：

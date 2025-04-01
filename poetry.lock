@@ -37,9 +37,10 @@ reference = "tsinghua"
 name = "anyio"
 version = "4.9.0"
 description = "High level compatibility layer for multiple asynchronous event loop implementations"
-optional = false
+optional = true
 python-versions = ">=3.9"
 groups = ["main"]
+markers = "extra == \"cuda\" and extra != \"dml\""
 files = [
     {file = "anyio-4.9.0-py3-none-any.whl", hash = "sha256:9f76d541cad6e36af7beb62e978876f3b41e3e04f2c1fbf0884604c0a9c4d93c"},
     {file = "anyio-4.9.0.tar.gz", hash = "sha256:673c0c244e15788651a4ff38710fea9675823028a6f08a5eda409e0c9840a028"},
@@ -65,9 +66,10 @@ reference = "tsinghua"
 name = "astor"
 version = "0.8.1"
 description = "Read/rewrite/write Python ASTs"
-optional = false
+optional = true
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
 groups = ["main"]
+markers = "extra == \"cuda\" and extra != \"dml\""
 files = [
     {file = "astor-0.8.1-py2.py3-none-any.whl", hash = "sha256:070a54e890cefb5b3739d19f30f5a5ec840ffc9c50ffa7d23cc9fc1a38ebbfc5"},
     {file = "astor-0.8.1.tar.gz", hash = "sha256:6a6effda93f4e1ce9f618779b2dd1d9d84f1e32812c23a29b3fff6fd7f63fa5e"},
@@ -82,9 +84,10 @@ reference = "tsinghua"
 name = "certifi"
 version = "2025.1.31"
 description = "Python package for providing Mozilla's CA Bundle."
-optional = false
+optional = true
 python-versions = ">=3.6"
 groups = ["main"]
+markers = "extra == \"cuda\" and extra != \"dml\""
 files = [
     {file = "certifi-2025.1.31-py3-none-any.whl", hash = "sha256:ca78db4565a652026a4db2bcdf68f2fb589ea80d0be70e03929ed730746b84fe"},
     {file = "certifi-2025.1.31.tar.gz", hash = "sha256:3d5da6925056f6f18f119200434a4780a94263f10d1c21d032a6f6b2baa20651"},
@@ -322,9 +325,10 @@ reference = "tsinghua"
 name = "decorator"
 version = "5.2.1"
 description = "Decorators for Humans"
-optional = false
+optional = true
 python-versions = ">=3.8"
 groups = ["main"]
+markers = "extra == \"cuda\" and extra != \"dml\""
 files = [
     {file = "decorator-5.2.1-py3-none-any.whl", hash = "sha256:d316bb415a2d9e2d2b3abcc4084c6502fc09240e292cd76a76afc106a1c8e04a"},
     {file = "decorator-5.2.1.tar.gz", hash = "sha256:65f266143752f734b0a7cc83c46f4618af75b8c5911b00ccb61d0ac9b6da0360"},
@@ -460,10 +464,10 @@ reference = "tsinghua"
 name = "exceptiongroup"
 version = "1.2.2"
 description = "Backport of PEP 654 (exception groups)"
-optional = false
+optional = true
 python-versions = ">=3.7"
 groups = ["main"]
-markers = "python_version == \"3.10\""
+markers = "python_version == \"3.10\" and (extra == \"cuda\" and extra != \"dml\" or extra == \"dev\")"
 files = [
     {file = "exceptiongroup-1.2.2-py3-none-any.whl", hash = "sha256:3111b9d131c238bec2f8f516e123e14ba243563fb135d3fe885990585aa7795b"},
     {file = "exceptiongroup-1.2.2.tar.gz", hash = "sha256:47c2edf7c6738fafb49fd34290706d1a1a2f4d1c6df275526b62cbb4aa5393cc"},
@@ -594,9 +598,10 @@ reference = "tsinghua"
 name = "h11"
 version = "0.14.0"
 description = "A pure-Python, bring-your-own-I/O implementation of HTTP/1.1"
-optional = false
+optional = true
 python-versions = ">=3.7"
 groups = ["main"]
+markers = "extra == \"cuda\" and extra != \"dml\""
 files = [
     {file = "h11-0.14.0-py3-none-any.whl", hash = "sha256:e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761"},
     {file = "h11-0.14.0.tar.gz", hash = "sha256:8f19fbbe99e72420ff35c00b27a34cb9937e902a8b810e2c88300c6f0a3b699d"},
@@ -611,9 +616,10 @@ reference = "tsinghua"
 name = "httpcore"
 version = "1.0.7"
 description = "A minimal low-level HTTP client."
-optional = false
+optional = true
 python-versions = ">=3.8"
 groups = ["main"]
+markers = "extra == \"cuda\" and extra != \"dml\""
 files = [
     {file = "httpcore-1.0.7-py3-none-any.whl", hash = "sha256:a3fff8f43dc260d5bd363d9f9cf1830fa3a458b332856f34282de498ed420edd"},
     {file = "httpcore-1.0.7.tar.gz", hash = "sha256:8551cb62a169ec7162ac7be8d4817d561f60e08eaa485234898414bb5a8a0b4c"},
@@ -638,9 +644,10 @@ reference = "tsinghua"
 name = "httpx"
 version = "0.28.1"
 description = "The next generation HTTP client."
-optional = false
+optional = true
 python-versions = ">=3.8"
 groups = ["main"]
+markers = "extra == \"cuda\" and extra != \"dml\""
 files = [
     {file = "httpx-0.28.1-py3-none-any.whl", hash = "sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad"},
     {file = "httpx-0.28.1.tar.gz", hash = "sha256:75e98c5f16b0f35b567856f597f06ff2270a374470a5c2392242528e3e3e42fc"},
@@ -688,9 +695,10 @@ reference = "tsinghua"
 name = "idna"
 version = "3.10"
 description = "Internationalized Domain Names in Applications (IDNA)"
-optional = false
+optional = true
 python-versions = ">=3.6"
 groups = ["main"]
+markers = "extra == \"cuda\" and extra != \"dml\""
 files = [
     {file = "idna-3.10-py3-none-any.whl", hash = "sha256:946d195a0d259cbba61165e88e65941f16e9b36ea6ddb97f00452bae8b1287d3"},
     {file = "idna-3.10.tar.gz", hash = "sha256:12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9"},
@@ -1075,19 +1083,20 @@ reference = "tsinghua"
 name = "onnxruntime-gpu"
 version = "1.20.0"
 description = "ONNX Runtime is a runtime accelerator for Machine Learning models"
-optional = false
+optional = true
 python-versions = "*"
 groups = ["main"]
+markers = "extra == \"cuda\" and extra != \"dml\""
 files = [
-    {file = "onnxruntime_gpu-1.20.0-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:03148c3d242ed3c1c6d5d24f96dd1320beed27c71ecfc79aa61b7cd5eac34fb9"},
-    {file = "onnxruntime_gpu-1.20.0-cp310-cp310-win_amd64.whl", hash = "sha256:4a2632d8b1cb13115eb2559dd6f5fcd097f0463c0f4dd57753f27e18ce76f59c"},
-    {file = "onnxruntime_gpu-1.20.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:df1207a61550dba7d88d7d91af2ab9bd0ddbdacd8234fbb63f69d79ea9e88786"},
-    {file = "onnxruntime_gpu-1.20.0-cp311-cp311-win_amd64.whl", hash = "sha256:f83be6e4f60d05e3e1b9b2c7e187463d95f48c6a9816213db0dad08f1b9dc790"},
-    {file = "onnxruntime_gpu-1.20.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:46b852e7840c2f1f31de67299b93ef01c9f2a8b545adcc1290b8cf2aefc3863a"},
-    {file = "onnxruntime_gpu-1.20.0-cp312-cp312-win_amd64.whl", hash = "sha256:8b3b58aa272bbea79d0dba9c2702dcc4261624368d0792105a666ffeb222d69b"},
-    {file = "onnxruntime_gpu-1.20.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:a7fe88b0182449395e734eceaab17dfbd432d113ee37ff78be604387b163cc43"},
-    {file = "onnxruntime_gpu-1.20.0-cp313-cp313-win_amd64.whl", hash = "sha256:8719802a164fef4a3ad5cb9ff14c01b512bfa7fe7d0beadda75f3f21185632cc"},
-    {file = "onnxruntime_gpu-1.20.0-cp313-cp313t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:94ae37775008f14c0b2393e10bb9419c614b4b120a014dbc7fc2e475beefd3be"},
+    {file = "onnxruntime_gpu-1.20.0-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:601e2acd192b4d66ed4d82a9a2fd8c1546fc3400cf9d202e36c0e5a7cef843d0"},
+    {file = "onnxruntime_gpu-1.20.0-cp310-cp310-win_amd64.whl", hash = "sha256:a493361d03b61e3a51f09b47468df02088877ee5a0e65dd9d655c21aeba364a3"},
+    {file = "onnxruntime_gpu-1.20.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:6338fdfc955489b1d4329498f7f07640c000f92eae8933de293adc5f5ed480f5"},
+    {file = "onnxruntime_gpu-1.20.0-cp311-cp311-win_amd64.whl", hash = "sha256:74426ccfb0240ea1e775b0579a9fffa1fee6cd093e10696421acfdaac0fc234e"},
+    {file = "onnxruntime_gpu-1.20.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:06398420c363b7e400de98deb8bc238fcff98adafe8eeda6ff96a94e20713ac0"},
+    {file = "onnxruntime_gpu-1.20.0-cp312-cp312-win_amd64.whl", hash = "sha256:7b217354ce20911405b9599e73c9fbbfe63047a95289efe72f53e611cf1688af"},
+    {file = "onnxruntime_gpu-1.20.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:809a6b39517186b264b3d1a14a10dc813b3dc8612eaf2f1107856e6eb5e76710"},
+    {file = "onnxruntime_gpu-1.20.0-cp313-cp313-win_amd64.whl", hash = "sha256:add0624b7fc5f554bf27c9220413230962900b1ff97baccbbaf51aaeb9938a59"},
+    {file = "onnxruntime_gpu-1.20.0-cp313-cp313t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:cbe57d92e932ef9daf6f35508abf9f5ad8d28d5b6900770fac461a3b30b99466"},
 ]
 
 [package.dependencies]
@@ -1100,8 +1109,8 @@ sympy = "*"
 
 [package.source]
 type = "legacy"
-url = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-11/pypi/simple"
-reference = "onnxruntime-cu118"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+reference = "tsinghua"
 
 [[package]]
 name = "opencv-python"
@@ -1137,9 +1146,10 @@ reference = "tsinghua"
 name = "opt-einsum"
 version = "3.3.0"
 description = "Optimizing numpys einsum function"
-optional = false
+optional = true
 python-versions = ">=3.5"
 groups = ["main"]
+markers = "extra == \"cuda\" and extra != \"dml\""
 files = [
     {file = "opt_einsum-3.3.0-py3-none-any.whl", hash = "sha256:2455e59e3947d3c275477df7f5205b30635e266fe6dc300e3d9f9646bfcea147"},
     {file = "opt_einsum-3.3.0.tar.gz", hash = "sha256:59f6475f77bbc37dcf7cd748519c0ec60722e91e63ca114e68821c0c54a46549"},
@@ -1178,19 +1188,20 @@ reference = "tsinghua"
 name = "paddlepaddle-gpu"
 version = "2.6.2"
 description = "Parallel Distributed Deep Learning"
-optional = false
+optional = true
 python-versions = "*"
 groups = ["main"]
+markers = "extra == \"cuda\" and extra != \"dml\""
 files = [
-    {file = "paddlepaddle_gpu-2.6.2-cp310-cp310-linux_x86_64.whl", hash = "sha256:72c89a5a79766968758c96a1f87072393800f29812ad5a764b39b4dd3a55c27f"},
+    {file = "paddlepaddle_gpu-2.6.2-cp310-cp310-manylinux1_x86_64.whl", hash = "sha256:72c89a5a79766968758c96a1f87072393800f29812ad5a764b39b4dd3a55c27f"},
     {file = "paddlepaddle_gpu-2.6.2-cp310-cp310-win_amd64.whl", hash = "sha256:ec2d80c41e89da8b2d76ff9175a175c074396797dce145c3537b36fcc48aa45b"},
-    {file = "paddlepaddle_gpu-2.6.2-cp311-cp311-linux_x86_64.whl", hash = "sha256:29694686383d935fb0966dd393f9af32a87d2d6674c8603583df5b08f9457f45"},
+    {file = "paddlepaddle_gpu-2.6.2-cp311-cp311-manylinux1_x86_64.whl", hash = "sha256:29694686383d935fb0966dd393f9af32a87d2d6674c8603583df5b08f9457f45"},
     {file = "paddlepaddle_gpu-2.6.2-cp311-cp311-win_amd64.whl", hash = "sha256:cc57a077bc7b8c61f022ffaf3bc98cf1a6a85dfcea05dad7fa4085ee5d006962"},
-    {file = "paddlepaddle_gpu-2.6.2-cp312-cp312-linux_x86_64.whl", hash = "sha256:289d9dac958bbb075a62c0a3ede821d67415e23df9bd3f94807d2a4ddc68c879"},
+    {file = "paddlepaddle_gpu-2.6.2-cp312-cp312-manylinux1_x86_64.whl", hash = "sha256:289d9dac958bbb075a62c0a3ede821d67415e23df9bd3f94807d2a4ddc68c879"},
     {file = "paddlepaddle_gpu-2.6.2-cp312-cp312-win_amd64.whl", hash = "sha256:3646ffed8ed3ed7fb79e8607fd67cc23a0e7e6bc8250cb11753a855cb9b74c3e"},
-    {file = "paddlepaddle_gpu-2.6.2-cp38-cp38-linux_x86_64.whl", hash = "sha256:83421e990a658e36e616bdaa116738f7e44b466043ebdc0c8119f2da8a30d9bf"},
+    {file = "paddlepaddle_gpu-2.6.2-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:83421e990a658e36e616bdaa116738f7e44b466043ebdc0c8119f2da8a30d9bf"},
     {file = "paddlepaddle_gpu-2.6.2-cp38-cp38-win_amd64.whl", hash = "sha256:17f668656daf35fee7b7c3593fef3fe4fe3c2d297c71b87f631785ef91d28269"},
-    {file = "paddlepaddle_gpu-2.6.2-cp39-cp39-linux_x86_64.whl", hash = "sha256:9febe264df7d14fda8e57e3a1b94de279557b64c0fd453af1a38c999c598410f"},
+    {file = "paddlepaddle_gpu-2.6.2-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:9febe264df7d14fda8e57e3a1b94de279557b64c0fd453af1a38c999c598410f"},
     {file = "paddlepaddle_gpu-2.6.2-cp39-cp39-win_amd64.whl", hash = "sha256:15060444f96e141e1cb8c8322502805d9fd9ccca985b51b81f373a7471aa80d8"},
 ]
 
@@ -1208,8 +1219,8 @@ protobuf = [
 
 [package.source]
 type = "legacy"
-url = "https://www.paddlepaddle.org.cn/packages/stable/cu118"
-reference = "paddlepaddle-cu118"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+reference = "tsinghua"
 
 [[package]]
 name = "pillow"
@@ -6448,9 +6459,10 @@ reference = "tsinghua"
 name = "sniffio"
 version = "1.3.1"
 description = "Sniff out which async library your code is running under"
-optional = false
+optional = true
 python-versions = ">=3.7"
 groups = ["main"]
+markers = "extra == \"cuda\" and extra != \"dml\""
 files = [
     {file = "sniffio-1.3.1-py3-none-any.whl", hash = "sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2"},
     {file = "sniffio-1.3.1.tar.gz", hash = "sha256:f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc"},
@@ -6584,4 +6596,4 @@ dml = ["onnxruntime-directml"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "8ceba11e5f95ba399bf6f0223c1bdff47b3a73f3af395dcc384777a0e6fb1920"
+content-hash = "ce163c979693168da87bc46663d675ccc7ba1dff9e6409afd7fe1567d179754a"

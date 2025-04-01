@@ -1,5 +1,4 @@
 import logging
-import traceback
 from threading import RLock
 
 from src.core.contexts import Context
@@ -17,7 +16,6 @@ class HwndServiceImpl(WindowService):
         super().__init__()
         self._context: Context = context
         self._window = hwnd_util.get_hwnd()
-        # self.width, self.height = hwnd_util.get_client_wh(self._window)
         self._rlock: RLock = RLock()
 
     @property
@@ -34,7 +32,7 @@ class HwndServiceImpl(WindowService):
                 self._window = hwnd_util.get_hwnd()
                 return True
             except Exception:
-                logger.error("Get hwnd error! %s", traceback.format_exc())
+                logger.exception("Get hwnd error!")
                 return False
 
     def get_ratio(self):

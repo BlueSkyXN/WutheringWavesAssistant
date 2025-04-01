@@ -35,7 +35,6 @@ dependencies = [
 [project.optional-dependencies]
 cuda = [
     "paddlepaddle-gpu (==2.6.2)",
-    #    "onnxruntime-gpu[cuda, cudnn] (==1.22.0)",
     "onnxruntime-gpu (==1.20.0)",
 ]
 dml = [
@@ -48,8 +47,14 @@ dev = [
 
 
 [tool.poetry.dependencies]
-paddlepaddle-gpu = { source = "paddlepaddle-cu118" }
-onnxruntime-gpu = { source = "onnxruntime-cu118" }
+#paddlepaddle-gpu = { source = "paddlepaddle-cu118" }
+#onnxruntime-gpu = { source = "onnxruntime-cu118" }
+paddlepaddle-gpu = [
+    { markers = "extra == 'cuda' and extra != 'dml'" },
+]
+onnxruntime-gpu = [
+    { markers = "extra == 'cuda' and extra != 'dml'" },
+]
 
 
 [build-system]

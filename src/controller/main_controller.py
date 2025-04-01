@@ -42,6 +42,13 @@ class MainController:
                 kwargs = {}
                 if task_name == "AutoStorySkipProcessTask":
                     kwargs["SKIP_IS_OPEN"] = "True"
+                elif task_name == "AutoStoryEnjoyProcessTask":
+                    kwargs["SKIP_IS_OPEN"] = "False"
+                if task_name == "AutoBossProcessTask":
+                    kwargs["OCR_USE_GPU"] = "False"
+                else:
+                    kwargs["OCR_USE_GPU"] = "False"
+
                 task = task_builder.build(args=(stop_event,), kwargs=kwargs, daemon=True).start()
                 self.running_tasks[task_name] = (task, stop_event)
                 if task_name in ["AutoBossProcessTask", "DailyActivityProcessTask"]:

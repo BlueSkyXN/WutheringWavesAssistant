@@ -1617,8 +1617,7 @@ class PageEventAbstractService(PageEventService, ABC):
                     self._info.healCount += 1
                     return True
         except Exception:
-            error_message = traceback.format_exc()
-            logger.error(f"前往复活点过程中出现异常: {error_message}")
+            logger.exception(f"前往复活点过程中出现异常")
             self._control_service.activate()
             for i in range(3):
                 time.sleep(2.5)

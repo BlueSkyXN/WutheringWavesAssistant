@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 import re
 import time
 from asyncio import Task
@@ -24,8 +25,11 @@ class RapidOcrServiceImpl(OCRService):
         self._context: Context = context
         self._window_service: WindowService = window_service
         self._img_service: ImgService = img_service
+
+        ocr_use_gpu = os.environ.get("OCR_USE_GPU")
+        self.ocr_use_gpu = ocr_use_gpu and ocr_use_gpu == "True"
         # self._engine = rapidocr_util.create_ocr(use_gpu=True)
-        self._engine = rapidocr_util.create_ocr(use_gpu=False)
+        self._engine = rapidocr_util.create_ocr(use_gpu=self.ocr_use_gpu)
         # self._engine = paddleocr_util.create_paddleocr(use_gpu=True, precision="int8")
         # self._collection: set[str] = set()
         self._last_time = time.time()

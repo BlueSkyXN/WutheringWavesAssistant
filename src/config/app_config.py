@@ -1,6 +1,5 @@
 import logging
 import os
-import traceback
 import winreg
 from typing import Optional, Dict, List
 
@@ -121,7 +120,7 @@ def get_wuthering_waves_path():
                     # print(f"从注册表中加载到游戏目录：{program_path}")
                     return program_path
             except Exception as e:
-                logger.error("获取游戏安装路径错误: %s", traceback.format_exc())
+                logger.exception("获取游戏安装路径错误")
             finally:
                 if "key" in locals():
                     key.Close()
@@ -137,5 +136,5 @@ def open_registry_key(key_path):
     except FileNotFoundError:
         logger.error(f"未找到注册表路径'{key_path}'")
     except Exception as e:
-        logger.error(f"访问注册表错误: {traceback.format_exc()}")
+        logger.exception("访问注册表错误")
     return None
