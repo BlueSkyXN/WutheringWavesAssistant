@@ -45,7 +45,7 @@ class MainController:
                 elif task_name == "AutoStoryEnjoyProcessTask":
                     kwargs["SKIP_IS_OPEN"] = "False"
                 if task_name == "AutoBossProcessTask":
-                    kwargs["OCR_USE_GPU"] = "False"
+                    kwargs["OCR_USE_GPU"] = "True"
                 else:
                     kwargs["OCR_USE_GPU"] = "False"
 

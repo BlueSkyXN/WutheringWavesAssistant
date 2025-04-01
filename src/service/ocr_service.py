@@ -1,4 +1,5 @@
 import asyncio
+import importlib.util
 import logging
 import os
 import re
@@ -27,7 +28,15 @@ class RapidOcrServiceImpl(OCRService):
         self._img_service: ImgService = img_service
 
         ocr_use_gpu = os.environ.get("OCR_USE_GPU")
-        self.ocr_use_gpu = ocr_use_gpu and ocr_use_gpu == "True"
+        if (ocr_use_gpu and ocr_use_gpu == "True"
+                and importlib.util.find_spec("paddle")
+                and importlib.util.find_spec("onnxruntime")):
+            self.ocr_use_gpu = True
+            logger.info("OCR is running on GPU")
+        else:
+            self.ocr_use_gpu = False
+            logger.info("OCR is running on CPU")
+
         # self._engine = rapidocr_util.create_ocr(use_gpu=True)
         self._engine = rapidocr_util.create_ocr(use_gpu=self.ocr_use_gpu)
         # self._engine = paddleocr_util.create_paddleocr(use_gpu=True, precision="int8")
@@ -129,7 +138,6 @@ class RapidOcrServiceImpl(OCRService):
             return
         for result in ocr_results:
             logger.debug(result)
-
 
 # class PaddleOcrServiceImpl(OCRService):
 #

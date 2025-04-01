@@ -805,7 +805,7 @@ class PageEventAbstractService(PageEventService, ABC):
             targetTexts=[
                 TextMatch(
                     name="战斗",
-                    text=r"(击败|对战|泰缇斯系统|凶戾之齿|倦怠之翼|妒恨之眼|(无餍?之舌)|(僭?越之矛)|(谵?妄之爪)|爱欲之容|盖希诺姆)",
+                    text=r"(击败|对战|泰缇斯系统|凶戾之齿|倦怠之翼|妒恨之眼|(无餍?之舌)|(僭?越之矛)|(谵?妄之爪)|爱欲之容|盖希诺姆|(愚执之瞳?))",
                 ),
             ],
             excludeTexts=[

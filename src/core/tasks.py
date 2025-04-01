@@ -147,6 +147,8 @@ def mouse_reset_task_run(event: Event, **kwargs):
 
 
 def auto_boss_task_run(event: Event, **kwargs):
+    for k, v in kwargs.items():
+        os.environ[k] = v
     logging_config.setup_logging()
     logger.info("刷boss任务进程开始运行")
     hwnd_util.set_hwnd_left_top()
@@ -184,7 +186,10 @@ def auto_boss_task_run(event: Event, **kwargs):
 
 
 def auto_pickup_task_run(event: Event, **kwargs):
+    for k, v in kwargs.items():
+        os.environ[k] = v
     logging_config.setup_logging()
+    logger.debug("kwargs: %s", kwargs)
     logger.info("自动拾取任务进程开始运行")
     context = Context()
     container = Container.build(context)
@@ -208,12 +213,11 @@ def auto_pickup_task_run(event: Event, **kwargs):
 
 
 def auto_story_task_run(event: Event, **kwargs):
-    logging_config.setup_logging()
-    logger.info("自动剧情任务进程开始运行")
-
     for k, v in kwargs.items():
         os.environ[k] = v
-
+    logging_config.setup_logging()
+    logger.debug("kwargs: %s", kwargs)
+    logger.info("自动剧情任务进程开始运行")
     context = Context()
     container = Container.build(context)
     logger.debug("Create application context")
@@ -238,8 +242,11 @@ def auto_story_task_run(event: Event, **kwargs):
             pass
 
 
-def daily_activity_task_run(event: Event):
+def daily_activity_task_run(event: Event, **kwargs):
+    for k, v in kwargs.items():
+        os.environ[k] = v
     logging_config.setup_logging()
+    logger.debug("kwargs: %s", kwargs)
     logger.info("每日任务进程开始运行")
     hwnd_util.set_hwnd_left_top()
     context = Context()
