@@ -22,19 +22,28 @@ class DynamicFpsLimit:
     def __init__(self):
         self.key_press_time = None
 
-    def sleep(self, execute_use_seconds: float):
-        now = time.perf_counter_ns()
-        if self.key_press_time is None:
-            fps = 1
+    def sleep(self, execute_use_seconds: float, fps_lock: float | None = None):
+        """
+        动态fps
+        :param execute_use_seconds:
+        :param fps_lock: 固定fps，即不使用动态fps
+        :return:
+        """
+        if fps_lock is None:
+            now = time.perf_counter_ns()
+            if self.key_press_time is None:
+                fps = 1
+            else:
+                idle_seconds = (now - self.key_press_time) / 1e9
+                if idle_seconds < 3:
+                    # logger.warning("3秒")
+                    fps = 1 / 3  # 按键3秒内有动过，可能不在剧情对话中，检测频率为3秒一次
+                elif idle_seconds < 5:
+                    fps = 1 / 2  # 2秒一次
+                else:  # idle_seconds >= 5
+                    fps = 1  # 超过5秒按键没有动过，可能进入剧情，检测频率为1秒一次
         else:
-            idle_seconds = (now - self.key_press_time) / 1e9
-            if idle_seconds < 3:
-                # logger.warning("3秒")
-                fps = 1 / 3  # 按键3秒内有动过，可能不在剧情对话中，检测频率为3秒一次
-            elif idle_seconds < 5:
-                fps = 1 / 2  # 2秒一次
-            else:  # idle_seconds >= 5
-                fps = 1  # 超过5秒按键没有动过，可能进入剧情，检测频率为1秒一次
+            fps = fps_lock
         seconds = 1 / fps
         # logger.info(f"seconds: {seconds:.2f}")
         sleep_seconds = seconds - execute_use_seconds # 减去流程耗时
@@ -61,9 +70,10 @@ class AutoStoryServiceImpl(PageEventAbstractService):
 
         logger.debug("os.environ: %s", os.environ)
         # skip_page
-        self.skip_is_open = os.environ.get("SKIP_IS_OPEN") is not None
-        # self.skip_is_open = False
-        self._is_first_skip_page: bool = True
+        self.skip_is_open = os.environ.get("SKIP_IS_OPEN") is not None # 跳过剧情 还是 沉浸式
+        self.skip_btn_is_clicked = False # 是否点击了跳过按钮，用于开启不再提示和剧情梗概的识别
+        self.skip_btn_is_clicked_start_time = time.time()
+        self.skip_btn_is_clicked_timeout = 3 # 不再提示和剧情梗概识别的最大时间，避免万一clicked状态未变导致每次都识别占用资源
 
         # auto_play_page
         self._is_auto_play_enabled: bool = False
@@ -90,7 +100,13 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         if use_time > 0.0:
             logger.debug(f"fps: {(1e9 / use_time)}")
         use_seconds = use_time / 1e9
-        self._dynamic_fps_limit.sleep(use_seconds)
+
+        if self.skip_is_open:
+            # 默认一秒一次，点击了跳过则每秒两次
+            fps_lock= 8 if self.skip_btn_is_clicked else 1
+        else:
+            fps_lock = None
+        self._dynamic_fps_limit.sleep(use_seconds, fps_lock=fps_lock)
         use_time = time.perf_counter_ns() - start_time
         if use_time > 0.0:
             logger.debug(f"final fps: {(1e9 / use_time)}")
@@ -108,32 +124,26 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         auto_npc_interact = False
         # 跳过剧情
         if self.skip_is_open:
-            skip_text_match = self._skip_page.targetTexts[0]
-            skip_pos = skip_text_match.position.to_position(img.shape[0], img.shape[1])
-            skip_page_img = img[skip_pos.y1: skip_pos.y2, skip_pos.x1: skip_pos.x2]
-            skip_ocr_results = self._ocr_service.ocr(skip_page_img)
-            # logger.debug(skip_ocr_results)
-            # from src.util import file_util, img_util
-            # img_util.save_img(skip_page_img, file_util.create_img_path())
-            skip_is_action = self.page_action(self._skip_page, src_img, img, skip_ocr_results)
-            # skip_is_action = self.text_match_limit_position(self._skip_page, src_img, img)
-            if skip_is_action and self._is_first_skip_page:
-                # 首次跳过会有确认弹窗
-                time.sleep(1)
-                self._is_first_skip = False
-                skip_confirm_src_img = self._img_service.screenshot()
-                skip_confirm_img = self._img_service.resize(skip_confirm_src_img)
-                skip_confirm_ocr_results = self._ocr_service.ocr(skip_confirm_img)
-                self.page_action(self._skip_confirm_page, skip_confirm_src_img, skip_confirm_img,
-                                 skip_confirm_ocr_results)
-                time.sleep(0.1)
-            # else:
-            #     time.sleep(0.1)
-            #     w, h = self._window_service.get_client_wh()
-            #     skip_page_img = img[h // 2:, w // 2:]  # 裁剪右下角
-            #     skip_ocr_results = self._ocr_service.ocr(skip_page_img) # 跳过剧情梗概
-            #     skip_is_action = self.page_action(self._skip_story_synopsis_page, src_img, img, skip_ocr_results)
-
+            # 点击了 跳过 后的数秒内，检查 不再提示 和 剧情梗概
+            if time.time() - self.skip_btn_is_clicked_start_time < self.skip_btn_is_clicked_timeout:
+                ocr_results = self._ocr_service.ocr(img)
+                if self.page_action(self._skip_confirm_page, src_img, img, ocr_results):
+                    return
+                if self.page_action(self._skip_story_synopsis_page, src_img, img, ocr_results):
+                    return
+                # self.page_action(self._blank_area_page, src_img, img, ocr_results)
+            elif self.skip_btn_is_clicked: # 超时了重置为未点击状态，即恢复默认检测频率，点击状态检测频率更高，无其他作用
+                self.skip_btn_is_clicked = False
+                return
+            if not ocr_results:
+                skip_text_match = self._skip_page.get_text_match_by_name("跳过|SKIP")
+                ocr_results = self._ocr_service.ocr(img, skip_text_match.position)
+            logger.debug("ocr_results: %s", ocr_results)
+            if self.page_action(self._skip_page, src_img, img, ocr_results):
+                self.skip_btn_is_clicked = True
+                self.skip_btn_is_clicked_start_time = time.time()
+                return
+            self.page_action(self._dialogue_page, src_img, img, ocr_results)
         else:
             if not self._is_auto_play_enabled:
                 # 打开自动播放
@@ -151,7 +161,8 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         if auto_npc_interact:
             self.page_action(self._npc_interact_page, src_img, img, ocr_results)
 
-        self._set_mouse_position_to_bottom_right()
+        if not self.skip_is_open:
+            self._set_mouse_position_to_bottom_right()
 
     @staticmethod
     def page_action(page: Page, src_img: np.ndarray, img: np.ndarray, ocr_results: list[TextPosition]) -> bool:
@@ -205,7 +216,8 @@ class AutoStoryServiceImpl(PageEventAbstractService):
 
     def _build_story_pages(self):
         def skip_page_action(positions: dict[str, Position]) -> bool:
-            position = positions.get("SKIP")
+            time.sleep(0.1)
+            position = positions.get("跳过|SKIP")
             self._control_service.click(*position.center)
             time.sleep(0.1)
             return True
@@ -214,9 +226,9 @@ class AutoStoryServiceImpl(PageEventAbstractService):
             name="左上角跳过|SKIP",
             targetTexts=[
                 TextMatch(
-                    name="SKIP",
+                    name="跳过|SKIP",
                     text=r"^(跳过|S?KI[PE].{0,3})",
-                    open_position=False,
+                    open_position=False, # 已在ocr时裁剪了图片，匹配文本时不再限制区域
                     position=DynamicPosition(
                         rate=(
                             0.0,
@@ -233,18 +245,22 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         self._skip_page = skip_page
 
         def skip_story_synopsis_action(positions: dict[str, Position]) -> bool:
+            time.sleep(0.1)
             position = positions.get("跳过剧情")
             self._control_service.click(*position.center)
-            time.sleep(0.2)
+            time.sleep(0.5)
             return True
 
         skip_story_synopsis_page = Page(
             name="剧情梗概",
             targetTexts=[
                 TextMatch(
+                    name="继续观看",
+                    text=r"^继续观看$",
+                ),
+                TextMatch(
                     name="跳过剧情",
                     text=r"^跳过剧情$",
-                    open_position=False,
                 ),
             ],
             action=skip_story_synopsis_action,
@@ -258,7 +274,7 @@ class AutoStoryServiceImpl(PageEventAbstractService):
             time.sleep(0.1)
             confirm_position = positions.get("确认")
             self._control_service.click(*confirm_position.center)
-            time.sleep(0.1)
+            time.sleep(0.5)
             return True
 
         skip_confirm_page = Page(
@@ -353,9 +369,10 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         self._auto_play_open_page = auto_play_open_page
 
         def dialogue_page_action(positions: dict[str, Position]) -> bool:
-            time.sleep(0.5)
-            self._control_service.set_mouse_position_to_bottom_right()
-            time.sleep(1.5)
+            if not self.skip_is_open:
+                time.sleep(0.5)
+                self._control_service.set_mouse_position_to_bottom_right()
+                time.sleep(1.5)
             self._control_service.pick_up()
             time.sleep(0.1)
             return True

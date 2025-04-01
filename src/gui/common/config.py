@@ -49,23 +49,23 @@ class Config(QConfig):
 
     # # Material
     # blurRadius  = RangeConfigItem("Material", "AcrylicBlurRadius", 15, RangeValidator(0, 40))
-    #
-    # # software update
-    # checkUpdateAtStartUp = ConfigItem("Update", "CheckUpdateAtStartUp", True, BoolValidator())
+
+    # software update
+    checkUpdateAtStartUp = ConfigItem("Update", "CheckUpdateAtStartUp", False, BoolValidator())
 
 
 YEAR = 2025
 AUTHOR = "wakening"
-VERSION = "2.2.0 Alpha"
-HELP_URL = "https://github.com/wakening"
+VERSION = "2.2.1 Alpha"
+HELP_URL = "https://github.com/wakening/WutheringWavesAssistant?tab=readme-ov-file#-%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97"
 REPO_URL = "https://github.com/wakening/WutheringWavesAssistant"
 EXAMPLE_URL = "https://github.com/wakening"
 FEEDBACK_URL = "https://github.com/wakening/WutheringWavesAssistant/issues"
 RELEASE_URL = "https://github.com/wakening/WutheringWavesAssistant/releases/latest"
-ZH_SUPPORT_URL = "https://github.com/wakening"
-EN_SUPPORT_URL = "https://github.com/wakening"
+ZH_SUPPORT_URL = "https://afdian.com/a/wakening"
+EN_SUPPORT_URL = "https://afdian.com/a/wakening"
 
 
 cfg = Config()
 cfg.themeMode.value = Theme.AUTO
-qconfig.load('app/config/config.json', cfg)
+qconfig.load('temp/config/gui-config.json', cfg)

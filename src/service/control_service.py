@@ -187,8 +187,10 @@ class Win32PlayerControlServiceImpl(PlayerControlService, BaseControlService):
 
 class Win32ExtendedControlServiceImpl(ExtendedControlService, BaseControlService):
 
-    def forward_run(self, forward_run_seconds: float):
-        keymouse_util.key_down(self._window_service.window, "w")
+    def forward_run(self, forward_run_seconds: float, key: str | None = None):
+        if not key:
+            key = "w"
+        keymouse_util.key_down(self._window_service.window, key)
         time.sleep(0.1)
         keymouse_util.key_down(self._window_service.window, win32con.VK_LSHIFT)
         if forward_run_seconds > 1.3:
@@ -198,10 +200,10 @@ class Win32ExtendedControlServiceImpl(ExtendedControlService, BaseControlService
         else:
             time.sleep(forward_run_seconds)
         keymouse_util.key_up(self._window_service.window, win32con.VK_LSHIFT)
-        keymouse_util.key_up(self._window_service.window, "w")
+        keymouse_util.key_up(self._window_service.window, key)
         time.sleep(0.2)
         keymouse_util.key_up(self._window_service.window, win32con.VK_LSHIFT)
-        keymouse_util.key_up(self._window_service.window, "w")
+        keymouse_util.key_up(self._window_service.window, key)
 
     def forward_walk(self, forward_walk_times: int, sleep_seconds: float = None):
         for _ in range(forward_walk_times):

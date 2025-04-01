@@ -1,3 +1,4 @@
+<!-- pyside6-rcc ./resource.qrc -o ./resource.py -->
 <RCC>
     <qresource prefix="/gallery">
         <file>images/controls/Acrylic.png</file>

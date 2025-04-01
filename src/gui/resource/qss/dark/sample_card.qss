@@ -1,6 +1,6 @@
 #titleLabel {
     color: white;
-    font: 14px 'Segoe UI', 'Microsoft YaHei', 'PingFang SC';
+    font: 16px 'Segoe UI', 'Microsoft YaHei', 'PingFang SC';
     font-weight: bold;
 }
 

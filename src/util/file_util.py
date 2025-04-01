@@ -104,7 +104,7 @@ def create_img_path(prefix="screenshot") -> str:
     """
     生成不重复的图片路径，支持并发，绝对路径，png格式，自动创建目录，图片名称带当前时间戳和随机数，用于保存图片
     :param prefix: 图片名称前缀
-    :return: e.g. X:\{project_dir}\temp\screenshot\screenshot_1740480141_66666666.png
+    :return: e.g. X:\\{project_dir}\\temp\\screenshot\\screenshot_1740480141_66666666.png
     """
     temp_screenshot = get_temp_screenshot()
     temp_screenshot.mkdir(exist_ok=True, parents=True)

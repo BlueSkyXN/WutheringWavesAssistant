@@ -991,7 +991,14 @@ class PageEventAbstractService(PageEventService, ABC):
             def default_action(positions: dict[str, Position]) -> bool:
                 self._control_service.pick_up()
                 self._info.in_dungeon = True
-                self._info.lastBossName = "赫卡忒"
+                # TODO 启动时就站在声之领域门口，无法区分是打哪个boss
+                if not self._info.lastBossName:
+                    if "芙露德莉斯" in self._config.TargetBoss:
+                        self._info.lastBossName = "芙露德莉斯"
+                    elif "赫卡忒" in self._config.TargetBoss:
+                        self._info.lastBossName = "赫卡忒"
+                    else:
+                        self._info.lastBossName = "赫卡忒"
                 return True
 
             action = default_action
@@ -1256,6 +1263,9 @@ class PageEventAbstractService(PageEventService, ABC):
             case "赫卡忒":
                 time.sleep(0.3)
                 self._control_service.forward_run(2.1)
+            case "芙露德莉斯":
+                time.sleep(0.3)
+                self._control_service.forward_run(2.1)
             case _:
                 pass
 
@@ -1270,6 +1280,11 @@ class PageEventAbstractService(PageEventService, ABC):
             #     self._control_service.esc()
             #     time.sleep(1)
             return
+
+        if self._info.lastBossName == "芙露德莉斯":
+            self.absorption_action_fleurdelys()
+            return
+
         start_time = datetime.now()  # 开始时间
         # 最大吸收时间为最大空闲时间的一半与设定MaxSearchEchoesTime取较大值
         if self._config.MaxIdleTime / 2 > self._config.MaxSearchEchoesTime:
@@ -1382,6 +1397,18 @@ class PageEventAbstractService(PageEventService, ABC):
         # if self._info.in_dungeon:
         #     self._control_service.esc()
         #     time.sleep(1)
+
+    def absorption_action_fleurdelys(self):
+        run_param = [("w", 0.5), ("a", 0.4), ("s", 1.0), ("d", 0.8), ("w", 0.6)]
+        for i in range(len(run_param)):
+            key, sleep_time = run_param[i]
+            if i > 0:
+                self._control_service.player().fight_tap(key, 0.05)
+                self._control_service.player().fight_tap(key, 0.05)
+            self._control_service.forward_run(sleep_time, key)
+            if self._ocr_service.find_text("吸收"):
+                self.absorption_and_receive_rewards({})
+                return
 
     def search_reward_action(self):
 
@@ -1662,6 +1689,7 @@ class PageEventAbstractService(PageEventService, ABC):
             "异构武装": 4, "罗蕾莱": 4.5, "叹息古龙": 5.6, "梦魇无常凶鹭": 5.3, "梦魇云闪之鳞": 4.8,
             "梦魇朔雷之鳞": 3.2,
             "梦魇无冠者": 2.4, "梦魇燎照之骑": 4.5, "梦魇哀声鸷": 3.6, "梦魇飞廉之猩": 1,
+            "梦魇辉萤军势": 2.6,
         }
         # position = self.find_pic(template_img_name="UI_F2_Guidebook_EchoHunting.png", threshold=0.5)
         position = self._img_service.match_template(img=None, template_img="UI_F2_Guidebook_EchoHunting.png",
@@ -1687,6 +1715,7 @@ class PageEventAbstractService(PageEventService, ABC):
             "梦魇无冠者": "梦.*无冠者",
             "梦魇燎照之骑": "梦.*燎照之骑",
             "梦魇哀声鸷": "梦.*哀声鸷?",
+            "梦魇辉萤军势": "梦.*辉萤军势",
         }
         find_boss_name_reg = boss_name_reg_mapping.get(bossName, bossName)
         findBoss = None
@@ -1828,7 +1857,7 @@ class PageEventAbstractService(PageEventService, ABC):
         self._control_service.click(*position.center)
 
     def _need_retry(self):
-        return len(self._config.TargetBoss) == 1 and self._config.TargetBoss[0] in ["无妄者", "角", "赫卡忒"]
+        return len(self._config.TargetBoss) == 1 and self._config.TargetBoss[0] in ["无妄者", "角", "赫卡忒", "芙露德莉斯"]
 
     def wait_home(self, timeout=120) -> bool:
         """

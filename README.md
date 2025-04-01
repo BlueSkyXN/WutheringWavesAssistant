@@ -6,7 +6,7 @@
 
 ---
 
-![Wuthering Waves Assistant](assets/static/home_page.png)
+![Wuthering Waves Assistant](assets/static/HomePage.png)
 
 ---
 

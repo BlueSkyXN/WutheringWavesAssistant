@@ -211,7 +211,7 @@ def auto_story_task_run(event: Event, **kwargs):
     logging_config.setup_logging()
     logger.info("自动剧情任务进程开始运行")
 
-    for k,v in kwargs.items():
+    for k, v in kwargs.items():
         os.environ[k] = v
 
     context = Context()
@@ -221,8 +221,11 @@ def auto_story_task_run(event: Event, **kwargs):
     control_service: ControlService = container.control_service()
     page_event_service: PageEventService = container.auto_story_service()
     clock_action = ClockAction(control_service.activate, 3.0)
+    count = 0
     try:
         while not event.is_set():
+            logger.debug("count: %s", count)
+            count += 1
             clock_action.action()
             page_event_service.execute()
     except KeyboardInterrupt:

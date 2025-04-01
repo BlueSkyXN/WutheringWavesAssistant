@@ -63,7 +63,7 @@ package-mode = false
 
 [[tool.poetry.source]]
 name = "tsinghua"
-url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple/"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
 priority = "primary"
 
 

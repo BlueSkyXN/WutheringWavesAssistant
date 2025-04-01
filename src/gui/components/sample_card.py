@@ -6,7 +6,7 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QWidget, QFrame, QLabel, QVBoxLayout, QHBoxLayout, QButtonGroup
 
 from qfluentwidgets import IconWidget, TextWrap, FlowLayout, CardWidget, SwitchButton, IndicatorPosition, \
-    ToggleToolButton, FluentIcon, ProgressRing, IndeterminateProgressRing
+    ToggleToolButton, FluentIcon, ProgressRing, IndeterminateProgressRing, InfoBar, InfoBarPosition
 from ..common.signal_bus import signalBus
 from ..common.style_sheet import StyleSheet
 from ... import application
@@ -55,22 +55,38 @@ class SampleCard(CardWidget):
         self.titleLabel.setObjectName('titleLabel')
         self.contentLabel.setObjectName('contentLabel')
 
-        self.parentCardManager = parent
+        self._parent = parent
         self.group_index = group_index
         self.task_name = task_name
 
     def onCheckedChanged(self, isChecked: bool):
         if self.group_index > 3:
-            self.switchButton.setChecked(False)
+            if isChecked:
+                self.switchButton.setChecked(False)
+                self.createTopRightInfoBar()
             return
 
         if isChecked:
-            if self.parentCardManager:
-                self.parentCardManager.handleSwitchChange(self.group_index)
-                self.task_selected.emit(self.task_name)
+            # 将其他按钮设置为关闭，限制只能选择一个 TODO后续支持多个
+            self._parent.handleSwitchChange(self.group_index)
+            emit_task_name = self.task_name
+        else:
+            emit_task_name = ""
+        self.task_selected.emit(emit_task_name)
+
         text = 'On' if isChecked else 'Off'
         self.switchButton.setText(self.tr(text))
 
+    def createTopRightInfoBar(self):
+        InfoBar.info(
+            title=self.tr('Tips'),
+            content=self.tr("敬请期待"),
+            orient=Qt.Horizontal,
+            isClosable=True,
+            position=InfoBarPosition.TOP_RIGHT,
+            duration=2500,
+            parent=self.parent().parent()
+        )
 
 
 class RunCard(CardWidget):
@@ -123,39 +139,46 @@ class RunCard(CardWidget):
         self.titleLabel.setObjectName('titleLabel')
         # self.contentLabel.setObjectName('contentLabel')
 
-        self.parentCardManager = parent
-        # self.group_index = group_index
-        self.task_name = None
+        self.checked_task_name = None
         self.running_task_name = None
 
-    # def onCheckedChanged(self, isChecked: bool):
-    #     if isChecked:
-    #         if self.parentCardManager:
-    #             self.parentCardManager.handleSwitchChange(self.group_index)
-    #
-    #     text = 'On' if isChecked else 'Off'
-    #     self.switchButton.setText(self.tr(text))
 
     def onButtonClicked(self):
-        logger.info("任务名: %s", self.task_name)
         if self.button.isChecked():
-            self.button.setIcon(FluentIcon.PAUSE_BOLD)
-            self.spinner.start()
-            if self.task_name:
-                self.running_task_name = self.task_name
+            if self.checked_task_name:
+                logger.info("任务名: %s", self.checked_task_name)
+                self.button.setIcon(FluentIcon.PAUSE_BOLD)
+                self.spinner.start()
+                self.running_task_name = self.checked_task_name
                 application.GUI.on_run_clicked(self.running_task_name, "START")
             else:
                 logger.info("没有要运行的任务")
+                self.createTopRightInfoBar()
+                # 阻止 `setChecked(False)` 触发额外的 `clicked`
+                self.button.blockSignals(True)
+                self.button.setChecked(False)
+                self.button.blockSignals(False)
         else: # stop
             self.spinner.stop()
             self.spinner.reset()
             if self.running_task_name:
                 application.GUI.on_run_clicked(self.running_task_name, "STOP")
-                self.running_task_name = None
+                self.running_task_name = ""
             self.button.setIcon(FluentIcon.PLAY_SOLID)
 
     def update_task(self, task_name: str):
-        self.task_name = task_name
+        self.checked_task_name = task_name
+
+    def createTopRightInfoBar(self):
+        InfoBar.info(
+            title=self.tr('Tips'),
+            content=self.tr("没有要运行的任务"),
+            orient=Qt.Horizontal,
+            isClosable=True,
+            position=InfoBarPosition.TOP_RIGHT,
+            duration=2500,
+            parent=self.parent().parent()
+        )
 
 
 class SampleCardView(QWidget):
@@ -197,11 +220,8 @@ class SampleCardView(QWidget):
     def handleSwitchChange(self, group_index: int):
         """ Ensure that only one switch button is active at a time """
         for i in range(len(self.card_group)):
-            if i != group_index:
-                self.card_group[i].switchButton.setChecked(False)
-
-    # def set_task_name(self, select_task: str):
-    #     self.select_task = select_task
-    #
-    # def get_task_name(self):
-    #     return self.select_task
+            if i == group_index:
+                continue
+            btn = self.card_group[i].switchButton
+            if btn.isChecked():
+                btn.setChecked(False)

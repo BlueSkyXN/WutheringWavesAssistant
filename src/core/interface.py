@@ -299,7 +299,7 @@ class ExtendedControlService(ABC):
     """拓展操作"""
 
     @abstractmethod
-    def forward_run(self, forward_run_seconds: float):
+    def forward_run(self, forward_run_seconds: float, key: str | None = None):
         pass
 
     @abstractmethod

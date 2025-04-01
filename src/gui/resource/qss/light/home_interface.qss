@@ -14,8 +14,7 @@ BannerWidget > #galleryLabel {
     /*font: 25px 'Segoe UI SemiBold', 'Microsoft YaHei SemiBold';*/
     /*font-weight: 600;*/
     font-weight: 600;
+    background-color: transparent;
     color: black;
     padding-left: 10px;
 }
-
-

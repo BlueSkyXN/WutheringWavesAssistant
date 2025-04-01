@@ -77,7 +77,7 @@ LOGGING_CONFIG = {
     'formatters': {
         'colored': {
             '()': CustomColoredFormatter,  # 使用自定义 colorlog.ColoredFormatter
-            'format': '%(log_color)s%(asctime)s - %(levelname)-5s - %(customLineno)-30s - %(message)s',
+            'format': '%(log_color)s%(asctime)s.%(msecs)03d - %(levelname)-5s - %(customLineno)-30s - %(message)s',
             'datefmt': '%Y-%m-%d %H:%M:%S',
             'log_colors': {
                 'DEBUG': 'green',
@@ -166,7 +166,7 @@ LOGGING_CONFIG_TEST = {
     'formatters': {
         'colored': {
             '()': CustomColoredFormatter,  # 使用自定义 colorlog.ColoredFormatter
-            'format': '%(log_color)s%(asctime)s - %(levelname)-5s - %(customLineno)-30s - %(message)s',
+            'format': '%(log_color)s%(asctime)s.%(msecs)03d - %(levelname)-5s - %(customLineno)-30s - %(message)s',
             'datefmt': '%Y-%m-%d %H:%M:%S',
             'log_colors': {
                 'DEBUG': 'green',
@@ -211,9 +211,29 @@ LOGGING_CONFIG_TEST = {
             'level': 'INFO',
             'propagate': False,
         },
+        'src.util.img_util': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'src.util.file_util': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'src.util.yolo_util': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
         'tests': {
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
+            'propagate': False,
+        },
+        'rapidocr': {
+            'handlers': ['console', 'file'],
+            'level': 'WARNING',
             'propagate': False,
         },
     },

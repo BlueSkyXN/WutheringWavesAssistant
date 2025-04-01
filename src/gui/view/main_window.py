@@ -1,13 +1,14 @@
 # coding: utf-8
 from typing import List
-from PySide6.QtCore import Qt, Signal, QEasingCurve, QUrl, QSize
+from PySide6.QtCore import Qt, Signal, QEasingCurve, QUrl, QSize, QTimer
 from PySide6.QtGui import QIcon, QDesktopServices
 from PySide6.QtWidgets import QApplication, QHBoxLayout, QFrame, QWidget
 
 from qfluentwidgets import (NavigationAvatarWidget, NavigationItemPosition, MessageBox, FluentWindow,
-                            SplashScreen)
+                            SplashScreen, SystemThemeListener, isDarkTheme)
 from qfluentwidgets import FluentIcon as FIF
 
+from .notice_interface import NoticeInterface
 from .gallery_interface import GalleryInterface
 from .home_interface import HomeInterface
 from .setting_interface import SettingInterface
@@ -24,8 +25,12 @@ class MainWindow(FluentWindow):
         super().__init__()
         self.initWindow()
 
+        # create system theme listener
+        self.themeListener = SystemThemeListener(self)
+
         # create sub interface
         self.homeInterface = HomeInterface(self)
+        self.noticeInterface = NoticeInterface(self)
 
         self.settingInterface = SettingInterface(self)
 
@@ -38,6 +43,9 @@ class MainWindow(FluentWindow):
         self.initNavigation()
         self.splashScreen.finish()
 
+        # start theme listener
+        self.themeListener.start()
+
     def connectSignalToSlot(self):
         signalBus.micaEnableChanged.connect(self.setMicaEffectEnabled)
         signalBus.switchToSampleCard.connect(self.switchToSample)
@@ -46,6 +54,7 @@ class MainWindow(FluentWindow):
     def initNavigation(self):
         # add navigation items
         self.addSubInterface(self.homeInterface, FIF.HOME, self.tr('Home'))
+        self.addSubInterface(self.noticeInterface, FIF.MEGAPHONE, self.tr('Notice'))
 
         self.addSubInterface(
             self.settingInterface, FIF.SETTING, self.tr('Settings'), NavigationItemPosition.BOTTOM)
@@ -81,6 +90,18 @@ class MainWindow(FluentWindow):
         super().resizeEvent(e)
         if hasattr(self, 'splashScreen'):
             self.splashScreen.resize(self.size())
+
+    def closeEvent(self, e):
+        self.themeListener.terminate()
+        self.themeListener.deleteLater()
+        super().closeEvent(e)
+
+    def _onThemeChangedFinished(self):
+        super()._onThemeChangedFinished()
+
+        # retry
+        if self.isMicaEffectEnabled():
+            QTimer.singleShot(100, lambda: self.windowEffect.setMicaEffect(self.winId(), isDarkTheme()))
 
     def switchToSample(self, routeKey, index):
         """ switch to sample """
