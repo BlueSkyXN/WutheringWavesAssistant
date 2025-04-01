@@ -1,12 +1,14 @@
 import logging
 import math
 import os
+import subprocess
 import time
 from abc import ABC, abstractmethod
 from datetime import datetime
 from multiprocessing import Process, Event
 from typing import Iterable, Any, TypeVar, Callable, Mapping
 
+import pywintypes
 import win32gui
 from pydantic import BaseModel, Field
 from pynput.mouse import Controller
@@ -150,6 +152,8 @@ def auto_boss_task_run(event: Event, **kwargs):
     for k, v in kwargs.items():
         os.environ[k] = v
     logging_config.setup_logging()
+    # logging_config.setup_logging_test()
+    logger.debug("kwargs: %s", kwargs)
     logger.info("刷boss任务进程开始运行")
     hwnd_util.set_hwnd_left_top()
 
@@ -165,16 +169,53 @@ def auto_boss_task_run(event: Event, **kwargs):
     logger.debug("-------- run ----------")
     count = 0
     clock_action = ClockAction(control_service.activate, 3.0)
+
+    def restart_game() -> bool:
+        start_time = time.time()
+        while time.time() - start_time < 300:
+            try:
+                time.sleep(1)
+                logger.info("强制关闭游戏")
+                hwnd_util.force_close_process(window_service.window)
+            except Exception:
+                pass
+            time.sleep(5)
+            game_path = context.config.app.AppPath
+            subprocess.Popen(game_path, creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP)
+            time.sleep(20)
+            for i in range(10):
+                try:
+                    hwnd = hwnd_util.get_hwnd()
+                    if hwnd is not None and hwnd > 0:
+                        logger.info("游戏已重启")
+                        time.sleep(5)
+                        hwnd_util.set_hwnd_left_top()
+                        time.sleep(1)
+                        return True
+                except Exception:
+                    pass
+                time.sleep(5)
+        return False
+
     try:
         while not event.is_set():
-            count += 1
-            # logger.info("count %s", count)
-            clock_action.action()
+            try:
+                count += 1
+                # logger.info("count %s", count)
+                clock_action.action()
 
-            src_img = img_service.screenshot()
-            img = img_service.resize(src_img)
-            result = ocr_service.ocr(img)
-            page_event_service.execute(src_img=src_img, img=img, ocr_results=result)
+                src_img = img_service.screenshot()
+                img = img_service.resize(src_img)
+                result = ocr_service.ocr(img)
+                page_event_service.execute(src_img=src_img, img=img, ocr_results=result)
+            except pywintypes.error as e:
+                logger.exception("检测到窗口异常，开始重启")
+                if restart_game():
+                    window_service.refresh()
+                    continue
+                else:
+                    logger.error("游戏重启失败，任务无法进行，结束运行")
+                    break
     except KeyboardInterrupt:
         logger.info("刷boss任务进程结束")
     finally:

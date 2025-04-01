@@ -91,6 +91,8 @@ class AppConfig(BaseModel):
             config_path = APP_CONFIG_PATH
         data = OmegaConf.load(config_path)
         app_config = AppConfig.model_validate(data)
+        if not app_config.AppPath:
+            app_config.AppPath = get_wuthering_waves_path()
         logger.debug(app_config)
         return app_config
 
