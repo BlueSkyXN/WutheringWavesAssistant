@@ -1406,6 +1406,7 @@ class PageEventAbstractService(PageEventService, ABC):
                 self._control_service.player().fight_tap(key, 0.05)
                 self._control_service.player().fight_tap(key, 0.05)
             self._control_service.forward_run(sleep_time, key)
+            time.sleep(0.5)
             if self._ocr_service.find_text("吸收"):
                 self.absorption_and_receive_rewards({})
                 return
