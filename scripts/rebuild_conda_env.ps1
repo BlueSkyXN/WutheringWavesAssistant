@@ -89,14 +89,14 @@ if ($envs -contains $condaEnvName) {
     Write-Host "Conda virtual environment '$condaEnvName' already exists."
 } else {
     Write-Host "Creating Conda virtual environment: '$condaEnvName'"
-    conda create --name $condaEnvName python=3.12 -y
+    conda create --name $condaEnvName python=3.12 -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
 }
 
 conda activate $condaEnvName
 
 $poetryVersion = "2.1.1"
 Write-Host "Conda is installing Poetry version $poetryVersion..."
-conda install poetry=$poetryVersion -c conda-forge -y
+conda install poetry=$poetryVersion -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
 
 poetry config virtualenvs.create false
 Write-Host "Set poetry config virtualenvs.create to false."
@@ -115,11 +115,14 @@ if ($poetryExtra -eq "cuda") {
     Write-Output "cuda12.6 + cudnn9.7"
     $cudatoolkitVersion = "12.6.1"
     Write-Host "Conda is installing cuda-toolkit version $cudatoolkitVersion..."
-    conda install cuda-toolkit=$cudatoolkitVersion -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+#    conda install cuda-toolkit=$cudatoolkitVersion -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+    conda install cuda-toolkit=$cudatoolkitVersion -y -c https://mirrors.sustech.edu.cn/anaconda-extra/cloud/nvidia/
 
-    $cudnnVersion = "9.7.1.26"
-    Write-Host "Conda is installing cudnn version $cudnnVersion..."
-    conda install cudnn=$cudnnVersion -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+    $cudnnVersion = "9.3.0.75"
+    $cudnnBuild = "cuda12.6"
+    Write-Host "Conda is installing cudnn version $cudnnVersion build $cudnnBuild..."
+#    conda install cudnn=$cudnnVersion=$cudnnBuild -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+    conda install cudnn=$cudnnVersion=$cudnnBuild -y -c https://mirrors.sustech.edu.cn/anaconda-extra/cloud/nvidia/
 
     #$zlibwapiVersion = "1.3.1"
     #Write-Host "Conda is installing zlib-wapi version $zlibwapiVersion..."
