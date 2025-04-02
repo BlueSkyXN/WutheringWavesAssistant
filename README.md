@@ -40,7 +40,7 @@ git clone https://gitclone.com/github.com/wakening/WutheringWavesAssistant.git
 
 
 ```powershell
-设置允许执行脚本，输入 Y 确认
+设置powershell允许执行脚本，输入 Y 确认
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
@@ -49,8 +49,8 @@ cd WutheringWavesAssistant
 ./scripts/rebuild_conda_env.ps1
 ```
 
-等待脚本执行完成，安装所需环境，执行一次即可，若失败可以重跑  
-
+按照提示，输入1 回车 选择GPU环境安装，等待脚本执行完成，执行一次即可，若失败可以重跑  
+v2.2.2之前安装过的用户需要再执行一次来安装gpu环境，此前安装的是3 cpu环境
 
 ### 6️⃣ 配置文件
 
@@ -62,7 +62,9 @@ cd WutheringWavesAssistant
 **务必以管理员身份运行**，否则部分功能可能无法正常工作。
 
 ```powershell
-conda activate WutheringWavesAssistant
+# 激活英伟达GPU环境wwa-cuda，cpu则是wwa-cpu
+conda activate wwa-cuda
+# 运行程序
 python main.py
 ```
 
@@ -70,6 +72,16 @@ python main.py
 
 ```powershell
 git pull
+```
+
+### 9️⃣ 管理历史环境
+
+```powershell
+查看conda里所有的环境:
+conda env list
+
+删除历史测试环境(v2.2.2 Alpha之前的版本):
+conda remove --name WutheringWavesAssistant --all -y
 ```
 
 ---

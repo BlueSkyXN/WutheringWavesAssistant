@@ -41,10 +41,10 @@ class ChangelogCard(CardWidget):
         self.hBoxLayout.setAlignment(Qt.AlignVCenter)
         # self.hBoxLayout.addWidget(self.iconWidget)
         self.hBoxLayout.addLayout(self.vBoxLayout)
-        self.vBoxLayout.addStretch(1)
+        # self.vBoxLayout.addStretch(1)
         # self.vBoxLayout.addWidget(self.titleLabel)
         self.vBoxLayout.addWidget(self.contentLabel)
-        self.vBoxLayout.addStretch(1)
+        # self.vBoxLayout.addStretch(1)
 
         # self.titleLabel.setObjectName('titleLabel')
         self.contentLabel.setObjectName('contentLabel')
@@ -66,7 +66,7 @@ class ChangelogCardView(QWidget):
         self.flowLayout.setVerticalSpacing(12)
 
         self.vBoxLayout.addWidget(self.titleLabel)
-        self.vBoxLayout.addLayout(self.flowLayout, 1)
+        self.vBoxLayout.addLayout(self.flowLayout)
 
         self.titleLabel.setObjectName('viewTitleLabel')
         StyleSheet.SAMPLE_CARD.apply(self)

@@ -39,3 +39,10 @@ def get_window_info(hwnd):
     hwnd_util.get_window_dpi(hwnd)
     hwnd_util.get_window_wh(hwnd)
     hwnd_util.get_client_wh(hwnd)
+
+
+def test_pid():
+    pid = hwnd_util.get_hwnd_by_exe_name(hwnd_util.CLIENT_WIN64_SHIPPING_EXE)
+    logger.debug(pid)
+
+

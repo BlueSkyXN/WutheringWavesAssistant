@@ -53,6 +53,9 @@ paddlepaddle-gpu = [
 onnxruntime-gpu = [
     { markers = "extra == 'cuda' and extra != 'dml'" },
 ]
+onnxruntime-directml = [
+    { markers = "extra != 'cuda' and extra == 'dml'" },
+]
 
 
 [build-system]

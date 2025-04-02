@@ -1675,6 +1675,7 @@ class PageEventAbstractService(PageEventService, ABC):
         else:
             self._info.absorptionCount += 1
         absorption_rate = self._info.absorptionCount / self._info.fightCount
+        logger.info("战斗次数：%s 吸收次数：%s 治疗次数：%s", self._info.fightCount, self._info.absorptionCount, self._info.healCount)
         logger.info("目前声骸吸收率为：%s", str(format(absorption_rate * 100, ".2f")))
         return True
 

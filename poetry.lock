@@ -1376,7 +1376,7 @@ description = "ONNX Runtime is a runtime accelerator for Machine Learning models
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "extra == \"dml\""
+markers = "extra != \"cuda\" and extra == \"dml\""
 files = [
     {file = "onnxruntime_directml-1.20.0-cp310-cp310-win_amd64.whl", hash = "sha256:c1d107d099c75a371d72ec0fd068a5692603f3780f943d23cd5888d850e8671d"},
     {file = "onnxruntime_directml-1.20.0-cp311-cp311-win_amd64.whl", hash = "sha256:3639912c3c7584824f210c24e744fc1e206a568692970119265ddad51e0252ab"},
@@ -6890,4 +6890,4 @@ dml = ["onnxruntime-directml"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "de60426e3ef82909f2a09d115eb6181fee7291bcf8e572f453ad40be4ef5281c"
+content-hash = "f2e7d8ff33c438b80f9e787077a1e13af89bb91300264659575f6baaa71d8f63"
