@@ -1,5 +1,7 @@
 v2.2.2 Alpha
 支持GPU，详见github首页安装教程
+rebuild脚本补充缺少的加速源，cuda源改为nvidia
+修复长时间运行后截图异常导致停止
 
 v2.2.1 Alpha
 UI 增加按钮提醒
