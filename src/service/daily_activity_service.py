@@ -132,7 +132,9 @@ class DailyActivityServiceImpl(PageEventAbstractService, ABC):
                 end_time = datetime.now()
                 logger.info("任务已全部结束, %s, 耗时: %ss", end_time, (end_time - start_time).total_seconds)
                 break
-
+        # except ScreenshotError as e:
+        #     logger.exception("截图失败")
+        #     time.sleep(1)
         return True
 
     # def _run(self, pages, conditional_actions, src_img=None, img=None, ocr_results=None):

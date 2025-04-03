@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime, timedelta
 from enum import Enum
+from typing import Any
 
 from pydantic import BaseModel, Field, PrivateAttr
 
@@ -53,6 +54,11 @@ class BossTaskContext(BaseModel):
     dataMergeFinish: bool = Field(False, title="数据融合是否完成")
     bagIsOpen: bool = Field(False, title="背包是否打开")
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # self.lastFightTime = datetime.now() + timedelta(seconds=config.MaxIdleTime / 2)
+        self.lastFightTime = datetime.now() + timedelta(seconds=5)
+
 
 class EchoContext:
 
@@ -64,7 +70,7 @@ class Context(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
     config: Config = Field(default_factory=Config, title="所有配置文件")
     boss_task_ctx: BossTaskContext = Field(default_factory=BossTaskContext, title="刷boss声骸上下文")
-    _container = PrivateAttr()
+    _container: Any = PrivateAttr()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

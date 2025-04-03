@@ -4,6 +4,7 @@ from enum import Enum
 import numpy as np
 
 from src.core.contexts import Context
+from src.core.exceptions import ForegroundScreenshotError, BackgroundScreenshotError
 from src.core.interface import ImgService, WindowService
 from src.core.regions import Position, DynamicPosition
 from src.util import screenshot_util, img_util, file_util, mss_util
@@ -38,12 +39,18 @@ class ImgServiceImpl(ImgService):
         self._capture_mode = capture_mode
 
     def _foreground_screenshot(self, region: tuple[int, int, int, int] | None = None) -> np.ndarray:
-        # return dxcam_util.screenshot(self._dx_camera, region)
-        # return screenshot_util.screenshot_bitblt(self._window_service.window, region)
-        return mss_util.screenshot(self._mss_camera, region)
+        try:
+            # return dxcam_util.screenshot(self._dx_camera, region)
+            # return screenshot_util.screenshot_bitblt(self._window_service.window, region)
+            return mss_util.screenshot(self._mss_camera, region)
+        except Exception as e:
+            raise ForegroundScreenshotError() from e
 
     def _background_screenshot(self, region: tuple[int, int, int, int] | None = None) -> np.ndarray:
-        return screenshot_util.screenshot(self._window_service.window)
+        try:
+            return screenshot_util.screenshot(self._window_service.window)
+        except Exception as e:
+            raise BackgroundScreenshotError() from e
 
     def match_template(self,
                        img: np.ndarray | None,

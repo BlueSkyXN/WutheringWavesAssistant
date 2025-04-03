@@ -15,6 +15,7 @@ from pynput.mouse import Controller
 
 from src.config import logging_config
 from src.core.contexts import Context
+from src.core.exceptions import ScreenshotError
 from src.core.injector import Container
 from src.core.interface import ImgService, OCRService, ControlService, PageEventService, WindowService
 from src.util import hwnd_util, keymouse_util
@@ -110,7 +111,10 @@ class ClockAction:
     def action(self):
         if self.monotonic is None or time.monotonic() - self.monotonic > self.seconds:
             self.monotonic = time.monotonic()
-            self.callable()
+            try:
+                self.callable()
+            except Exception:
+                pass
 
 
 def mouse_reset_task_run(event: Event, **kwargs):
@@ -122,12 +126,14 @@ def mouse_reset_task_run(event: Event, **kwargs):
     try:
         while event is None or not event.is_set():
             time.sleep(0.2)
-            if not hwnd or not win32gui.IsWindow(hwnd):
-                time.sleep(0.5)
-                try:
+            try:
+                if not hwnd or not win32gui.IsWindow(hwnd):
+                    time.sleep(0.5)
                     hwnd = hwnd_util.get_hwnd()
-                except Exception:
-                    logger.warning("MouseReset: 获取窗口句柄时异常")
+                    continue
+            except Exception:
+                logger.warning("MouseReset: 获取窗口句柄时异常")
+                time.sleep(0.5)
                 continue
             current_position = mouse.position
             left, top, right, bottom = win32gui.GetClientRect(hwnd)
@@ -208,7 +214,7 @@ def auto_boss_task_run(event: Event, **kwargs):
                 img = img_service.resize(src_img)
                 result = ocr_service.ocr(img)
                 page_event_service.execute(src_img=src_img, img=img, ocr_results=result)
-            except pywintypes.error as e:
+            except (pywintypes.error, ScreenshotError) as e:
                 logger.exception("检测到窗口异常，开始重启")
                 if restart_game():
                     window_service.refresh()
@@ -242,7 +248,11 @@ def auto_pickup_task_run(event: Event, **kwargs):
     try:
         while not event.is_set():
             clock_action.action()
-            page_event_service.execute()
+            try:
+                page_event_service.execute()
+            except ScreenshotError as e:
+                logger.exception("截图失败")
+                time.sleep(1)
     except KeyboardInterrupt:
         logger.info("自动拾取任务进程结束")
     finally:
@@ -272,7 +282,11 @@ def auto_story_task_run(event: Event, **kwargs):
             logger.debug("count: %s", count)
             count += 1
             clock_action.action()
-            page_event_service.execute()
+            try:
+                page_event_service.execute()
+            except ScreenshotError as e:
+                logger.exception("截图失败")
+                time.sleep(1)
     except KeyboardInterrupt:
         logger.info("自动剧情任务进程结束")
     finally:
