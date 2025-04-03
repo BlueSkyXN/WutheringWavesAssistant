@@ -2,20 +2,20 @@ import logging
 import math
 import os
 import subprocess
+import threading
 import time
 from abc import ABC, abstractmethod
 from datetime import datetime
 from multiprocessing import Process, Event
 from typing import Iterable, Any, TypeVar, Callable, Mapping
 
-import pywintypes
 import win32gui
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 from pynput.mouse import Controller
 
 from src.config import logging_config
 from src.core.contexts import Context
-from src.core.exceptions import ScreenshotError
+from src.core.exceptions import ScreenshotError, WindowError
 from src.core.injector import Container
 from src.core.interface import ImgService, OCRService, ControlService, PageEventService, WindowService
 from src.util import hwnd_util, keymouse_util
@@ -31,9 +31,9 @@ class ProcessTask(BaseModel, ABC):
     args: Iterable[Any] | None = Field(None)
     kwargs: Mapping[str, Any] = Field(None)
     daemon: bool | None = Field(None)
-    start_time: datetime | None = Field(None)
-    end_time: datetime | None = Field(None)
-    process: Process | None = Field(None)
+    _start_time: datetime | None = PrivateAttr()
+    _end_time: datetime | None = PrivateAttr()
+    _process: Process | None = PrivateAttr()
 
     @abstractmethod
     def get_task(self, *args) -> Callable[..., None] | None:
@@ -46,32 +46,32 @@ class ProcessTask(BaseModel, ABC):
               name: str | None = None,
               daemon: bool | None = None) -> Task:
         name = name if name is not None else cls.__qualname__
-        task = cls(args=args, name=name, daemon=daemon)
-        task.process = Process(target=task.get_task(), args=args, kwargs=kwargs, name=task.name, daemon=task.daemon)
+        task = cls(args=args, kwargs=kwargs, name=name, daemon=daemon)
+        task._process = Process(target=task.get_task(), args=args, kwargs=kwargs, name=task.name, daemon=task.daemon)
         return task
 
     def start(self):
-        self.start_time = datetime.now()
-        self.process.start()
+        self._start_time = datetime.now()
+        self._process.start()
         return self
 
     def stop(self, timeout=5):
-        self.end_time = datetime.now()
-        elapsed_time = (self.end_time - self.start_time).total_seconds()
+        self._end_time = datetime.now()
+        elapsed_time = (self._end_time - self._start_time).total_seconds()
         hours, remainder = divmod(elapsed_time, 3600)
         minutes, seconds = divmod(remainder, 60)
         logger.info(f"[{self.name}] 任务结束，已运行: {int(hours)}h {int(minutes)}m {seconds:.2f}s")
         try:
-            if not self.process.is_alive():
+            if not self._process.is_alive():
                 return self
-            self.process.terminate()
-            self.process.join(timeout)
+            self._process.terminate()
+            self._process.join(timeout)
         except Exception:
             logger.error(f"任务[{self.name}]结束失败", exc_info=True)
         return self
 
     def join(self):
-        self.process.join()
+        self._process.join()
 
 
 class MouseResetProcessTask(ProcessTask):
@@ -114,7 +114,7 @@ class ClockAction:
             try:
                 self.callable()
             except Exception:
-                pass
+                logger.exception("Clock action error!")
 
 
 def mouse_reset_task_run(event: Event, **kwargs):
@@ -133,7 +133,7 @@ def mouse_reset_task_run(event: Event, **kwargs):
                     continue
             except Exception:
                 logger.warning("MouseReset: 获取窗口句柄时异常")
-                time.sleep(0.5)
+                time.sleep(5)
                 continue
             current_position = mouse.position
             left, top, right, bottom = win32gui.GetClientRect(hwnd)
@@ -160,6 +160,7 @@ def auto_boss_task_run(event: Event, **kwargs):
     logging_config.setup_logging()
     # logging_config.setup_logging_test()
     logger.debug("kwargs: %s", kwargs)
+    logger.debug(os.environ)
     logger.info("刷boss任务进程开始运行")
     hwnd_util.set_hwnd_left_top()
 
@@ -177,12 +178,14 @@ def auto_boss_task_run(event: Event, **kwargs):
     clock_action = ClockAction(control_service.activate, 3.0)
 
     def restart_game() -> bool:
-        start_time = time.time()
-        while time.time() - start_time < 300:
+        start_time = time.monotonic()
+        while time.monotonic() - start_time < 300:
+            time.sleep(3) # 必须写在try外面，防止关闭进程时进入这里还继续往下走
             try:
-                time.sleep(1)
-                logger.info("强制关闭游戏")
+                logger.info("关闭游戏")
                 hwnd_util.force_close_process(window_service.window)
+            except KeyboardInterrupt:
+                raise
             except Exception:
                 pass
             time.sleep(5)
@@ -198,10 +201,30 @@ def auto_boss_task_run(event: Event, **kwargs):
                         hwnd_util.set_hwnd_left_top()
                         time.sleep(1)
                         return True
+                except KeyboardInterrupt:
+                    raise
                 except Exception:
                     pass
                 time.sleep(5)
         return False
+
+    def close_game():
+        try:
+            logger.info("定时关闭游戏")
+            hwnd_util.force_close_process(window_service.window)
+        except Exception:
+            logger.exception("定时关闭游戏时异常")
+
+    # 定时重启开启
+    if context.config.app.RestartWutheringWaves is True:
+        restart_duration = context.config.app.RestartWutheringWavesTime
+        if restart_duration < 10:
+            logger.warning("定时重启周期过短: %ss, 自动关闭定时", restart_duration)
+        else:
+            logger.info("已开启定时重启，周期: %ss", restart_duration)
+            close_game_thread = threading.Timer(restart_duration, close_game)
+            close_game_thread.daemon = True
+            close_game_thread.start()
 
     try:
         while not event.is_set():
@@ -214,7 +237,7 @@ def auto_boss_task_run(event: Event, **kwargs):
                 img = img_service.resize(src_img)
                 result = ocr_service.ocr(img)
                 page_event_service.execute(src_img=src_img, img=img, ocr_results=result)
-            except (pywintypes.error, ScreenshotError) as e:
+            except (WindowError, ScreenshotError) as e:
                 logger.exception("检测到窗口异常，开始重启")
                 if restart_game():
                     window_service.refresh()
@@ -237,6 +260,7 @@ def auto_pickup_task_run(event: Event, **kwargs):
         os.environ[k] = v
     logging_config.setup_logging()
     logger.debug("kwargs: %s", kwargs)
+    logger.debug(os.environ)
     logger.info("自动拾取任务进程开始运行")
     context = Context()
     container = Container.build(context)
@@ -268,6 +292,7 @@ def auto_story_task_run(event: Event, **kwargs):
         os.environ[k] = v
     logging_config.setup_logging()
     logger.debug("kwargs: %s", kwargs)
+    logger.debug(os.environ)
     logger.info("自动剧情任务进程开始运行")
     context = Context()
     container = Container.build(context)
@@ -302,6 +327,7 @@ def daily_activity_task_run(event: Event, **kwargs):
         os.environ[k] = v
     logging_config.setup_logging()
     logger.debug("kwargs: %s", kwargs)
+    logger.debug(os.environ)
     logger.info("每日任务进程开始运行")
     hwnd_util.set_hwnd_left_top()
     context = Context()

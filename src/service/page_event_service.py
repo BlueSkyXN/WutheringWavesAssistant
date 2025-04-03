@@ -419,6 +419,8 @@ class PageEventAbstractService(PageEventService, ABC):
                 self._control_service.activate()
                 time.sleep(0.2)
                 if self._need_retry() and not self._info.needHeal:
+                    logger.info("战斗次数：%s 吸收次数：%s 治疗次数：%s", self._info.fightCount,
+                                self._info.absorptionCount, self._info.healCount)
                     self.click_position(positions["重新挑战|Restart"])
                     if not self._info.lastBossName:
                         self._info.lastBossName = self._config.TargetBoss[0]
@@ -1547,6 +1549,8 @@ class PageEventAbstractService(PageEventService, ABC):
         return False
 
     def transfer(self) -> bool:
+        logger.info("战斗次数：%s 吸收次数：%s 治疗次数：%s", self._info.fightCount,
+                    self._info.absorptionCount, self._info.healCount)
         self._info.isCheckedHeal = False
         if self._config.CharacterHeal and self._info.needHeal:  # 检查是否需要治疗
             logger.info("有角色阵亡，开始治疗")
@@ -1676,7 +1680,6 @@ class PageEventAbstractService(PageEventService, ABC):
         else:
             self._info.absorptionCount += 1
         absorption_rate = self._info.absorptionCount / self._info.fightCount
-        logger.info("战斗次数：%s 吸收次数：%s 治疗次数：%s", self._info.fightCount, self._info.absorptionCount, self._info.healCount)
         logger.info("目前声骸吸收率为：%s", str(format(absorption_rate * 100, ".2f")))
         return True
 

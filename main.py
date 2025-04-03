@@ -1,4 +1,5 @@
 import logging
+import os
 
 from src.config import logging_config
 
@@ -11,6 +12,7 @@ logger = logging.getLogger(__name__)
 if __name__ == "__main__":
     logger.info("https://github.com/wakening/WutheringWavesAssistant")
     logger.warning("当前版本为测试版，仅供测试，非最终效果")
+    logger.debug(os.environ)
     application.run()
     logger.info("https://github.com/wakening/WutheringWavesAssistant")
     logger.info("结束")
