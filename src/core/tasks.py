@@ -9,6 +9,7 @@ from datetime import datetime
 from multiprocessing import Process, Event
 from typing import Iterable, Any, TypeVar, Callable, Mapping
 
+import psutil
 import win32gui
 from pydantic import BaseModel, Field, PrivateAttr
 from pynput.mouse import Controller
@@ -117,6 +118,18 @@ class ClockAction:
                 logger.exception("Clock action error!")
 
 
+def is_gui_process_alive():
+    """ 用于修复主动关闭gui时，触发退出异常进入重启游戏流程，判断gui是否还存活 """
+    parent_pid = os.getppid()  # 获取 GUI 进程的 PID
+    if parent_pid == 1:  # 如果父进程变成 `init`，说明 GUI 进程已退出
+        return False
+    try:
+        parent = psutil.Process(parent_pid)
+        return parent.is_running()  # GUI 进程是否仍然在运行
+    except psutil.NoSuchProcess:
+        return False  # GUI 进程已退出
+
+
 def mouse_reset_task_run(event: Event, **kwargs):
     logging_config.setup_logging()
     logger.info("鼠标重置进程启动成功")
@@ -180,9 +193,12 @@ def auto_boss_task_run(event: Event, **kwargs):
     def restart_game() -> bool:
         start_time = time.monotonic()
         while time.monotonic() - start_time < 300:
-            time.sleep(3) # 必须写在try外面，防止关闭进程时进入这里还继续往下走
+            time.sleep(2)  # 必须写在try外面，防止关闭进程时进入这里还继续往下走
+            time.sleep(2)
+            if not is_gui_process_alive():
+                return False
             try:
-                logger.info("关闭游戏")
+                logger.info("尝试关闭游戏")
                 hwnd_util.force_close_process(window_service.window)
             except KeyboardInterrupt:
                 raise

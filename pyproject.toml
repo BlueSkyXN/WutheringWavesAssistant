@@ -11,10 +11,10 @@ requires-python = ">=3.10,<3.13"
 dependencies = [
     "numpy (==1.26.4)",
     "opencv-python (>=4.11.0.0)",
-    "rapidocr (==2.0.4)",
-    "onnxruntime (==1.20.0)", # rapidocr里依赖了，这里只是固定其版本号和安装顺序，保证被后面的覆盖
-    "onnxruntime-directml (==1.20.0) ; extra != 'cuda' and extra == 'dml'",
-    "onnxruntime-gpu (==1.20.0) ; extra == 'cuda' and extra != 'dml'",
+    "rapidocr (==2.0.6)",
+    "onnxruntime (==1.20.0) ; extra != 'cuda' and extra != 'dml' and extra == 'cpu' ",
+    "onnxruntime-directml (==1.20.0) ; extra != 'cuda' and extra == 'dml' and extra != 'cpu' ",
+    "onnxruntime-gpu (==1.20.0) ; extra == 'cuda' and extra != 'dml' and extra != 'cpu' ",
     "pyside6-fluent-widgets[full] (==1.7.6)",
     "pyside6 (>=6.8.0,<7.0.0)",
     "dependency-injector (>=4.45.0,<5.0.0)",
@@ -40,6 +40,9 @@ cuda = [
 dml = [
     "onnxruntime-directml (==1.20.0)",
 ]
+cpu = [
+    "onnxruntime (==1.20.0)",
+]
 dev = [
     "pytest",
     "matplotlib",
@@ -47,14 +50,17 @@ dev = [
 
 
 [tool.poetry.dependencies]
-paddlepaddle-gpu = [
-    { markers = "extra == 'cuda' and extra != 'dml'", source = "paddlepaddle-cu126" },
-]
-onnxruntime-gpu = [
-    { markers = "extra == 'cuda' and extra != 'dml'" },
+onnxruntime = [
+    { markers = "extra != 'cuda' and extra != 'dml' and extra == 'cpu' " },
 ]
 onnxruntime-directml = [
-    { markers = "extra != 'cuda' and extra == 'dml'" },
+    { markers = "extra != 'cuda' and extra == 'dml' and extra != 'cpu' " },
+]
+onnxruntime-gpu = [
+    { markers = "extra == 'cuda' and extra != 'dml' and extra != 'cpu' " },
+]
+paddlepaddle-gpu = [
+    { markers = "extra == 'cuda' and extra != 'dml' and extra != 'cpu' ", source = "paddlepaddle-cu126" },
 ]
 
 

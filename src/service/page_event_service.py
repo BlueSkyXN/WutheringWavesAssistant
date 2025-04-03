@@ -1699,7 +1699,7 @@ class PageEventAbstractService(PageEventService, ABC):
         position = self._img_service.match_template(img=None, template_img="UI_F2_Guidebook_EchoHunting.png",
                                                     threshold=0.5)
         if not position:
-            logger.info("识别残像探寻失败", "WARN")
+            logger.warning("识别残像探寻失败")
             self._control_service.esc()
             return False
         self._control_service.click(*position.center)  # 进入残像探寻
