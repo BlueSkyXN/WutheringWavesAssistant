@@ -55,7 +55,7 @@ v2.2.2之前安装过的用户需要再执行一次来安装gpu环境，此前�
 ### 6️⃣ 配置文件
 
 - **老用户**（使用过 `mc_auto_boss` 的用户）：请复制 `config.yaml` 到本目录并覆盖。
-- **新用户**：无需额外配置，可直接运行。
+- **新用户**：修改config.yaml中的DungeonWeeklyBossLevel和TargetBoss后运行。
 
 ### 7️⃣ 启动脚本
 
