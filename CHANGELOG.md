@@ -1,3 +1,6 @@
+v2.2.3 Alpha
+添加启动器WWA.exe
+
 v2.2.2 Alpha
 支持GPU，详见github首页安装教程
 rebuild脚本补充缺少的加速源，cuda源改为nvidia

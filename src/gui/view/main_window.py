@@ -64,7 +64,7 @@ class MainWindow(FluentWindow):
         # self.resize(960, 780)
         self.setMinimumWidth(760)
         self.setWindowIcon(QIcon(':/gallery/images/logo.png'))
-        self.setWindowTitle('Wuthering Waves Assistant')
+        self.setWindowTitle('Wuthering Waves Assistant 2.2.3 Alpha')
 
         self.setMicaEffectEnabled(cfg.get(cfg.micaEnabled))
 

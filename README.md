@@ -40,7 +40,7 @@ git clone https://gitclone.com/github.com/wakening/WutheringWavesAssistant.git
 
 
 ```powershell
-设置powershell允许执行脚本，输入 Y 确认
+管理员身份打开powershell，设置允许执行脚本
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
@@ -50,7 +50,6 @@ cd WutheringWavesAssistant
 ```
 
 按照提示，输入1 回车 选择GPU环境安装，等待脚本执行完成，执行一次即可，若失败可以重跑  
-v2.2.2之前安装过的用户需要再执行一次来安装gpu环境，此前安装的是3 cpu环境
 
 ### 6️⃣ 配置文件
 
@@ -67,11 +66,14 @@ conda activate wwa-cuda
 # 运行程序
 python main.py
 ```
+若能正常运行，后续可双击启动器运行 WWA.exe
 
 ### 8️⃣ 更新脚本
 
 ```powershell
 git pull
+
+更新后若无法运行或窗口出现闪烁，运行5️⃣中的rebuild脚本即可
 ```
 
 ### 9️⃣ 管理历史环境

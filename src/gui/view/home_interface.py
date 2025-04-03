@@ -23,7 +23,7 @@ class BannerWidget(QWidget):
 
         self.vBoxLayout = QVBoxLayout(self)
 
-        self.galleryLabel = QLabel(f'鸣潮\nWuthering Waves Assistant Alpha Ver2.2.2', self)
+        self.galleryLabel = QLabel(f'鸣潮\nWuthering Waves Assistant', self)
 
         # # 创建阴影效果 TODO 不生效，Qt5有用
         # shadow = QGraphicsDropShadowEffect()
