@@ -85,17 +85,17 @@ class TerminalInterface(GalleryInterface):
         signalBus.closeSignal.connect(self.stopLogListener)
 
     def append_log(self, text):
-        # 获取当前光标
-        cursor = self.textEdit.textCursor()
-        # 判断是否在底部
-        is_at_bottom = cursor.atBlockEnd()
-        # 添加新日志
+        # # 获取当前光标
+        # cursor = self.textEdit.textCursor()
+        # # 判断是否在底部
+        # is_at_bottom = cursor.atBlockEnd()
+        # # 添加新日志
         self.textEdit.append(text)
-        # 如果光标原本在底部，就自动滚动
-        if is_at_bottom:
-            cursor = self.textEdit.textCursor()
-            cursor.movePosition(QTextCursor.End)  # 修改为 QTextCursor.End
-            self.textEdit.setTextCursor(cursor)
+        # # 如果光标原本在底部，就自动滚动
+        # if is_at_bottom:
+        #     cursor = self.textEdit.textCursor()
+        #     cursor.movePosition(QTextCursor.End)  # 修改为 QTextCursor.End
+        #     self.textEdit.setTextCursor(cursor)
 
     def stopLogListener(self):
         self.logListener.stop()

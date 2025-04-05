@@ -1,5 +1,5 @@
-<div style="text-align: center;">
-  <img src="src/gui/resource/images/logo.png" alt="LOGO" />
+<div align="center">
+<img src="src/gui/resource/images/logo.png" alt="LOGO" />
 
 # Wuthering Waves Assistant
 
