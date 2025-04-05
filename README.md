@@ -20,11 +20,9 @@
 
 </div>
 
----
 
 ![Wuthering Waves Assistant](assets/static/HomePage.png)
 
----
 
 ## 📌 使用指南
 
