@@ -39,21 +39,25 @@ class MainController:
                 stop_event = Event()
                 task_builder = self.tasks.get(task_name)
 
+                from src.config import logging_config
+                from src.core import environs
                 kwargs = {}
+                kwargs["LOG_QUEUE"] = logging_config.get_log_queue()
                 if task_name == "AutoStorySkipProcessTask":
                     kwargs["SKIP_IS_OPEN"] = "True"
                 elif task_name == "AutoStoryEnjoyProcessTask":
                     kwargs["SKIP_IS_OPEN"] = "False"
                 if task_name == "AutoBossProcessTask":
-                    kwargs["OCR_USE_GPU"] = "True"
+                    kwargs[environs.ENV_WWA_OCR_USE_GPU] = "True"
                 else:
-                    kwargs["OCR_USE_GPU"] = "False"
+                    kwargs[environs.ENV_WWA_OCR_USE_GPU] = "False"
 
                 task = task_builder.build(args=(stop_event,), kwargs=kwargs, daemon=True).start()
                 self.running_tasks[task_name] = (task, stop_event)
                 if task_name in ["AutoBossProcessTask", "DailyActivityProcessTask"]:
                     from src.core.tasks import MouseResetProcessTask
-                    mouse_reset_process_task = MouseResetProcessTask.build(args=(stop_event,), kwargs=kwargs, daemon=True).start()
+                    mouse_reset_process_task = MouseResetProcessTask.build(args=(stop_event,), kwargs=kwargs,
+                                                                           daemon=True).start()
                     self.running_tasks["MouseResetProcessTask"] = (mouse_reset_process_task, stop_event)
                 logger.info("任务已提交: %s", task_name)
                 return True, "任务已提交"

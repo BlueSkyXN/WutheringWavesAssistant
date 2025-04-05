@@ -221,7 +221,7 @@ class GameControlService(ABC):
 
     @abstractmethod
     def camera_reset(self):
-        """重置视角"""
+        """重置视角/锁定"""
         pass
 
     @abstractmethod
@@ -230,7 +230,7 @@ class GameControlService(ABC):
 
     @abstractmethod
     def drop(self):
-        """落（攀爬时）"""
+        """下落（攀爬时）"""
         pass
 
     @abstractmethod
@@ -296,7 +296,7 @@ class PlayerControlService(ABC):
 
 
 class ExtendedControlService(ABC):
-    """拓展操作"""
+    """拓展操作键鼠控制"""
 
     @abstractmethod
     def forward_run(self, forward_run_seconds: float, key: str | None = None):

@@ -9,14 +9,6 @@ logger = logging.getLogger(__name__)
 
 # https://paddlepaddle.github.io/PaddleOCR/latest/ppocr/model_list.html
 
-# # Det（文本检测）识别文字、Rec（文本识别）识别文本框的位置 和 Cls（文本分类）
-# PADDLE_DET_MODEL_DIR = str(file_util.get_assets_model_paddleocr().joinpath("ch_PP-OCRv4_det_infer"))
-# PADDLE_REC_MODEL_DIR = str(file_util.get_assets_model_paddleocr().joinpath("ch_PP-OCRv4_rec_infer"))
-#
-# PADDLE_DET_MODEL_FILES = ["inference.pdiparams", "inference.pdiparams.info", "inference.pdmodel"]
-# PADDLE_REC_MODEL_FILES = ["inference.pdiparams", "inference.pdiparams.info", "inference.pdmodel"]
-
-
 ###########################################################################
 
 
@@ -57,7 +49,7 @@ def create_paddleocr_gpu(
         show_log: bool = False,
         # enable_mkldnn=True,
 ) -> PaddleOCR:
-    if check_paddleocr_gpu_available():
+    if not check_paddleocr_gpu_available():
         raise Exception("paddleocr没有配置GPU环境但开启GPU模式")
     # logger.info("PaddleOCR is running on the %s", "GPU" if use_gpu else "CPU")
     ocr = PaddleOCR(

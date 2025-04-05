@@ -1,12 +1,15 @@
 import logging.config
+import multiprocessing
 import os
 import pprint
+import queue
 import re
 from datetime import datetime
 from pathlib import Path
 
 from colorlog import ColoredFormatter
 
+from src.core import environs
 from src.util import file_util
 
 logger = logging.getLogger(__name__)
@@ -45,16 +48,54 @@ class CustomColoredFormatter(ColoredFormatter):
         return super().format(_custom_logging_format(self, record))
 
 
-def rotate_log(log_file, max_size=5 * 1024 * 1024):
+# 日志队列，收集所有进程的日志，用于ui上展示
+_LOG_QUEUE = multiprocessing.Queue()
+
+
+def get_log_queue():
+    return _LOG_QUEUE
+
+
+class QueueFileHandler(logging.FileHandler):
+    LOG_QUEUE = None
+
+    def emit(self, record):
+        if self.stream is None:
+            if self.mode != 'w' or not self._closed:
+                self.stream = self._open()
+        if self.stream:
+            try:
+                msg = self.format(record)
+                stream = self.stream
+                # issue 35046: merged two stream.writes into one.
+                stream.write(msg + self.terminator)
+                self.flush()
+                self.LOG_QUEUE.put(msg, block=False)
+            except RecursionError:  # See issue 36272
+                raise
+            except queue.Full:
+                pass  # 日志队列满了忽略
+            except Exception:
+                self.handleError(record)
+
+
+def rotate_log(max_size=5 * 1024 * 1024, is_test: bool = False):
+    if is_test:
+        log_file = file_util.get_test_log_file()
+    else:
+        log_file = file_util.get_log_file()
+    if environs.get_log_path() is None:
+        environs.set_log_path(log_file)
     # 主进程
-    if os.environ.get("WWA_LOG_LEADER") is None:
+    if environs.get_log_leader() is None:
         # 首次执行后标记，禁止子进程滚动日志文件
-        os.environ["WWA_LOG_LEADER"] = "True"
-    else: # 子进程
+        environs.set_log_leader(True)
+    else:  # 子进程
         return log_file
     log_path = Path(log_file)
     if not log_path.exists():
         return log_file
+    # 滚动日志，防止单文件过大
     if log_path.stat().st_size > max_size:
         backup_name = f"{log_file}.{datetime.now().strftime("%Y%m%d")}"
         count = 1
@@ -71,188 +112,203 @@ def rotate_log(log_file, max_size=5 * 1024 * 1024):
     return log_file
 
 
-LOGGING_CONFIG = {
-    'version': 1,
-    'disable_existing_loggers': False,  # 保留已有 logger
-    'formatters': {
-        'colored': {
-            '()': CustomColoredFormatter,  # 使用自定义 colorlog.ColoredFormatter
-            'format': '%(log_color)s%(asctime)s.%(msecs)03d - %(levelname)-5s - %(customLineno)-30s - %(message)s',
-            'datefmt': '%Y-%m-%d %H:%M:%S',
-            'log_colors': {
-                'DEBUG': 'green',
-                'INFO': 'white',
-                'WARNING': 'yellow',
-                'WARN': 'yellow',
-                'ERROR': 'red',
-                'CRITICAL': 'red',
+def build_logging_config():
+    return {
+        'version': 1,
+        'disable_existing_loggers': False,  # 保留已有 logger
+        'formatters': {
+            'colored': {
+                '()': CustomColoredFormatter,  # 使用自定义 colorlog.ColoredFormatter
+                'format': '%(log_color)s%(asctime)s.%(msecs)03d - %(levelname)-5s - %(customLineno)-30s - %(message)s',
+                'datefmt': '%Y-%m-%d %H:%M:%S',
+                'log_colors': {
+                    'DEBUG': 'green',
+                    'INFO': 'white',
+                    'WARNING': 'yellow',
+                    'WARN': 'yellow',
+                    'ERROR': 'red',
+                    'CRITICAL': 'red',
+                },
+            },
+            'standard': {
+                '()': CustomFormatter,  # 使用自定义 Formatter
+                'format': '%(asctime)s.%(msecs)03d - %(levelname)-5s - %(customLineno)-30s - %(message)s',
+                'datefmt': '%Y-%m-%d %H:%M:%S'
             },
         },
-        'standard': {
-            '()': CustomFormatter,  # 使用自定义 Formatter
-            'format': '%(asctime)s - %(levelname)-5s - %(customLineno)-30s - %(message)s',
-            'datefmt': '%Y-%m-%d %H:%M:%S'
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'colored',  # 使用彩色 formatter
-            'level': 'INFO'
-        },
-        # 'file': {
-        #     'class': 'logging.handlers.RotatingFileHandler',
-        #     'formatter': 'standard',  # 文件输出使用标准 formatter
-        #     'filename': file_util.get_log_file(),
-        #     'maxBytes': 10 * 1024 * 1024,  # 10MB
-        #     'backupCount': 5,  # 这里不做自动备份，由压缩等其他方式处理
-        #     'encoding': 'utf-8',
-        #     'level': 'DEBUG'
-        # },
-        'file': {
-            'class': 'logging.FileHandler',
-            'formatter': 'standard',
-            'filename': rotate_log(file_util.get_log_file()),
-            'encoding': 'utf-8',
-            'level': 'INFO'
-        },
-    },
-    'loggers': {  # module 的日志级别
-        'src': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'src.config.logging_config': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'src.util.img_util': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'src.util.file_util': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'src.util.yolo_util': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'tests': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'rapidocr': {
-            'handlers': ['console', 'file'],
-            'level': 'WARNING',
-            'propagate': False,
-        },
-    },
-    'root': {  # 根 logger 配置
-        'handlers': ['console', 'file'],
-        'level': 'INFO',
-    },
-}
-
-LOGGING_CONFIG_TEST = {
-    'version': 1,
-    'disable_existing_loggers': False,  # 保留已有 logger
-    'formatters': {
-        'colored': {
-            '()': CustomColoredFormatter,  # 使用自定义 colorlog.ColoredFormatter
-            'format': '%(log_color)s%(asctime)s.%(msecs)03d - %(levelname)-5s - %(customLineno)-30s - %(message)s',
-            'datefmt': '%Y-%m-%d %H:%M:%S',
-            'log_colors': {
-                'DEBUG': 'green',
-                'INFO': 'white',
-                'WARNING': 'yellow',
-                'WARN': 'yellow',
-                'ERROR': 'red',
-                'CRITICAL': 'red',
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'colored',  # 使用彩色 formatter
+                'level': 'INFO'
+            },
+            # 'file': {
+            #     'class': 'logging.handlers.RotatingFileHandler',
+            #     'formatter': 'standard',  # 文件输出使用标准 formatter
+            #     'filename': file_util.get_log_file(),
+            #     'maxBytes': 10 * 1024 * 1024,  # 10MB
+            #     'backupCount': 5,  # 这里不做自动备份，由压缩等其他方式处理
+            #     'encoding': 'utf-8',
+            #     'level': 'DEBUG'
+            # },
+            'file': {
+                # 'class': 'logging.FileHandler',
+                '()': QueueFileHandler,
+                'formatter': 'standard',
+                'filename': rotate_log(),
+                'encoding': 'utf-8',
+                'level': 'INFO'
             },
         },
-        'standard': {
-            '()': CustomFormatter,  # 使用自定义 Formatter
-            'format': '%(asctime)s - %(levelname)-5s - %(customLineno)-30s - %(message)s',
-            'datefmt': '%Y-%m-%d %H:%M:%S'
+        'loggers': {  # module 的日志级别
+            'src': {
+                'handlers': ['console', 'file'],
+                'level': 'INFO',
+                'propagate': False,
+            },
+            'src.config.logging_config': {
+                'handlers': ['console', 'file'],
+                'level': 'INFO',
+                'propagate': False,
+            },
+            'src.util.img_util': {
+                'handlers': ['console', 'file'],
+                'level': 'INFO',
+                'propagate': False,
+            },
+            'src.util.file_util': {
+                'handlers': ['console', 'file'],
+                'level': 'INFO',
+                'propagate': False,
+            },
+            'src.util.yolo_util': {
+                'handlers': ['console', 'file'],
+                'level': 'INFO',
+                'propagate': False,
+            },
+            'tests': {
+                'handlers': ['console', 'file'],
+                'level': 'INFO',
+                'propagate': False,
+            },
+            'rapidocr': {
+                'handlers': ['console', 'file'],
+                'level': 'WARNING',
+                'propagate': False,
+            },
         },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'colored',  # 使用彩色 formatter
-            'level': 'DEBUG'
-        },
-        'file': {
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'formatter': 'standard',
-            'filename': file_util.get_test_log_file(),
-            'when': 'midnight',
-            'interval': 1,
-            'backupCount': 5,
-            'encoding': 'utf-8',
-            'level': 'DEBUG'
-        },
-    },
-    'loggers': {  # module 的日志级别
-        'src': {
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-        'src.config.logging_config': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'src.util.img_util': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'src.util.file_util': {
+        'root': {  # 根 logger 配置
             'handlers': ['console', 'file'],
             'level': 'INFO',
-            'propagate': False,
         },
-        'src.util.yolo_util': {
+    }
+
+def build_logging_config_test():
+    return {
+        'version': 1,
+        'disable_existing_loggers': False,  # 保留已有 logger
+        'formatters': {
+            'colored': {
+                '()': CustomColoredFormatter,  # 使用自定义 colorlog.ColoredFormatter
+                'format': '%(log_color)s%(asctime)s.%(msecs)03d - %(levelname)-5s - %(customLineno)-30s - %(message)s',
+                'datefmt': '%Y-%m-%d %H:%M:%S',
+                'log_colors': {
+                    'DEBUG': 'green',
+                    'INFO': 'white',
+                    'WARNING': 'yellow',
+                    'WARN': 'yellow',
+                    'ERROR': 'red',
+                    'CRITICAL': 'red',
+                },
+            },
+            'standard': {
+                '()': CustomFormatter,  # 使用自定义 Formatter
+                'format': '%(asctime)s.%(msecs)03d - %(levelname)-5s - %(customLineno)-30s - %(message)s',
+                'datefmt': '%Y-%m-%d %H:%M:%S'
+            },
+        },
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'colored',  # 使用彩色 formatter
+                'level': 'DEBUG'
+            },
+            # 'file': {
+            #     'class': 'logging.handlers.TimedRotatingFileHandler',
+            #     'formatter': 'standard',
+            #     'filename': rotate_log(),
+            #     'when': 'midnight',
+            #     'interval': 1,
+            #     'backupCount': 5,
+            #     'encoding': 'utf-8',
+            #     'level': 'DEBUG'
+            # },
+            'file': {
+                # 'class': 'logging.FileHandler',
+                '()': QueueFileHandler,
+                'formatter': 'standard',
+                'filename': rotate_log(is_test=True),
+                'encoding': 'utf-8',
+                'level': 'INFO'
+            },
+        },
+        'loggers': {  # module 的日志级别
+            'src': {
+                'handlers': ['console', 'file'],
+                'level': 'DEBUG',
+                'propagate': False,
+            },
+            'src.config.logging_config': {
+                'handlers': ['console', 'file'],
+                'level': 'INFO',
+                'propagate': False,
+            },
+            'src.util.img_util': {
+                'handlers': ['console', 'file'],
+                'level': 'INFO',
+                'propagate': False,
+            },
+            'src.util.file_util': {
+                'handlers': ['console', 'file'],
+                'level': 'INFO',
+                'propagate': False,
+            },
+            'src.util.yolo_util': {
+                'handlers': ['console', 'file'],
+                'level': 'INFO',
+                'propagate': False,
+            },
+            'tests': {
+                'handlers': ['console', 'file'],
+                'level': 'DEBUG',
+                'propagate': False,
+            },
+            'rapidocr': {
+                'handlers': ['console', 'file'],
+                'level': 'WARNING',
+                'propagate': False,
+            },
+        },
+        'root': {  # 根 logger 配置
             'handlers': ['console', 'file'],
             'level': 'INFO',
-            'propagate': False,
         },
-        'tests': {
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-        'rapidocr': {
-            'handlers': ['console', 'file'],
-            'level': 'WARNING',
-            'propagate': False,
-        },
-    },
-    'root': {  # 根 logger 配置
-        'handlers': ['console', 'file'],
-        'level': 'INFO',
-    },
-}
+    }
 
 
-def setup_logging():
+def setup_logging(log_queue = None):
+    QueueFileHandler.LOG_QUEUE = get_log_queue() if log_queue is None else log_queue
     logging.addLevelName(logging.WARNING, "WARN")
     file_util.get_logs().mkdir(exist_ok=True, parents=True)
-    logging.config.dictConfig(LOGGING_CONFIG)
-    logger.debug(f"LOGGING_CONFIG: {pprint.pformat(LOGGING_CONFIG, indent=4)}")
+    dict_config = build_logging_config()
+    logging.config.dictConfig(dict_config)
+    logger.debug(f"logging_config: {pprint.pformat(dict_config, indent=4)}")
 
 
-def setup_logging_test():
+def setup_logging_test(log_queue = None):
+    QueueFileHandler.LOG_QUEUE = get_log_queue() if log_queue is None else log_queue
     logging.addLevelName(logging.WARNING, "WARN")
     file_util.get_logs().mkdir(exist_ok=True, parents=True)
-    logging.config.dictConfig(LOGGING_CONFIG_TEST)
-    logger.debug(f"LOGGING_CONFIG_TEST: {pprint.pformat(LOGGING_CONFIG_TEST, indent=4)}")
+    dict_config = build_logging_config_test()
+    logging.config.dictConfig(dict_config)
+    logger.debug(f"logging_config_test: {pprint.pformat(dict_config, indent=4)}")

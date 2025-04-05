@@ -109,26 +109,28 @@
         <file>images/icons/Text_white.svg</file>
         <file>images/icons/Price_black.svg</file>
         <file>images/icons/Price_white.svg</file>
-        <file>images/chidanta.jpg</file>
-        <file>images/chidanta2.jpg</file>
-        <file>images/chidanta3.jpg</file>
-        <file>images/chidanta4.jpg</file>
-        <file>images/chidanta5.jpg</file>
+        <file>images/icons/Terminal_black.svg</file>
+        <file>images/icons/Terminal_white.svg</file>
+<!--        <file>images/chidanta.jpg</file>-->
+<!--        <file>images/chidanta2.jpg</file>-->
+<!--        <file>images/chidanta3.jpg</file>-->
+<!--        <file>images/chidanta4.jpg</file>-->
+<!--        <file>images/chidanta5.jpg</file>-->
         <file>images/header.png</file>
         <file>images/header1.png</file>
-        <file>images/kunkun.png</file>
+<!--        <file>images/kunkun.png</file>-->
         <file>images/logo.png</file>
-        <file>images/shoko.png</file>
-        <file>images/Gyro.jpg</file>
-        <file>images/SBR.jpg</file>
-        <file>images/Dvd.png</file>
-        <file>images/Singer.png</file>
-        <file>images/MusicNote.png</file>
-        <file>images/Smiling_with_heart.png</file>
-        <file>images/Shoko1.jpg</file>
-        <file>images/Shoko2.jpg</file>
-        <file>images/Shoko3.jpg</file>
-        <file>images/Shoko4.jpg</file>
+<!--        <file>images/shoko.png</file>-->
+<!--        <file>images/Gyro.jpg</file>-->
+<!--        <file>images/SBR.jpg</file>-->
+<!--        <file>images/Dvd.png</file>-->
+<!--        <file>images/Singer.png</file>-->
+<!--        <file>images/MusicNote.png</file>-->
+<!--        <file>images/Smiling_with_heart.png</file>-->
+<!--        <file>images/Shoko1.jpg</file>-->
+<!--        <file>images/Shoko2.jpg</file>-->
+<!--        <file>images/Shoko3.jpg</file>-->
+<!--        <file>images/Shoko4.jpg</file>-->
 
         <file>qss/dark/gallery_interface.qss</file>
         <file>qss/dark/home_interface.qss</file>
@@ -138,6 +140,8 @@
         <file>qss/dark/setting_interface.qss</file>
         <file>qss/dark/view_interface.qss</file>
         <file>qss/dark/navigation_view_interface.qss</file>
+        <file>qss/dark/notice_interface.qss</file>
+        <file>qss/dark/terminal_interface.qss</file>
 
         <file>qss/light/gallery_interface.qss</file>
         <file>qss/light/home_interface.qss</file>
@@ -147,6 +151,8 @@
         <file>qss/light/setting_interface.qss</file>
         <file>qss/light/view_interface.qss</file>
         <file>qss/light/navigation_view_interface.qss</file>
+        <file>qss/light/notice_interface.qss</file>
+        <file>qss/light/terminal_interface.qss</file>
 
         <file>i18n/gallery.zh_CN.qm</file>
         <file>i18n/gallery.zh_HK.qm</file>

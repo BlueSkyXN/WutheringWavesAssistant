@@ -1,14 +1,12 @@
 import datetime
 import logging
-import os
 import random
 import time
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-# 环境变量
-ENV_PROJECT_ROOT = "PROJECT_ROOT"  # 值为项目根目录
+__PROJECT_ROOT: str | None = None  # 值为项目根目录
 
 # 文件名
 LOG_FILE_NAME = "wwa.log"
@@ -18,12 +16,10 @@ LOG_TEST_FILE_NAME = "wwa_test-%s.log"  # 测试日志
 ###### Dir or File abspath ######
 
 def get_project_root() -> Path:
-    project_root = os.environ.get(ENV_PROJECT_ROOT, None)
-    if project_root is not None:
-        return Path(project_root)
-    project_root_path = Path(__file__).parent.parent.parent
-    os.environ[ENV_PROJECT_ROOT] = str(project_root_path)
-    return project_root_path
+    global __PROJECT_ROOT
+    if not __PROJECT_ROOT:
+        __PROJECT_ROOT = str(Path(__file__).parent.parent.parent)
+    return Path(__PROJECT_ROOT)
 
 
 def get_path(dir_name: str, file_name: str | None = None) -> Path | str:

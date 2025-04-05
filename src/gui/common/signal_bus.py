@@ -9,5 +9,7 @@ class SignalBus(QObject):
     micaEnableChanged = Signal(bool)
     supportSignal = Signal()
 
+    closeSignal = Signal()  # 关闭信号
+
 
 signalBus = SignalBus()

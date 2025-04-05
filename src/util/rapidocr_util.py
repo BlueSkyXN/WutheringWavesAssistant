@@ -34,7 +34,7 @@ _DML_PARAMS = {
 _GPU_PADDLEPADDLE_PARAMS = {
     **_COMMON_PARAMS,
     "Global.with_paddle": True,
-    "EngineConfig.paddlepaddle.use_cuda": True,
+    "EngineConfig.paddle.use_cuda": True,
 }
 
 

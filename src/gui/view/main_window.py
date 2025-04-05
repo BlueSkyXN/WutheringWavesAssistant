@@ -12,11 +12,13 @@ from .notice_interface import NoticeInterface
 from .gallery_interface import GalleryInterface
 from .home_interface import HomeInterface
 from .setting_interface import SettingInterface
+from .terminal_interface import TerminalInterface
 from ..common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg
 from ..common.icon import Icon
 from ..common.signal_bus import signalBus
 from ..common.translator import Translator
 from ..common import resource
+from src import __version__
 
 
 class MainWindow(FluentWindow):
@@ -31,6 +33,7 @@ class MainWindow(FluentWindow):
         # create sub interface
         self.homeInterface = HomeInterface(self)
         self.noticeInterface = NoticeInterface(self)
+        self.terminalInterface = TerminalInterface(self)
 
         self.settingInterface = SettingInterface(self)
 
@@ -55,6 +58,7 @@ class MainWindow(FluentWindow):
         # add navigation items
         self.addSubInterface(self.homeInterface, FIF.HOME, self.tr('Home'))
         self.addSubInterface(self.noticeInterface, FIF.MEGAPHONE, self.tr('Notice'))
+        self.addSubInterface(self.terminalInterface, Icon.TERMINAL, self.tr('Terminal'))
 
         self.addSubInterface(
             self.settingInterface, FIF.SETTING, self.tr('Settings'), NavigationItemPosition.BOTTOM)
@@ -64,7 +68,7 @@ class MainWindow(FluentWindow):
         # self.resize(960, 780)
         self.setMinimumWidth(760)
         self.setWindowIcon(QIcon(':/gallery/images/logo.png'))
-        self.setWindowTitle('Wuthering Waves Assistant 2.2.4 Alpha')
+        self.setWindowTitle(f'Wuthering Waves Assistant {__version__}')
 
         self.setMicaEffectEnabled(cfg.get(cfg.micaEnabled))
 
@@ -92,6 +96,8 @@ class MainWindow(FluentWindow):
             self.splashScreen.resize(self.size())
 
     def closeEvent(self, e):
+        signalBus.closeSignal.emit()
+        self.terminalInterface.stopLogListener() # 同步调用，保证退出通知到位
         self.themeListener.terminate()
         self.themeListener.deleteLater()
         super().closeEvent(e)

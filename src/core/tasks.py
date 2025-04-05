@@ -131,7 +131,10 @@ def is_gui_process_alive():
 
 
 def mouse_reset_task_run(event: Event, **kwargs):
-    logging_config.setup_logging()
+    for k, v in kwargs.items():
+        if isinstance(v, str):
+            os.environ[k] = v
+    logging_config.setup_logging(kwargs.get("LOG_QUEUE"))
     logger.info("鼠标重置进程启动成功")
     mouse = Controller()
     last_position = mouse.position
@@ -169,9 +172,10 @@ def mouse_reset_task_run(event: Event, **kwargs):
 
 def auto_boss_task_run(event: Event, **kwargs):
     for k, v in kwargs.items():
-        os.environ[k] = v
-    logging_config.setup_logging()
-    # logging_config.setup_logging_test()
+        if isinstance(v, str):
+            os.environ[k] = v
+    logging_config.setup_logging(kwargs.get("LOG_QUEUE"))
+    # logging_config.setup_logging_test(kwargs.get("LOG_QUEUE"))
     logger.debug("kwargs: %s", kwargs)
     logger.debug(os.environ)
     logger.info("刷boss任务进程开始运行")
@@ -273,8 +277,9 @@ def auto_boss_task_run(event: Event, **kwargs):
 
 def auto_pickup_task_run(event: Event, **kwargs):
     for k, v in kwargs.items():
-        os.environ[k] = v
-    logging_config.setup_logging()
+        if isinstance(v, str):
+            os.environ[k] = v
+    logging_config.setup_logging(kwargs.get("LOG_QUEUE"))
     logger.debug("kwargs: %s", kwargs)
     logger.debug(os.environ)
     logger.info("自动拾取任务进程开始运行")
@@ -305,8 +310,9 @@ def auto_pickup_task_run(event: Event, **kwargs):
 
 def auto_story_task_run(event: Event, **kwargs):
     for k, v in kwargs.items():
-        os.environ[k] = v
-    logging_config.setup_logging()
+        if isinstance(v, str):
+            os.environ[k] = v
+    logging_config.setup_logging(kwargs.get("LOG_QUEUE"))
     logger.debug("kwargs: %s", kwargs)
     logger.debug(os.environ)
     logger.info("自动剧情任务进程开始运行")
@@ -340,8 +346,9 @@ def auto_story_task_run(event: Event, **kwargs):
 
 def daily_activity_task_run(event: Event, **kwargs):
     for k, v in kwargs.items():
-        os.environ[k] = v
-    logging_config.setup_logging()
+        if isinstance(v, str):
+            os.environ[k] = v
+    logging_config.setup_logging(kwargs.get("LOG_QUEUE"))
     logger.debug("kwargs: %s", kwargs)
     logger.debug(os.environ)
     logger.info("每日任务进程开始运行")

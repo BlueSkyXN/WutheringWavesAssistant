@@ -7,15 +7,17 @@ from rapidocr.utils import RapidOCROutput
 from src.core.contexts import Context
 from src.core.injector import Container
 from src.core.interface import ControlService, OCRService, ODService, ImgService, WindowService
+from src.core.pages import Page, TextMatch
 from src.core.regions import RapidocrPosition
 from src.service.auto_boss_service import AutoBossServiceImpl
 from src.service.daily_activity_service import DailyActivityServiceImpl
 from src.service.page_event_service import PageEventAbstractService
-from src.util import hwnd_util, img_util, file_util, rapidocr_util
+from src.util import hwnd_util, img_util, file_util, rapidocr_util, screenshot_util
 from src.util.wrap_util import timeit
 
 logger = logging.getLogger(__name__)
 
+hwnd_util.enable_dpi_awareness()
 
 def test_absorption_action():
     logger.debug("\n")
@@ -95,4 +97,32 @@ def __test_ui_page(page, engine, img_name):
     logger.debug("matchPositions: %s", page.matchPositions)
     assert is_match
 
+
+def test_page_match():
+    page = Page(
+        name="更新完成，请重新启动游戏",
+        targetTexts=[
+            TextMatch(
+                name="更新完成，请重新启动游戏",
+                text="更新完成，请重新启动游戏",
+            ),
+            TextMatch(
+                name="退出",
+                text="^退出$",
+            ),
+        ],
+    )
+    logger.debug("\n")
+    engine: RapidOCR = rapidocr_util.create_ocr()
+    hwnd = hwnd_util.get_hwnd()
+    img = screenshot_util.screenshot(hwnd)
+    img_util.save_img_in_temp(img)
+    output: RapidOCROutput = engine(img, use_det=True, use_rec=True, use_cls=False)
+    positions = RapidocrPosition.format(output)
+    is_match = page.is_match(img, img, positions)
+    if not is_match:
+        rapidocr_util.print_ocr_result(output)
+    logger.debug("is_match: %s", is_match)
+    logger.debug("matchPositions: %s", page.matchPositions)
+    assert is_match
 

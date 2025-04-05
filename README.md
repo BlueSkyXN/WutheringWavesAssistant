@@ -1,8 +1,24 @@
+<div style="text-align: center;">
+  <img src="src/gui/resource/images/logo.png" alt="LOGO" />
+
 # Wuthering Waves Assistant
+
+<br>
+<div>
+    <img alt="license" src="https://img.shields.io/github/license/wakening/WutheringWavesAssistant">
+    <img alt="commit" src="https://img.shields.io/github/commit-activity/m/wakening/WutheringWavesAssistant?color=%23ff69b4">
+</div>
+<div>
+    <img alt="stars" src="https://img.shields.io/github/stars/wakening/WutheringWavesAssistant?style=social">
+    <img alt="GitHub all releases" src="https://img.shields.io/github/downloads/wakening/WutheringWavesAssistant/total?style=social">
+</div>
+<br>
 
 鸣潮自动化助手
 
 **QQ群: 1039535103**
+
+</div>
 
 ---
 
@@ -14,7 +30,8 @@
 
 ### 1️⃣ 安装 Conda
 
-群文件里有，或点击 [Miniconda官方链接](https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe) 下载 Miniconda，并按照默认设置安装。
+群文件里有，或点击 [Miniconda官方链接](https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe) 下载
+Miniconda，并按照默认设置安装。
 
 ### 2️⃣ 安装 Git
 
@@ -38,7 +55,6 @@ git clone https://gitclone.com/github.com/wakening/WutheringWavesAssistant.git
 
 ### 5️⃣ 安装依赖
 
-
 ```powershell
 管理员身份打开powershell，设置允许执行脚本
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
@@ -49,7 +65,7 @@ cd WutheringWavesAssistant
 ./scripts/rebuild_conda_env.ps1
 ```
 
-按照提示，输入1 回车 选择GPU环境安装，等待脚本执行完成，执行一次即可，若失败可以重跑  
+按照提示，输入1 回车 选择GPU环境安装，等待脚本执行完成，执行一次即可，若失败可以重跑
 
 ### 6️⃣ 配置文件
 
@@ -66,6 +82,7 @@ conda activate wwa-cuda
 # 运行程序
 python main.py
 ```
+
 若能正常运行，后续可双击启动器运行 WWA.exe
 
 ### 8️⃣ 更新脚本
@@ -91,11 +108,23 @@ conda remove --name WutheringWavesAssistant --all -y
 ## ❓ 常见问题
 
 ### ⚠️ 脚本无法运行？
+
 确保 **PowerShell 以管理员身份运行**，并且 Conda 和 Git 均已正确安装。
 
 ### ⚠️ 依赖安装失败？
+
 重新运行 `./scripts/rebuild_conda_env.ps1` 以重建环境。
 
 ### ⚠️ 运行时报错？
+
 加入我们的 **QQ群 (1039535103)** 交流或提交 Issue 反馈问题。
+
+---
+
+## 免责声明
+
+本项目为本人学习python所建，请下载后24小时内删除  
+项目基于OCR文字识别、YOLO目标检测，纯图像识别，完全开源  
+脚本是否有使用风险，一切解释权均由kuro所有，建议手刷不要使用脚本  
+
 

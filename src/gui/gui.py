@@ -10,14 +10,23 @@ from PySide6.QtWidgets import QApplication
 from src.gui.common.config import cfg
 from src.gui.view.main_window import MainWindow
 
+_APP = None
+
 class GuiController(QObject):
     task_run_requested = Signal(str, str)
 
     def __init__(self):
         super().__init__()
+        self.log_file = None
+        self.log_queue = None
 
     def on_run_clicked(self, task_name: str, task_ops: str):
         self.task_run_requested.emit(task_name, task_ops)
+
+    def get_app(self):
+        global _APP
+        return _APP
+
 
 
 def wwa():
@@ -29,6 +38,9 @@ def wwa():
     # create application
     app = QApplication(sys.argv)
     app.setAttribute(Qt.AA_DontCreateNativeWidgetSiblings)
+
+    global _APP
+    _APP = app
 
     # internationalization
     locale = cfg.get(cfg.language).value
