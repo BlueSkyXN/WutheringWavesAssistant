@@ -1,11 +1,13 @@
 # coding:utf-8
 import sys
 from enum import Enum
+from pathlib import Path
 
 from PySide6.QtCore import QLocale
 from qfluentwidgets import (qconfig, QConfig, ConfigItem, OptionsConfigItem, BoolValidator,
                             OptionsValidator, RangeConfigItem, RangeValidator,
-                            FolderListValidator, Theme, FolderValidator, ConfigSerializer, __version__)
+                            FolderListValidator, Theme, FolderValidator, ConfigSerializer)
+from src import __version__
 
 
 class Language(Enum):
@@ -56,7 +58,7 @@ class Config(QConfig):
 
 YEAR = 2025
 AUTHOR = "wakening"
-VERSION = "2.2.1 Alpha"
+VERSION = __version__
 HELP_URL = "https://github.com/wakening/WutheringWavesAssistant?tab=readme-ov-file#-%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97"
 REPO_URL = "https://github.com/wakening/WutheringWavesAssistant"
 EXAMPLE_URL = "https://github.com/wakening"
@@ -68,4 +70,6 @@ EN_SUPPORT_URL = "https://afdian.com/a/wakening"
 
 cfg = Config()
 cfg.themeMode.value = Theme.AUTO
-qconfig.load('temp/config/gui-config.json', cfg)
+# qconfig.load('temp/config/gui-config.json', cfg)
+qconfig_path = str(Path(__file__).parent.parent.parent.joinpath('temp/config/gui-config.json'))
+qconfig.load(qconfig_path, cfg)

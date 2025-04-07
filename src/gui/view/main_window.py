@@ -13,12 +13,11 @@ from .gallery_interface import GalleryInterface
 from .home_interface import HomeInterface
 from .setting_interface import SettingInterface
 from .terminal_interface import TerminalInterface
-from ..common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg
+from ..common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg, VERSION
 from ..common.icon import Icon
 from ..common.signal_bus import signalBus
 from ..common.translator import Translator
 from ..common import resource
-from src import __version__
 
 
 class MainWindow(FluentWindow):
@@ -68,7 +67,7 @@ class MainWindow(FluentWindow):
         # self.resize(960, 780)
         self.setMinimumWidth(760)
         self.setWindowIcon(QIcon(':/gallery/images/logo.png'))
-        self.setWindowTitle(f'Wuthering Waves Assistant {__version__}')
+        self.setWindowTitle(f'Wuthering Waves Assistant {VERSION}')
 
         self.setMicaEffectEnabled(cfg.get(cfg.micaEnabled))
 
@@ -97,7 +96,6 @@ class MainWindow(FluentWindow):
 
     def closeEvent(self, e):
         signalBus.closeSignal.emit()
-        self.terminalInterface.stopLogListener() # 同步调用，保证退出通知到位
         self.themeListener.terminate()
         self.themeListener.deleteLater()
         super().closeEvent(e)

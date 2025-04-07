@@ -29,11 +29,14 @@
 ### 1️⃣ 安装 Conda
 
 群文件里有，或点击 [Miniconda官方链接](https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe) 下载
-Miniconda，并按照默认设置安装。
+Miniconda  
+安装时点击选项：  
+Next -> I agree ->  Just Me (recommended) -> Next -> Next ->  
+Add miniconda3 to my PATH environment variable -> Install  
 
 ### 2️⃣ 安装 Git
 
-前往 [Git 官网](https://git-scm.com/) 下载并安装 Git，全程保持默认设置。
+前往 [Git 官网（右下角有个显示器，点击 Download for Windows）](https://git-scm.com/) 下载并安装 Git，全程保持默认设置。
 
 ### 3️⃣ 准备环境
 
@@ -54,7 +57,7 @@ git clone https://gitclone.com/github.com/wakening/WutheringWavesAssistant.git
 ### 5️⃣ 安装依赖
 
 ```powershell
-管理员身份打开powershell，设置允许执行脚本
+管理员身份打开powershell，设置允许执行脚本，执行过一次即可
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
@@ -88,16 +91,16 @@ python main.py
 ```powershell
 git pull
 
-更新后若无法运行或窗口出现闪烁，运行5️⃣中的rebuild脚本即可
+# 更新后若无法运行或窗口出现闪烁，运行5️⃣中的rebuild脚本即可
 ```
 
 ### 9️⃣ 管理历史环境
 
 ```powershell
-查看conda里所有的环境:
+# 查看conda里所有的环境:
 conda env list
 
-删除历史测试环境(v2.2.2 Alpha之前的版本):
+# 删除历史测试环境(v2.2.2 Alpha之前的版本):
 conda remove --name WutheringWavesAssistant --all -y
 ```
 

@@ -16,14 +16,14 @@ else:
 APPLICATION = MainController()
 GUI = GuiController()
 
-GUI.log_file = environs.get_log_path()
-GUI.log_queue = logging_config.get_log_queue()
-
-# 前端连接信号到后端函数
-GUI.task_run_requested.connect(APPLICATION.execute)
-
 
 def run():
+    GUI.log_file = environs.get_log_path()
+    GUI.log_queue = logging_config.get_log_queue()
+
+    # 前端连接信号到后端函数
+    GUI.task_run_requested.connect(APPLICATION.execute)
+
     wwa()
 # https://kekee000.github.io/fonteditor/
 # Fluentlcon.MUTE
