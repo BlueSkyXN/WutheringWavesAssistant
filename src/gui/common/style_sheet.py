@@ -17,6 +17,7 @@ class StyleSheet(StyleSheetBase, Enum):
     NAVIGATION_VIEW_INTERFACE = "navigation_view_interface"
 
     NOTICE_INTERFACE = "notice_interface"
+    TERMINAL_INTERFACE = "terminal_interface"
 
     def path(self, theme=Theme.AUTO):
         theme = qconfig.theme if theme == Theme.AUTO else theme

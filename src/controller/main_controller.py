@@ -6,7 +6,7 @@ from enum import Enum
 from multiprocessing import Event, Lock
 
 from src.core.contexts import Context
-from src.core.injector import Container
+from src.core.tasks import ProcessTask
 from src.util import hwnd_util
 
 logger = logging.getLogger(__name__)
@@ -17,99 +17,42 @@ class TaskOpsEnum(Enum):
     STOP = "STOP"
 
 
-class MainController:
+class TaskMonitor:
 
-    def __init__(self):
-        logger.debug("Initializing %s", self.__class__.__name__)
-
-        from src.core.tasks import MouseResetProcessTask, AutoBossProcessTask, AutoPickupProcessTask, \
-            AutoStoryProcessTask, DailyActivityProcessTask, ProcessTask
-
-        self.tasks = {
-            "MouseResetProcessTask": MouseResetProcessTask,
-            "AutoBossProcessTask": AutoBossProcessTask,
-            "AutoPickupProcessTask": AutoPickupProcessTask,
-            "AutoStorySkipProcessTask": AutoStoryProcessTask,
-            "AutoStoryEnjoyProcessTask": AutoStoryProcessTask,
-            "DailyActivityProcessTask": DailyActivityProcessTask,
-        }
-        self.running_tasks: dict[str, tuple[ProcessTask, Event]] = {}
-        self._lock: Lock = Lock()
+    def __init__(self, running_tasks: dict[str, tuple[ProcessTask, Event]]):
+        self.running_tasks: dict[str, tuple[ProcessTask, Event]] = running_tasks
 
         self.context = Context()
-        self.container = Container.build(self.context)
 
-        self.restart_duration = self.get_restart_duration()
-        self.restart_time = None
+        # 游戏定时重启参数
+        self.game_restart_duration = self.get_restart_duration()
+        self.game_restart_time: float | None = None
+
+        # 任务重启冷却时间，防止异常时一直重启
+        self.task_restart_cooldown = 20  # seconds
+        self.task_restart_time: float | None = None
 
         self._monitor_event = threading.Event()
-        self._monitor_event.set()
         self._monitor_thread = threading.Thread(target=self.monitor)
         self._monitor_thread.daemon = True
-        self._monitor_running = False
 
+    def start(self):
+        self._monitor_event.set()
+        self._monitor_thread.start()
 
-    def execute(self, task_name: str, task_ops: str):
-        logger.debug("task_name: %s, task_ops: %s", task_name, task_ops)
-        with self._lock:
-            if not self._monitor_running:
-                # 提交了任务才启动，懒启动
-                self._monitor_running = True
-                self._monitor_thread.start()
-
-            if task_ops == TaskOpsEnum.START.value:
-                logger.info("准备开启任务: %s", task_name)
-                if self.running_tasks.get(task_name):
-                    logger.warning("任务已存在，请勿重复提交")
-                    return False, "任务已存在，请勿重复提交"
-                event = Event()
-                event.set()
-                task_builder = self.tasks.get(task_name)
-
-                from src.config import logging_config
-                from src.core import environs
-                kwargs = {}
-                kwargs["LOG_QUEUE"] = logging_config.get_log_queue()
-                if task_name == "AutoStorySkipProcessTask":
-                    kwargs["SKIP_IS_OPEN"] = "True"
-                elif task_name == "AutoStoryEnjoyProcessTask":
-                    kwargs["SKIP_IS_OPEN"] = "False"
-                if task_name == "AutoBossProcessTask":
-                    kwargs[environs.ENV_WWA_OCR_USE_GPU] = "True"
-                else:
-                    kwargs[environs.ENV_WWA_OCR_USE_GPU] = "False"
-
-                task = task_builder.build(args=(event,), kwargs=kwargs, daemon=True).start()
-                self.running_tasks[task_name] = (task, event)
-                if task_name in ["AutoBossProcessTask", "DailyActivityProcessTask"]:
-                    from src.core.tasks import MouseResetProcessTask
-                    mouse_reset_process_task = MouseResetProcessTask.build(args=(event,), kwargs=kwargs,
-                                                                           daemon=True).start()
-                    self.running_tasks["MouseResetProcessTask"] = (mouse_reset_process_task, event)
-                logger.info("任务已提交: %s", task_name)
-                return True, "任务已提交"
-            elif task_ops == TaskOpsEnum.STOP.value:
-                logger.info("准备关闭任务: %s", task_name)
-                if not self.running_tasks.get(task_name):
-                    logger.warning("任务不存在，无需关闭")
-                    return True, "任务不存在，无需关闭"
-                task, event = self.running_tasks[task_name]
-                event.clear()
-                time.sleep(0.1)
-                task.stop()
-                self.running_tasks.pop(task_name)
-                if self.running_tasks.get("MouseResetProcessTask"):
-                    task, event = self.running_tasks["MouseResetProcessTask"]
-                    task.stop()
-                    self.running_tasks.pop("MouseResetProcessTask")
-                logger.info("任务已停止: %s", task_name)
-                return True, "任务已停止"
-            else:
-                raise NotImplementedError(f"不支持的类型{task_ops}")
+    def stop(self):
+        self._monitor_event.clear()
+        self._monitor_thread.join()
 
     def monitor(self):
         logger.info("任务监控线程开始运行")
         try:
+            # 启动监控前等20s让任务进程先运行
+            wait_task = 20  # seconds
+            while self._monitor_event.is_set() and wait_task > 0:
+                time.sleep(1)
+                wait_task -= 1
+
             duration = 5  # seconds
             while self._monitor_event.is_set():
                 if not self.running_tasks:
@@ -117,26 +60,36 @@ class MainController:
                     continue
 
                 # 定时重启(仅关闭游戏)
-                if "AutoBossProcessTask" in self.running_tasks and self.restart_duration:
-                    if not self.restart_time:
-                        self.restart_time = time.monotonic()
-                    elif time.monotonic() - self.restart_time > self.restart_duration:
+                if "AutoBossProcessTask" in self.running_tasks and self.game_restart_duration:
+                    if not self.game_restart_time:
+                        self.game_restart_time = time.monotonic()
+                    elif time.monotonic() - self.game_restart_time > self.game_restart_duration:
                         self.close_game()
-                        self.restart_time = time.monotonic()
+                        self.game_restart_time = time.monotonic()
                         time.sleep(5)
 
+                if not self._monitor_event.is_set():
+                    break
+
                 # 检查游戏存活状态(重启游戏)
-                self._monitor_game()
+                if "AutoBossProcessTask" in self.running_tasks:
+                    self._monitor_game()
+
+                if not self._monitor_event.is_set():
+                    break
 
                 # 检查任务存活状态
-                for k, v in self.running_tasks.items():
+                for k, v in self.running_tasks.copy().items():
                     if k == "MouseResetProcessTask":
                         continue
                     process_task, event = v
                     if not event.is_set():
                         continue
                     time.sleep(1)
-                    if event.is_set() and not process_task.is_alive():
+                    if not event.is_set() or process_task.is_alive():
+                        continue
+                    if self.task_restart_time is None or time.monotonic() - self.task_restart_time > self.task_restart_cooldown:
+                        self.task_restart_time = time.monotonic()
                         process_task.restart()
 
                 time.sleep(duration)
@@ -210,6 +163,90 @@ class MainController:
                 logger.info("已开启定时重启，周期: %ss", restart_duration)
                 return restart_duration
         return None
+
+
+class MainController:
+
+    def __init__(self):
+        logger.debug("Initializing %s", self.__class__.__name__)
+
+        from src.core.tasks import MouseResetProcessTask, AutoBossProcessTask, AutoPickupProcessTask, \
+            AutoStoryProcessTask, DailyActivityProcessTask, ProcessTask
+
+        self.tasks = {
+            "MouseResetProcessTask": MouseResetProcessTask,
+            "AutoBossProcessTask": AutoBossProcessTask,
+            "AutoPickupProcessTask": AutoPickupProcessTask,
+            "AutoStorySkipProcessTask": AutoStoryProcessTask,
+            "AutoStoryEnjoyProcessTask": AutoStoryProcessTask,
+            "DailyActivityProcessTask": DailyActivityProcessTask,
+        }
+        self.running_tasks: dict[str, tuple[ProcessTask, Event]] = {}
+        self._lock: Lock = Lock()
+
+        self.task_monitor = None
+
+    def execute(self, task_name: str, task_ops: str):
+        logger.debug("task_name: %s, task_ops: %s", task_name, task_ops)
+        with self._lock:
+            if task_ops == TaskOpsEnum.START.value:
+                logger.info("准备开启任务: %s", task_name)
+                if self.running_tasks.get(task_name):
+                    logger.warning("任务已存在，请勿重复提交")
+                    return False, "任务已存在，请勿重复提交"
+                event = Event()
+                event.set()
+                task_builder = self.tasks.get(task_name)
+
+                from src.config import logging_config
+                from src.core import environs
+                kwargs = {}
+                kwargs["LOG_QUEUE"] = logging_config.get_log_queue()
+                if task_name == "AutoStorySkipProcessTask":
+                    kwargs["SKIP_IS_OPEN"] = "True"
+                elif task_name == "AutoStoryEnjoyProcessTask":
+                    kwargs["SKIP_IS_OPEN"] = "False"
+                # if task_name in ["AutoBossProcessTask", "AutoPickupProcessTask"]:
+                if task_name in ["AutoBossProcessTask"]:
+                    kwargs[environs.ENV_WWA_OCR_USE_GPU] = "True"
+                else:
+                    kwargs[environs.ENV_WWA_OCR_USE_GPU] = "False"
+
+                task = task_builder.build(args=(event,), kwargs=kwargs, daemon=True).start()
+                self.running_tasks[task_name] = (task, event)
+                if task_name in ["AutoBossProcessTask", "DailyActivityProcessTask"]:
+                    from src.core.tasks import MouseResetProcessTask
+                    mouse_reset_process_task = MouseResetProcessTask.build(args=(event,), kwargs=kwargs,
+                                                                           daemon=True).start()
+                    self.running_tasks["MouseResetProcessTask"] = (mouse_reset_process_task, event)
+
+                self.task_monitor = TaskMonitor(self.running_tasks.copy())
+                self.task_monitor.start()
+
+                logger.info("任务已提交: %s", task_name)
+                return True, "任务已提交"
+            elif task_ops == TaskOpsEnum.STOP.value:
+                logger.info("准备关闭任务: %s", task_name)
+                if not self.running_tasks.get(task_name):
+                    logger.warning("任务不存在，无需关闭")
+                    return True, "任务不存在，无需关闭"
+
+                self.task_monitor.stop()
+                self.task_monitor = None
+
+                task, event = self.running_tasks[task_name]
+                event.clear()
+                time.sleep(0.1)
+                task.stop()
+                self.running_tasks.pop(task_name)
+                if self.running_tasks.get("MouseResetProcessTask"):
+                    task, event = self.running_tasks["MouseResetProcessTask"]
+                    task.stop()
+                    self.running_tasks.pop("MouseResetProcessTask")
+                logger.info("任务已停止: %s", task_name)
+                return True, "任务已停止"
+            else:
+                raise NotImplementedError(f"不支持的类型{task_ops}")
 
 
 if __name__ == '__main__':

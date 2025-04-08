@@ -134,7 +134,7 @@ class ClockAction:
             try:
                 self.callable()
             except Exception:
-                logger.exception("Clock action error!")
+                pass
 
 
 def is_gui_process_alive():
@@ -213,57 +213,12 @@ def auto_boss_task_run(event: Event, **kwargs):
     count = 0
     clock_action = ClockAction(control_service.activate, 3.0)
 
-    # def restart_game() -> bool:
-    #     start_time = time.monotonic()
-    #     while time.monotonic() - start_time < 300:
-    #         time.sleep(2)  # 必须写在try外面，防止关闭进程时进入这里还继续往下走
-    #         time.sleep(2)
-    #         if not is_gui_process_alive():
-    #             return False
-    #         try:
-    #             logger.info("先尝试关闭游戏")
-    #             hwnd_util.force_close_process(window_service.window)
-    #         except Exception:
-    #             logger.exception("游戏不存在")
-    #         time.sleep(5)
-    #         game_path = context.config.app.AppPath
-    #         logger.info("开始重启游戏")
-    #         subprocess.Popen(game_path, creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP)
-    #         time.sleep(20)
-    #         for i in range(10):
-    #             try:
-    #                 hwnd = hwnd_util.get_hwnd()
-    #                 if hwnd is not None and hwnd > 0:
-    #                     logger.info("游戏已重启")
-    #                     time.sleep(5)
-    #                     hwnd_util.set_hwnd_left_top()
-    #                     time.sleep(1)
-    #                     return True
-    #             except KeyboardInterrupt:
-    #                 logger.warning("KeyboardInterrupt")
-    #                 raise
-    #             except Exception as e2:
-    #                 logger.exception(e2)
-    #             time.sleep(5)
-    #     return False
-
     def close_game():
         try:
             logger.info("定时关闭游戏")
             hwnd_util.force_close_process(window_service.window)
         except Exception:
             logger.exception("关闭游戏时异常")
-
-    # # 定时重启开启
-    # if context.config.app.RestartWutheringWaves is True:
-    #     restart_duration = context.config.app.RestartWutheringWavesTime
-    #     if restart_duration < 10:
-    #         logger.warning("定时重启周期过短: %ss, 自动关闭定时", restart_duration)
-    #     else:
-    #         logger.info("已开启定时重启，周期: %ss", restart_duration)
-    #         close_game_thread = threading.Timer(restart_duration, close_game)
-    #         close_game_thread.daemon = True
-    #         close_game_thread.start()
 
     try:
         while event.is_set():
@@ -279,14 +234,6 @@ def auto_boss_task_run(event: Event, **kwargs):
             except ScreenshotError:
                 close_game()
                 raise
-            # except (WindowError, ScreenshotError) as e:
-            # logger.exception("检测到窗口异常，开始重启")
-            # if restart_game():
-            #     window_service.refresh()
-            #     continue
-            # else:
-            #     logger.error("游戏重启失败，任务无法进行，结束运行")
-            #     break
     except KeyboardInterrupt:
         logger.warning("KeyboardInterrupt")
     except Exception as e:
@@ -320,11 +267,13 @@ def auto_pickup_task_run(event: Event, **kwargs):
             clock_action.action()
             try:
                 page_event_service.execute()
-            except ScreenshotError as e:
+            except ScreenshotError:
                 logger.exception("截图失败")
                 time.sleep(1)
     except KeyboardInterrupt:
         logger.info("自动拾取任务进程结束")
+    except Exception as e:
+        logger.exception(e)
     finally:
         try:
             keymouse_util.key_up(window_service.window, "W")
@@ -361,6 +310,8 @@ def auto_story_task_run(event: Event, **kwargs):
                 time.sleep(1)
     except KeyboardInterrupt:
         logger.info("自动剧情任务进程结束")
+    except Exception as e:
+        logger.exception(e)
     finally:
         try:
             keymouse_util.key_up(window_service.window, "W")
@@ -391,6 +342,8 @@ def daily_activity_task_run(event: Event, **kwargs):
         page_event_service.execute()
     except KeyboardInterrupt:
         logger.info("每日任务进程结束")
+    except Exception as e:
+        logger.exception(e)
     finally:
         try:
             keymouse_util.key_up(window_service.window, "W")

@@ -70,7 +70,9 @@ class QueueFileHandler(logging.FileHandler):
                 # issue 35046: merged two stream.writes into one.
                 stream.write(msg + self.terminator)
                 self.flush()
-                self.LOG_QUEUE.put(msg, block=False)
+                if self.LOG_QUEUE is not None: # 启动时日志未初始化，若写入了日志，则跳过
+                    emit_msg = (record.levelname, msg)
+                    self.LOG_QUEUE.put(emit_msg, block=False)
             except RecursionError:  # See issue 36272
                 raise
             except queue.Full:
@@ -105,7 +107,7 @@ def rotate_log(max_size=5 * 1024 * 1024, is_test: bool = False):
                 backup_name = backup_name + "." + str(count)
                 count += 1
                 continue
-            logger.info("Backing up log file: %s", backup_path)
+            # logger.info("Backing up log file: %s", backup_path) # 此时日志还未初始化
             log_path.rename(backup_path)  # 重命名日志文件
             log_path.touch()  # 重新创建一个空的日志文件
             break

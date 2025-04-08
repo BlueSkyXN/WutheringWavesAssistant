@@ -37,7 +37,7 @@ class AutoPickupServiceImpl(PageEventAbstractService):
 
     def execute(self, **kwargs):
         if not self._window_service.is_foreground_window():
-            time.sleep(0.5)
+            time.sleep(1)
             return
 
         start_time = time.perf_counter_ns()

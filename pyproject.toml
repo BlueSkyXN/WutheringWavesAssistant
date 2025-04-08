@@ -1,6 +1,6 @@
 [project]
 name = "wuthering-waves-assistant"
-version = "2.2.6"
+version = "2.2"
 description = "Wuthering Waves Assistant"
 authors = [
     { name = "wakening", email = "MzUwODA3OTg5Mw==@qq.com" }

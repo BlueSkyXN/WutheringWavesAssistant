@@ -23,19 +23,20 @@ class ChangelogCard(CardWidget):
 
         # self.iconWidget = IconWidget(icon, self)
         # self.titleLabel = QLabel(title, self)
-        self.contentLabel = QLabel(TextWrap.wrap(content, 57, False)[0], self)
+        self.contentLabel = QLabel(TextWrap.wrap(content, 800, False)[0], self)
 
         self.hBoxLayout = QHBoxLayout(self)
         self.vBoxLayout = QVBoxLayout()
 
-        self.setFixedSize(1000, 90)
+        # self.setFixedSize(1000, 90)
+        self.setFixedWidth(1000)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)  # 宽度自适应，固定高度
         # self.iconWidget.setFixedSize(48, 48)
 
         self.hBoxLayout.setSpacing(28)
         self.hBoxLayout.setContentsMargins(20, 0, 20, 0)
         self.vBoxLayout.setSpacing(2)
-        self.vBoxLayout.setContentsMargins(0, 0, 0, 0)
+        self.vBoxLayout.setContentsMargins(0, 15, 0, 15)
         self.vBoxLayout.setAlignment(Qt.AlignVCenter)
 
         self.hBoxLayout.setAlignment(Qt.AlignVCenter)
@@ -90,14 +91,6 @@ class NoticeInterface(GalleryInterface):
         )
         self.setObjectName('noticeInterface')
         # StyleSheet.NOTICE_INTERFACE.apply(self)
-
-        # self.changelog = self.load_file("CHANGELOG.md")
-
-        # self.text_browser = QTextBrowser(self)
-        # self.text_browser.setMarkdown(self.changelog)
-        # # self.text_browser.style()
-        # # self.text_browser.setObjectName('contentLabel')
-        # self.vBoxLayout.addWidget(self.text_browser, 0, Qt.AlignTop)
 
         changelog_list = self.load_changelog("CHANGELOG.md")
         for changelog in changelog_list:
