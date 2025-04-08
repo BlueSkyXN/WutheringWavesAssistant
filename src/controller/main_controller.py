@@ -54,10 +54,14 @@ class TaskMonitor:
                 wait_task -= 1
 
             duration = 5  # seconds
+            duration_before = 2.5  # seconds
+            duration_after = duration - duration_before  # seconds
             while self._monitor_event.is_set():
                 if not self.running_tasks:
                     time.sleep(duration)
                     continue
+
+                time.sleep(duration_before)
 
                 # 定时重启(仅关闭游戏)
                 if "AutoBossProcessTask" in self.running_tasks and self.game_restart_duration:
@@ -92,7 +96,7 @@ class TaskMonitor:
                         self.task_restart_time = time.monotonic()
                         process_task.restart()
 
-                time.sleep(duration)
+                time.sleep(duration_after)
         except KeyboardInterrupt:
             raise
         except Exception:
