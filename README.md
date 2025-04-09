@@ -33,6 +33,12 @@ Miniconda
 安装时点击选项：  
 Next -> I agree ->  Just Me (recommended) -> Next -> Next ->  
 Add miniconda3 to my PATH environment variable -> Install  
+安装完成后，任意打开一个**新的 powershell 窗口**，准备初始化conda
+```powershell
+conda -V
+conda init powershell
+```
+执行后没有红色异常文字，这步就完成了，**关闭 powershell 窗口**
 
 ### 2️⃣ 安装 Git
 
@@ -41,7 +47,7 @@ Add miniconda3 to my PATH environment variable -> Install
 ### 3️⃣ 准备环境
 
 - 选择一个**路径中不包含中文**的文件夹来存放本项目。
-- **以管理员身份**打开 PowerShell。
+- **以管理员身份**打开一个**新的 PowerShell 窗口**。
 
 ### 4️⃣ 下载项目
 
@@ -56,11 +62,11 @@ git clone https://gitclone.com/github.com/wakening/WutheringWavesAssistant.git
 
 ### 5️⃣ 安装依赖
 
-```powershell
 管理员身份打开powershell，设置允许执行脚本，执行过一次即可
+```powershell
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
-
+开始自动安装依赖，无需梯子
 ```powershell
 cd WutheringWavesAssistant
 ./scripts/rebuild_conda_env.ps1
@@ -77,30 +83,32 @@ cd WutheringWavesAssistant
 
 **务必以管理员身份运行**，否则部分功能可能无法正常工作。
 
+激活英伟达GPU环境wwa-cuda，cpu则是wwa-cpu
 ```powershell
-# 激活英伟达GPU环境wwa-cuda，cpu则是wwa-cpu
 conda activate wwa-cuda
-# 运行程序
+```
+激活后运行程序
+```powershell
 python main.py
 ```
 
-若能正常运行，后续可双击启动器运行 WWA.exe
+若能正常运行，后续可双击启动器运行 WWA.exe  
 
 ### 8️⃣ 更新脚本
 
 ```powershell
 git pull
-
-# 更新后若无法运行或窗口出现闪烁，运行5️⃣中的rebuild脚本即可
 ```
+更新后若无法运行或窗口出现闪烁，运行5️⃣中的rebuild脚本即可
 
 ### 9️⃣ 管理历史环境
 
+查看conda里所有的环境:
 ```powershell
-# 查看conda里所有的环境:
 conda env list
-
-# 删除历史测试环境(v2.2.2 Alpha之前的版本):
+```
+删除历史测试环境(v2.2.2 Alpha之前的版本):
+```powershell
 conda remove --name WutheringWavesAssistant --all -y
 ```
 
