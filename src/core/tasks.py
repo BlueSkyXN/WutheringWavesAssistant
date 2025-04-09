@@ -33,7 +33,7 @@ class ProcessTask(ABC):
 
         self._start_time: datetime | None = None
         self._end_time: datetime | None = None
-        self._restart_time: list[datetime] = []
+        self._restart_time_list: list[datetime] = []
         self._process: Process | None = None
 
     @abstractmethod
@@ -83,12 +83,13 @@ class ProcessTask(ABC):
 
     def restart(self, timeout=5):
         self._stop(timeout=timeout)
+        if len(self._restart_time_list) > 0:
+            start_time_last = self._restart_time_list[-1]
+        else:
+            start_time_last = self._start_time
         restart_time = datetime.now()
-        elapsed_time = (restart_time - self._start_time).total_seconds()
-        hours, remainder = divmod(elapsed_time, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        logger.warning(f"[{self.name}] 任务重启，已运行: {int(hours)}h {int(minutes)}m {seconds:.2f}s")
-        self._restart_time.append(restart_time)
+        logger.warning(f"[{self.name}] 任务重启，上次重启时间: {start_time_last.strftime("%Y-%m-%d %H:%M:%S")}")
+        self._restart_time_list.append(restart_time)
         self._process = Process(
             target=self.get_task(), args=self.args, kwargs=self.kwargs, name=self.name, daemon=self.daemon)
         self._process.start()
@@ -213,13 +214,6 @@ def auto_boss_task_run(event: Event, **kwargs):
     count = 0
     clock_action = ClockAction(control_service.activate, 3.0)
 
-    def close_game():
-        try:
-            logger.info("定时关闭游戏")
-            hwnd_util.force_close_process(window_service.window)
-        except Exception:
-            logger.exception("关闭游戏时异常")
-
     try:
         while event.is_set():
             try:
@@ -232,7 +226,11 @@ def auto_boss_task_run(event: Event, **kwargs):
                 result = ocr_service.ocr(img)
                 page_event_service.execute(src_img=src_img, img=img, ocr_results=result)
             except ScreenshotError:
-                close_game()
+                try:
+                    logger.warning("截图异常，关闭游戏")
+                    hwnd_util.force_close_process(window_service.window)
+                except Exception:
+                    logger.error("关闭游戏时异常")
                 raise
     except KeyboardInterrupt:
         logger.warning("KeyboardInterrupt")

@@ -1,5 +1,7 @@
+import html
 import logging
 import queue
+import re
 import threading
 
 from PySide6.QtGui import Qt, QColor
@@ -90,12 +92,20 @@ class TerminalCard(SimpleCardWidget):
         if level_name in ["ERROR", "WARN", "WARNING", "DEBUG"]:
             if level_name == "ERROR":
                 color = QColor(255, 100, 100)
+                # 转义 HTML 特殊字符
+                safe_msg = html.escape(msg)
+                # 替换每一行开头的空格为 &nbsp;（缩进）
+                safe_msg = re.sub(r'^(\s+)', lambda m: '&nbsp;' * len(m.group(1)), safe_msg, flags=re.MULTILINE)
+                # 替换换行符为 <br>
+                safe_msg = safe_msg.replace('\n', '<br>')
+                formatted_msg = rf"<font color='{color.name()}'>{safe_msg}</font>"
             elif level_name == "WARNING" or level_name == "WARN":
                 # color = QColor(200, 200, 0)
                 color = QColor(184, 134, 11)
+                formatted_msg = rf"<font color='{color.name()}'>{msg}</font>"
             else:  # level_name == "DEBUG":
                 color = QColor(100, 255, 100)
-            formatted_msg = rf"<font color='{color.name()}'>{msg}</font>"
+                formatted_msg = rf"<font color='{color.name()}'>{msg}</font>"
             self.textEdit.append(formatted_msg)
         else:
             # 添加文本

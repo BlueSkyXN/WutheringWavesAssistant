@@ -123,9 +123,13 @@ class TaskMonitor:
             time.sleep(2)
             try:
                 logger.info("先尝试关闭游戏")
-                hwnd_util.force_close_process(hwnd_util.get_hwnd())
+                hwnd = hwnd_util.get_hwnd()
+                if hwnd:
+                    hwnd_util.force_close_process(hwnd)
+                else:
+                    logger.warning("游戏窗口不存在")
             except Exception:
-                logger.exception("游戏不存在")
+                logger.error("游戏不存在")
             time.sleep(5)
             game_path = self.context.config.app.AppPath
             subprocess.Popen(game_path, creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP)
@@ -152,7 +156,10 @@ class TaskMonitor:
         try:
             logger.info("定时关闭游戏")
             hwnd = hwnd_util.get_hwnd()
-            hwnd_util.force_close_process(hwnd)
+            if hwnd:
+                hwnd_util.force_close_process(hwnd)
+            else:
+                logger.warning("游戏窗口不存在")
         except Exception:
             logger.exception("定时关闭游戏时异常")
 
