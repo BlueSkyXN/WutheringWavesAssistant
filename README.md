@@ -3,16 +3,10 @@
 
 # Wuthering Waves Assistant
 
-<br>
-<div>
-    <img alt="license" src="https://img.shields.io/github/license/wakening/WutheringWavesAssistant">
-    <img alt="commit" src="https://img.shields.io/github/commit-activity/m/wakening/WutheringWavesAssistant?color=%23ff69b4">
-</div>
-<div>
-    <img alt="stars" src="https://img.shields.io/github/stars/wakening/WutheringWavesAssistant?style=social">
-    <img alt="GitHub all releases" src="https://img.shields.io/github/downloads/wakening/WutheringWavesAssistant/total?style=social">
-</div>
-<br>
+![license](https://img.shields.io/github/license/wakening/WutheringWavesAssistant)
+![commit](https://img.shields.io/github/commit-activity/m/wakening/WutheringWavesAssistant?color=%23ff69b4)  
+[![QQ](https://img.shields.io/badge/QQ-加群-blue?logo=tencentqq)](https://qm.qq.com/q/tDWAi0LCj8)
+[![Discord](https://img.shields.io/badge/Discord-加入社区-5865F2?logo=discord&logoColor=white)](https://discord.gg/CQtp2ZYs)  
 
 鸣潮自动化助手
 
