@@ -1723,7 +1723,7 @@ class PageEventAbstractService(PageEventService, ABC):
         }
         find_boss_name_reg = boss_name_reg_mapping.get(bossName, bossName)
         findBoss = None
-        y = 133
+        y = 113
         while y < 700:
             y = y + 22
             if y > 700:

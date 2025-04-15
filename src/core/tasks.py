@@ -161,7 +161,7 @@ def mouse_reset_task_run(event: Event, **kwargs):
     hwnd = None
     try:
         while event.is_set():
-            time.sleep(0.2)
+            time.sleep(0.05)
             try:
                 if not hwnd or not win32gui.IsWindow(hwnd):
                     time.sleep(0.5)
@@ -172,17 +172,17 @@ def mouse_reset_task_run(event: Event, **kwargs):
                 time.sleep(5)
                 continue
             current_position = mouse.position
-            left, top, right, bottom = win32gui.GetClientRect(hwnd)
+            left, top, right, bottom = win32gui.GetWindowRect(hwnd)
             center_position = (left + right) / 2, (top + bottom) / 2
-            cur_pos_to_center_distance = math.sqrt(
+            curr_pos_to_center_distance = math.sqrt(
                 (current_position[0] - center_position[0]) ** 2
                 + (current_position[1] - center_position[1]) ** 2
             )
-            cur_pos_to_last_pos_distance = math.sqrt(
+            curr_pos_to_last_pos_distance = math.sqrt(
                 (current_position[0] - last_position[0]) ** 2
                 + (current_position[1] - last_position[1]) ** 2
             )
-            if cur_pos_to_last_pos_distance > 200 and cur_pos_to_center_distance < 50:
+            if curr_pos_to_last_pos_distance > 200 and curr_pos_to_center_distance < 50:
                 mouse.position = last_position
             else:
                 last_position = current_position
