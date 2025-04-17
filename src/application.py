@@ -1,9 +1,8 @@
 import logging
 
-from src.config import logging_config
+from src.config import logging_config, gui_config
 from src.controller.main_controller import MainController
 from src.core import environs
-from src.gui.gui import GuiController, wwa
 from src.util import uac_util
 
 logger = logging.getLogger(__name__)
@@ -13,21 +12,23 @@ if uac_util.is_admin():
 else:
     logger.error("请以管理员身份运行！")
 
-APPLICATION = MainController()
-GUI = GuiController()
-
 
 def run():
-    GUI.log_file = environs.get_log_path()
-    GUI.log_queue = logging_config.get_log_queue()
+    from src.gui.common.globals import globalSignal, globalParam
 
-    # 前端连接信号到后端函数
-    GUI.task_run_requested.connect(APPLICATION.execute)
+    # 启动后台
+    server = MainController()
 
+    # 设置gui需要用到的参数
+    globalParam.logFile = environs.get_log_path()
+    globalParam.logQueue = logging_config.get_log_queue()
+    globalParam.gamePath = gui_config.ParamConfig.get_default_game_path()
+
+    # 前端信号绑定后端函数
+    globalSignal.executeTaskSignal.connect(server.execute)
+    globalSignal.closeMainWindowSignal.connect(server.stop)
+    globalSignal.paramConfigPathSignal.connect(server.set_param_config_path)  # 动态告诉后端配置文件的路径，要在emit前绑定好
+
+    # 启动qt
+    from src.gui.gui import wwa
     wwa()
-# https://kekee000.github.io/fonteditor/
-# Fluentlcon.MUTE
-# Speaker 1
-# Speaker Off
-# Window Console
-# Cellular Off

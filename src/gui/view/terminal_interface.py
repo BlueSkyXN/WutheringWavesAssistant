@@ -2,59 +2,45 @@ import html
 import logging
 import queue
 import re
-import threading
 
+from PySide6.QtCore import QThread
 from PySide6.QtGui import Qt, QColor
 from PySide6.QtWidgets import QTextEdit, QVBoxLayout
 from qfluentwidgets import SimpleCardWidget
 
-from src import application
 from .gallery_interface import GalleryInterface
+from ..common.globals import globalParam, globalSignal
 from ..common.signal_bus import signalBus
 
 logger = logging.getLogger(__name__)
 
 
-# class LogListener(QThread):
-class LogListener:
+class LogListener(QThread):
 
-    def __init__(self, log_queue, callback):
+    def __init__(self, logQueue):
         super().__init__()
-        self.log_queue = log_queue
-        self.callback = callback
-        self._running = threading.Event()
-        self._running.set()
-        self._thread = threading.Thread(target=self.run)
-        self._thread.daemon = True
+        self.logQueue = logQueue
 
     def run(self):
-        while self._running.is_set():
+        while not self.isInterruptionRequested():
             try:
-                log_text = self.log_queue.get(timeout=1)  # 设置超时，避免永久阻塞
-                if log_text is None:
+                logText = self.logQueue.get(timeout=1)  # 设置超时，避免永久阻塞
+                if logText is None:
                     continue
-                self.callback(log_text)
+                # 异步必须用signal传递数据，再由槽函数往控件内添加文本，直接在这往控件添加文本QT会经常闪退
+                signalBus.logQueueSignal.emit(logText)
             except queue.Empty:
                 continue  # 超时继续循环，及时感知运行状态
             except Exception:
-                logger.exception("Unexpected exception")
+                logger.exception("日志监听线程发生未知异常，停止运行")
                 break
 
     def stop(self):
-        self._running.clear()
-        self.log_queue.put(None)
-        self.log_queue.put(None)
-        self._thread.join(timeout=1.2)
+        self.requestInterruption()
+        self.logQueue.put(None)
+        self.logQueue.put(None)
+        self.wait(1200)
         logger.info("日志监听已关闭")
-
-    def start(self):
-        self._thread.start()
-
-    # def stop(self):
-    #     self._running = False
-    #     if self.isRunning():
-    #         # self.quit()
-    #         self.terminate()
 
 
 class TerminalCard(SimpleCardWidget):
@@ -75,12 +61,6 @@ class TerminalCard(SimpleCardWidget):
 
         self.textEdit.setReadOnly(True)
         self.textEdit.setObjectName('textEdit')
-
-        # self.levelName_color_mapping = {
-        #     "": "green",
-        #     "": "yellow",
-        #     "": "red",
-        # }
 
     def append_log(self, emit_msg):
         # 获取当前的滚动条位置
@@ -121,8 +101,8 @@ class TerminalInterface(GalleryInterface):
     """ Terminal interface """
 
     def __init__(self, parent=None):
-        self.logFIle = application.GUI.log_file
-        self.logQueue = application.GUI.log_queue
+        self.logFIle = globalParam.logFile or ""
+        self.logQueue = globalParam.logQueue
 
         super().__init__(
             title=self.tr("Terminal"),
@@ -134,8 +114,11 @@ class TerminalInterface(GalleryInterface):
 
         # self.textEdit = QTextEdit()
         self.terminalCard = TerminalCard(self)
-        self.logListener = LogListener(self.logQueue, signalBus.logQueueSignal.emit)
-        self.logListener.start()
+        self.logListener = LogListener(self.logQueue)
+        if self.logFIle is not None:
+            self.logListener.start()
+        else:
+            logger.warning("日志队列未初始化")
 
         self.__initWidget()
 
@@ -154,19 +137,8 @@ class TerminalInterface(GalleryInterface):
 
     def __connectSignalToSlot(self):
         """ connect signal to slot """
-        signalBus.closeSignal.connect(self.stopLogListener)
+        globalSignal.closeMainWindowSignal.connect(self.stopLogListener)
         signalBus.logQueueSignal.connect(self.terminalCard.append_log)
-
-    # def append_log(self, text):
-    #     # 获取当前的滚动条位置
-    #     scrollbar = self.textEdit.verticalScrollBar()
-    #     # 判断滚动条是否在最底部
-    #     is_at_bottom = scrollbar.value() == scrollbar.maximum()
-    #     # 添加文本
-    #     self.textEdit.append(text)
-    #     # 如果原本在底部，添加文本后跳到最底部
-    #     if is_at_bottom:
-    #         scrollbar.setValue(scrollbar.maximum())
 
     def stopLogListener(self):
         self.logListener.stop()

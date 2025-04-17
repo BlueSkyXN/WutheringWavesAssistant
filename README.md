@@ -60,22 +60,22 @@ git clone https://gitclone.com/github.com/wakening/WutheringWavesAssistant.git
 ```powershell
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
-开始自动安装依赖，无需梯子
+开始安装依赖，无需梯子
 ```powershell
 cd WutheringWavesAssistant
 ./scripts/rebuild_conda_env.ps1
 ```
 
-按照提示，输入1 回车 选择GPU环境安装，等待脚本执行完成，执行一次即可，若失败可以重跑
+按照提示，输入1 回车 选择GPU环境安装，等待脚本执行完成，若失败可以重跑，有红色文字即为失败，黄色等为正常  
 
 ### 6️⃣ 配置文件
 
-- **老用户**（使用过 `mc_auto_boss` 的用户）：请复制 `config.yaml` 到本目录并覆盖。
-- **新用户**：修改config.yaml中的DungeonWeeklyBossLevel和TargetBoss后运行。
+- **老用户**（使用过 `mc_auto_boss` 的用户）：请复制 `config.yaml` 到本目录并覆盖  
+- **新用户**：直接运行，详细可修改config.yaml  
 
 ### 7️⃣ 启动脚本
 
-**务必以管理员身份运行**，否则部分功能可能无法正常工作。
+**务必以管理员身份运行**，否则无法正常工作。
 
 激活英伟达GPU环境wwa-cuda，cpu则是wwa-cpu
 ```powershell
@@ -86,24 +86,26 @@ conda activate wwa-cuda
 python main.py
 ```
 
-若能正常运行，后续可双击启动器运行 WWA.exe  
+若能正常运行，后续可双击启动器 WWA.exe 运行  
 
 ### 8️⃣ 更新脚本
 
 ```powershell
 git pull
 ```
-更新后若无法运行或窗口出现闪烁，运行5️⃣中的rebuild脚本即可
 
-### 9️⃣ 管理历史环境
+若正常不报错，后续可双击更新器 WWA_updater.exe 更新并运行  
+更新后若无法运行或窗口出现闪烁，可看下方常见问题  
+
+### 9️⃣ 管理环境
 
 查看conda里所有的环境:
 ```powershell
 conda env list
 ```
-删除历史测试环境(v2.2.2 Alpha之前的版本):
+卸载环境
 ```powershell
-conda remove --name WutheringWavesAssistant --all -y
+conda remove --name wwa-cuda --all -y
 ```
 
 ---
@@ -127,7 +129,7 @@ conda remove --name WutheringWavesAssistant --all -y
 ## 免责声明
 
 本项目为本人学习python所建，请下载后24小时内删除  
-项目基于OCR文字识别、YOLO目标检测，纯图像识别，完全开源  
+项目基于OCR文字识别、YOLO目标检测，纯图像识别，完全开源，永久免费，禁止售卖  
 脚本是否有使用风险，一切解释权均由kuro所有，建议手刷不要使用脚本  
 
 

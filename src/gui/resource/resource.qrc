@@ -111,6 +111,8 @@
         <file>images/icons/Price_white.svg</file>
         <file>images/icons/Terminal_black.svg</file>
         <file>images/icons/Terminal_white.svg</file>
+        <file>images/icons/Param_black.svg</file>
+        <file>images/icons/Param_white.svg</file>
 <!--        <file>images/chidanta.jpg</file>-->
 <!--        <file>images/chidanta2.jpg</file>-->
 <!--        <file>images/chidanta3.jpg</file>-->
@@ -119,7 +121,8 @@
         <file>images/header.png</file>
         <file>images/header1.png</file>
 <!--        <file>images/kunkun.png</file>-->
-        <file>images/logo.png</file>
+<!--        <file>images/logo.png</file>-->
+        <file>images/logo.ico</file>
 <!--        <file>images/shoko.png</file>-->
 <!--        <file>images/Gyro.jpg</file>-->
 <!--        <file>images/SBR.jpg</file>-->
@@ -142,6 +145,7 @@
         <file>qss/dark/navigation_view_interface.qss</file>
         <file>qss/dark/notice_interface.qss</file>
         <file>qss/dark/terminal_interface.qss</file>
+        <file>qss/dark/param_interface.qss</file>
 
         <file>qss/light/gallery_interface.qss</file>
         <file>qss/light/home_interface.qss</file>
@@ -153,6 +157,7 @@
         <file>qss/light/navigation_view_interface.qss</file>
         <file>qss/light/notice_interface.qss</file>
         <file>qss/light/terminal_interface.qss</file>
+        <file>qss/light/param_interface.qss</file>
 
         <file>i18n/gallery.zh_CN.qm</file>
         <file>i18n/gallery.zh_HK.qm</file>

@@ -1,6 +1,7 @@
 import logging
 import math
 import os
+import threading
 import time
 from abc import ABC, abstractmethod
 from datetime import datetime
@@ -12,9 +13,9 @@ import win32gui
 from pynput.mouse import Controller
 
 from src.config import logging_config
+from src.config.gui_config import ParamConfig
 from src.core.contexts import Context
 from src.core.exceptions import ScreenshotError
-from src.core.injector import Container
 from src.core.interface import ImgService, OCRService, ControlService, PageEventService, WindowService
 from src.util import hwnd_util, keymouse_util
 
@@ -48,15 +49,17 @@ class ProcessTask(ABC):
               daemon: bool | None = None) -> Task:
         name = name if name is not None else cls.__qualname__
         task = cls(args=args, kwargs=kwargs, name=name, daemon=daemon)
-        task._process = Process(target=task.get_task(), args=args, kwargs=kwargs, name=task.name, daemon=task.daemon)
+        # task._process = Process(target=task.get_task(), args=args, kwargs=kwargs, name=task.name, daemon=task.daemon)
         return task
 
     def start(self):
+        self._process = Process(
+            target=self.get_task(), args=self.args, kwargs=self.kwargs, name=self.name, daemon=self.daemon)
         self._start_time = datetime.now()
         self._process.start()
         return self
 
-    def stop(self, timeout=5):
+    def stop(self, timeout=3):
         self._end_time = datetime.now()
         elapsed_time = (self._end_time - self._start_time).total_seconds()
         hours, remainder = divmod(elapsed_time, 3600)
@@ -65,14 +68,17 @@ class ProcessTask(ABC):
         self._stop(timeout=timeout)
         return self
 
-    def _stop(self, timeout=5):
+    def _stop(self, timeout=3):
+        if self._process is None:
+            return
         try:
             if not self._process.is_alive():
                 return self
             self._process.terminate()
-            self._process.join(timeout)
+            if timeout > 0:
+                self._process.join(timeout)
         except Exception:
-            logger.error(f"任务[{self.name}]结束失败", exc_info=True)
+            logger.exception(f"任务[{self.name}]结束失败")
         return self
 
     def join(self):
@@ -81,7 +87,7 @@ class ProcessTask(ABC):
     def is_alive(self):
         return self._process.is_alive()
 
-    def restart(self, timeout=5):
+    def restart(self, timeout=3):
         self._stop(timeout=timeout)
         if len(self._restart_time_list) > 0:
             start_time_last = self._restart_time_list[-1]
@@ -138,16 +144,47 @@ class ClockAction:
                 pass
 
 
-def is_gui_process_alive():
-    """ 用于修复主动关闭gui时，触发退出异常进入重启游戏流程，判断gui是否还存活 """
-    parent_pid = os.getppid()  # 获取 GUI 进程的 PID
-    if parent_pid == 1:  # 如果父进程变成 `init`，说明 GUI 进程已退出
-        return False
-    try:
-        parent = psutil.Process(parent_pid)
-        return parent.is_running()  # GUI 进程是否仍然在运行
-    except psutil.NoSuchProcess:
-        return False  # GUI 进程已退出
+def create_parent_monitor(event: Event, parent_pid: str):
+    if not parent_pid:
+        return
+
+    def run():
+        try:
+            pid = int(parent_pid)
+            # 获取父进程
+            parent_process = psutil.Process(pid)
+        except Exception as e:
+            logger.error(e)
+            return
+        while event.is_set():
+            try:
+                if not parent_process.is_running():
+                    event.clear()
+                    logger.info("检测到父进程结束，退出任务")
+                    break  # 父进程退出后，子进程退出
+            except Exception as e:
+                logger.exception(e)
+                return
+            time.sleep(5)
+        logger.info("父进程监控结束")
+
+    monitor_thread = threading.Thread(target=run, name="ParentPidMonitorThread")
+    monitor_thread.daemon = True
+    monitor_thread.start()
+    return monitor_thread
+
+
+def create_mouse_reset_monitor(event: Event, parent_pid: str, **kwargs):
+    if not parent_pid:
+        return
+
+    def run(**run_kwargs):
+        mouse_reset_task_run(event, **run_kwargs)
+
+    monitor_thread = threading.Thread(target=run, kwargs=kwargs, name="MouseResetMonitorThread")
+    monitor_thread.daemon = True
+    monitor_thread.start()
+    return monitor_thread
 
 
 def mouse_reset_task_run(event: Event, **kwargs):
@@ -191,6 +228,8 @@ def mouse_reset_task_run(event: Event, **kwargs):
 
 
 def auto_boss_task_run(event: Event, **kwargs):
+    from src.core.injector import Container
+
     for k, v in kwargs.items():
         if isinstance(v, str):
             os.environ[k] = v
@@ -199,20 +238,37 @@ def auto_boss_task_run(event: Event, **kwargs):
     logger.debug("kwargs: %s", kwargs)
     logger.debug(os.environ)
     logger.info("刷boss任务进程开始运行")
-    hwnd_util.set_hwnd_left_top()
 
     context = Context()
+    # 从快照还原配置
+    if param_config_snapshot := kwargs.get("PARAM_CONFIG_SNAPSHOT"):
+        context.param_config = ParamConfig.build(content=param_config_snapshot)
+    if game_path := kwargs.get("GAME_PATH"):
+        context.param_config.gamePath = game_path
+    # 新旧配置兼容
+    context.app_config.TargetBoss = context.param_config.get_boss_name_list()
+    logger.debug("TargetBoss: %s", context.app_config.TargetBoss)
+    context.app_config.DungeonWeeklyBossLevel = context.param_config.get_boss_level_int()
+
     container = Container.build(context)
     logger.debug("Create application context")
     window_service: WindowService = container.window_service()
     img_service: ImgService = container.img_service()
     ocr_service: OCRService = container.ocr_service()
     control_service: ControlService = container.control_service()
-    page_event_service: PageEventService = container.auto_boss_service()
+
+    hwnd_util.set_hwnd_left_top(window_service.window)
+    time.sleep(0.2)
+    logger.debug(game_path)
+    parent_pid = kwargs.get("PARENT_PID")
+    create_parent_monitor(event, parent_pid)
+    create_mouse_reset_monitor(event, parent_pid, **kwargs)
+    clock_action = ClockAction(control_service.activate, 3.0)
 
     logger.debug("-------- run ----------")
     count = 0
-    clock_action = ClockAction(control_service.activate, 3.0)
+
+    page_event_service: PageEventService = container.auto_boss_service()
 
     try:
         while event.is_set():
@@ -246,6 +302,8 @@ def auto_boss_task_run(event: Event, **kwargs):
 
 
 def auto_pickup_task_run(event: Event, **kwargs):
+    from src.core.injector import Container
+
     for k, v in kwargs.items():
         if isinstance(v, str):
             os.environ[k] = v
@@ -253,13 +311,35 @@ def auto_pickup_task_run(event: Event, **kwargs):
     logger.debug("kwargs: %s", kwargs)
     logger.debug(os.environ)
     logger.info("自动拾取任务进程开始运行")
+
     context = Context()
+    # 从快照还原配置
+    if param_config_snapshot := kwargs.get("PARAM_CONFIG_SNAPSHOT"):
+        context.param_config = ParamConfig.build(content=param_config_snapshot)
+    if game_path := kwargs.get("GAME_PATH"):
+        context.param_config.gamePath = game_path
+    # 新旧配置兼容
+    context.app_config.TargetBoss = context.param_config.get_boss_name_list()
+    logger.debug("TargetBoss: %s", context.app_config.TargetBoss)
+    context.app_config.DungeonWeeklyBossLevel = context.param_config.get_boss_level_int()
+
     container = Container.build(context)
     logger.debug("Create application context")
     window_service: WindowService = container.window_service()
+    # img_service: ImgService = container.img_service()
+    # ocr_service: OCRService = container.ocr_service()
     control_service: ControlService = container.control_service()
-    page_event_service: PageEventService = container.auto_pickup_service()
+
+    # hwnd_util.set_hwnd_left_top(window_service.window)
+    # time.sleep(0.2)
+    logger.debug(game_path)
+    parent_pid = kwargs.get("PARENT_PID")
+    create_parent_monitor(event, parent_pid)
+    # create_mouse_reset_monitor(event, parent_pid, **kwargs)
     clock_action = ClockAction(control_service.activate, 3.0)
+
+    page_event_service: PageEventService = container.auto_pickup_service()
+
     try:
         while event.is_set():
             clock_action.action()
@@ -281,6 +361,8 @@ def auto_pickup_task_run(event: Event, **kwargs):
 
 
 def auto_story_task_run(event: Event, **kwargs):
+    from src.core.injector import Container
+
     for k, v in kwargs.items():
         if isinstance(v, str):
             os.environ[k] = v
@@ -288,14 +370,36 @@ def auto_story_task_run(event: Event, **kwargs):
     logger.debug("kwargs: %s", kwargs)
     logger.debug(os.environ)
     logger.info("自动剧情任务进程开始运行")
+
     context = Context()
+    # 从快照还原配置
+    if param_config_snapshot := kwargs.get("PARAM_CONFIG_SNAPSHOT"):
+        context.param_config = ParamConfig.build(content=param_config_snapshot)
+    if game_path := kwargs.get("GAME_PATH"):
+        context.param_config.gamePath = game_path
+    # 新旧配置兼容
+    context.app_config.TargetBoss = context.param_config.get_boss_name_list()
+    logger.debug("TargetBoss: %s", context.app_config.TargetBoss)
+    context.app_config.DungeonWeeklyBossLevel = context.param_config.get_boss_level_int()
+
     container = Container.build(context)
     logger.debug("Create application context")
     window_service: WindowService = container.window_service()
+    # img_service: ImgService = container.img_service()
+    # ocr_service: OCRService = container.ocr_service()
     control_service: ControlService = container.control_service()
-    page_event_service: PageEventService = container.auto_story_service()
+
+    # hwnd_util.set_hwnd_left_top(window_service.window)
+    # time.sleep(0.2)
+    logger.debug(game_path)
+    parent_pid = kwargs.get("PARENT_PID")
+    create_parent_monitor(event, parent_pid)
+    # create_mouse_reset_monitor(event, parent_pid, **kwargs)
     clock_action = ClockAction(control_service.activate, 3.0)
+
+    page_event_service: PageEventService = container.auto_story_service()
     count = 0
+
     try:
         while event.is_set():
             logger.debug("count: %s", count)
@@ -319,6 +423,8 @@ def auto_story_task_run(event: Event, **kwargs):
 
 
 def daily_activity_task_run(event: Event, **kwargs):
+    from src.core.injector import Container
+
     for k, v in kwargs.items():
         if isinstance(v, str):
             os.environ[k] = v
@@ -326,14 +432,35 @@ def daily_activity_task_run(event: Event, **kwargs):
     logger.debug("kwargs: %s", kwargs)
     logger.debug(os.environ)
     logger.info("每日任务进程开始运行")
-    hwnd_util.set_hwnd_left_top()
+
     context = Context()
+    # 从快照还原配置
+    if param_config_snapshot := kwargs.get("PARAM_CONFIG_SNAPSHOT"):
+        context.param_config = ParamConfig.build(content=param_config_snapshot)
+    if game_path := kwargs.get("GAME_PATH"):
+        context.param_config.gamePath = game_path
+    # 新旧配置兼容
+    context.app_config.TargetBoss = context.param_config.get_boss_name_list()
+    logger.debug("TargetBoss: %s", context.app_config.TargetBoss)
+    context.app_config.DungeonWeeklyBossLevel = context.param_config.get_boss_level_int()
+
     container = Container.build(context)
     logger.debug("Create application context")
     window_service: WindowService = container.window_service()
+    # img_service: ImgService = container.img_service()
+    # ocr_service: OCRService = container.ocr_service()
     control_service: ControlService = container.control_service()
-    page_event_service: PageEventService = container.daily_activity_service()
+
+    hwnd_util.set_hwnd_left_top(window_service.window)
+    time.sleep(0.2)
+    logger.debug(game_path)
+    parent_pid = kwargs.get("PARENT_PID")
+    create_parent_monitor(event, parent_pid)
+    create_mouse_reset_monitor(event, parent_pid, **kwargs)
     # clock_action = ClockAction(control_service.activate, 3.0)
+
+    page_event_service: PageEventService = container.daily_activity_service()
+
     try:
         # while event.is_set():
         #     clock_action.action()

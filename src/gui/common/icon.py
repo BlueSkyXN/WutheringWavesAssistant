@@ -13,6 +13,7 @@ class Icon(FluentIconBase, Enum):
     EMOJI_TAB_SYMBOLS = "EmojiTabSymbols"
 
     TERMINAL = "Terminal"
+    PARAM = "Param"
 
     def path(self, theme=Theme.AUTO):
         return f":/gallery/images/icons/{self.value}_{getIconColor(theme)}.svg"

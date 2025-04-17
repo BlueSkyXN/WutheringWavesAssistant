@@ -5,7 +5,9 @@ from typing import Any
 
 from pydantic import BaseModel, Field, PrivateAttr
 
+from src.config.app_config import AppConfig
 from src.config.config import Config
+from src.config.gui_config import ParamConfig
 
 logger = logging.getLogger(__name__)
 
@@ -78,6 +80,18 @@ class Context(BaseModel):
 
     def __str__(self):
         return self.model_dump_json(indent=4)
+
+    @property
+    def app_config(self) -> AppConfig:
+        return self.config.app
+
+    @property
+    def param_config(self) -> ParamConfig:
+        return self.config.param
+
+    @param_config.setter
+    def param_config(self, value: ParamConfig):
+        self.config.param = value
 
 
 if __name__ == '__main__':

@@ -1,6 +1,5 @@
 import logging
 import time
-import traceback
 from abc import ABC
 from datetime import datetime, timedelta
 from typing import Callable
@@ -63,6 +62,7 @@ class PageEventAbstractService(PageEventService, ABC):
         if ocr_results is None:
             ocr_results = self._ocr_service.ocr(img)
 
+        logger.debug(ocr_results)
         # action
         for page in pages:
             if not page.is_match(src_img, img, ocr_results):
@@ -1035,26 +1035,61 @@ class PageEventAbstractService(PageEventService, ABC):
                     dungeon_weekly_boss_level = 40  # 如果没有自动搜索的结果，且没有Config值或为值异常，则从40开始判断
                 else:
                     dungeon_weekly_boss_level = self._config.DungeonWeeklyBossLevel  # 如果没有自动搜索的结果，但有Config值且不为默认值，则使用Config值
-                result = self._ocr_service.wait_text("推荐等级" + str(dungeon_weekly_boss_level))
-                if not result:
-                    for i in range(1, 5):
-                        self._control_service.esc()
-                        result = self._ocr_service.wait_text("推荐等级" + str(dungeon_weekly_boss_level + (10 * i)))
-                        if result:
-                            self._info.DungeonWeeklyBossLevel = dungeon_weekly_boss_level + (10 * i)
-                            break
-                if not result:
-                    self._control_service.esc()
-                    return False
-                for i in range(2):
+
+                final_level = None
+                for i in range(6):
+                    level = (dungeon_weekly_boss_level + 10 * i - 40) % 60 + 40
+                    result = self._ocr_service.wait_text("推荐等级" + str(level))
+                    if not result:
+                        continue
                     self._control_service.click(*result.center)
-                    time.sleep(0.5)
-                result = self._ocr_service.find_text("单人挑战")
-                if not result:
+                    time.sleep(0.3)
+                    result = self._ocr_service.find_text("单人挑战")
+                    if not result:
+                        self._control_service.esc()
+                        break
+                    self._control_service.click(*result.center)
+                    time.sleep(0.2)
+                    result = self._ocr_service.wait_text("等级差距过大", 1, wait_time=0.2)
+                    if result:
+                        time.sleep(0.2)
+                        self._control_service.esc()
+                        time.sleep(0.5)
+                        continue
+                    self._info.DungeonWeeklyBossLevel = level
+                    final_level = level
+                    break
+
+                if not final_level:
                     self._control_service.esc()
+                    time.sleep(0.5)
                     return False
-                logger.info(f"最低推荐等级为{dungeon_weekly_boss_level}级")
-                self._control_service.click(*result.center)
+
+                find_challenge = False
+                for _ in range(2):
+                    result = self._ocr_service.wait_text(["开启挑战", "结晶波片不足"], timeout=3, wait_time=0.3)
+                    if not result:
+                        return False
+                    if challenge := self._ocr_service.search_text([result], "开启挑战"):
+                        find_challenge = True
+                        time.sleep(0.3)
+                        self._control_service.click(*challenge.center)
+                        time.sleep(0.2)
+                        self._control_service.click(*challenge.center)
+                        time.sleep(0.5)
+                        break
+                    elif self._ocr_service.search_text([result], "结晶波片不足"):
+                        result = self._ocr_service.find_text("^确认$")
+                        if result:
+                            self._control_service.click(*result.center)
+                            time.sleep(0.3)
+
+                if not find_challenge:
+                    self._control_service.esc()
+                    time.sleep(0.5)
+                    return False
+
+                logger.info(f"最低推荐等级为{self._info.DungeonWeeklyBossLevel}级")
                 self._info.waitBoss = True
                 self._info.lastFightTime = datetime.now()
                 time.sleep(1)

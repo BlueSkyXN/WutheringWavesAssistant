@@ -1,4 +1,5 @@
 import logging
+import subprocess
 import time
 
 from src.util import hwnd_util, img_util, screenshot_util
@@ -16,6 +17,7 @@ def test_hwnd_util():
 
 def test_login_hwnd_official():
     logger.debug("\n")
+    hwnd_util.enable_dpi_awareness()
     hwnd_list_all, hwnd_list_visible = hwnd_util.get_login_hwnd_official()
     # logger.debug("遍历所有登录窗口")
     # if hwnd_list_all is not None and len(hwnd_list_all) > 0:
@@ -46,10 +48,12 @@ def test_pid():
     pid = hwnd_util.get_hwnd_by_exe_name(hwnd_util.CLIENT_WIN64_SHIPPING_EXE)
     logger.debug(pid)
 
+
 def test_hung():
     import ctypes
     hwnd_util.enable_dpi_awareness()
     hwnd = hwnd_util.get_hwnd()
+
     def is_window_hung(hwnd):
         return ctypes.windll.user32.IsHungAppWindow(hwnd) != 0  # 非 0 代表卡死
 
@@ -72,3 +76,51 @@ def test_hung():
         else:
             print("游戏正常运行")
         time.sleep(2)
+
+
+def test_get_exe_path_from_hwnd():
+    hwnd = hwnd_util.get_hwnd()
+    exe_path = hwnd_util.get_exe_path_from_hwnd(hwnd)
+    logger.debug(exe_path)
+
+
+def test_get_hwnd_filter_start_game_by_shipping_exe_path_official():
+    # exe_path = r"D:\Program Files\Wuthering Waves\Wuthering Waves Game\Client\Binaries\Win64\Client-Win64-Shipping.exe"
+    exe_path = r"D:\Program Files\Wuthering Waves\Wuthering Waves Game\Wuthering Waves.exe"
+    logger.debug(exe_path)
+    subprocess.Popen(exe_path, creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP)
+    time.sleep(5)
+
+
+def test_get_hwnd_filter_start_game_by_shipping_exe_path_oversea():
+    # exe_path = r"D:\Program Files\Wuthering Waves Oversea\Wuthering Waves\Wuthering Waves Game\Client\Binaries\Win64\Client-Win64-Shipping.exe"
+    exe_path = r"D:\Program Files\Wuthering Waves Oversea\Wuthering Waves\Wuthering Waves Game\Wuthering Waves.exe"
+    logger.debug(exe_path)
+    subprocess.Popen(exe_path, creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP)
+    time.sleep(5)
+
+
+def test_get_hwnd_filter_path_official():
+    filter_path = r"D:\Program Files\Wuthering Waves\Wuthering Waves Game\Wuthering Waves.exe"
+    hwnd = hwnd_util.get_hwnd(filter_path)
+    logger.debug(hwnd)
+
+
+def test_get_hwnd_filter_path_oversea():
+    filter_path = r"D:\Program Files\Wuthering Waves Oversea\Wuthering Waves\Wuthering Waves Game\Wuthering Waves.exe"
+    hwnd = hwnd_util.get_hwnd(filter_path)
+    logger.debug(hwnd)
+
+def test_get_wwg_path():
+    client_exe = r"D:\Program Files\Wuthering Waves Oversea\Wuthering Waves\Wuthering Waves Game\Client\Binaries\Win64\Client-Win64-Shipping.exe"
+    client_wwg_path = hwnd_util.get_wwg_path(client_exe)
+    logger.debug(client_wwg_path)
+    ww_exe = r"D:\Program Files\Wuthering Waves Oversea\Wuthering Waves\Wuthering Waves Game\Wuthering Waves.exe"
+    ww_wwg_path = hwnd_util.get_wwg_path(ww_exe)
+    logger.debug(ww_wwg_path)
+    logger.debug(client_wwg_path.resolve() == ww_wwg_path.resolve())
+
+
+def test_get_hwnds():
+    hwnds = hwnd_util.get_hwnds()
+    logger.debug(hwnds)

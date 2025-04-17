@@ -5,6 +5,7 @@ from pathlib import Path
 ENV_WWA_ROOT_PATH = "WWA_ROOT_PATH"
 ENV_WWA_LOG_PATH = "WWA_LOG_PATH"
 ENV_WWA_LOG_LEADER = "WWA_LOG_LEADER"
+ENV_WWA_PARAM_CONFIG_PATH = "WWA_PARAM_CONFIG_PATH"
 ENV_WWA_OCR_USE_GPU = "WWA_OCR_USE_GPU"
 
 
@@ -34,6 +35,14 @@ def set_log_leader(value: bool):
 
 def get_log_leader():
     return os.environ.get(ENV_WWA_LOG_LEADER)  # "True" / None
+
+
+def set_param_config_path(value: str):
+    os.environ[ENV_WWA_PARAM_CONFIG_PATH] = value
+
+
+def get_param_config_path():
+    return os.environ.get(ENV_WWA_PARAM_CONFIG_PATH)  # x:/xxx/temp/config/param-config.json
 
 
 def set_ocr_use_gpu(value: bool):

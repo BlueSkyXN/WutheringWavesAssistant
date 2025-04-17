@@ -11,6 +11,7 @@ import logging
 import re
 import time
 from ctypes import windll
+from pathlib import Path
 
 import psutil
 import win32api
@@ -76,22 +77,106 @@ def get_hwnd_by_exe_name(exe_name: str) -> list | None:
     return rt_hwnd_list
 
 
-def get_hwnd_by_class_and_title(class_name: str, titles: list[str] | str):
+def get_exe_path_from_hwnd(hwnd: int) -> str | None:
+    # 获取进程 ID
+    pid = ctypes.c_ulong()
+    ctypes.windll.user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+    pid = pid.value
+
+    # 通过 psutil 获取进程路径
+    try:
+        proc = psutil.Process(pid)
+        return proc.exe()
+    except (psutil.NoSuchProcess, psutil.AccessDenied):
+        return None
+
+
+def _find_all_windows(class_name=None, titles=None):
+    result = []
+
+    def callback(hwnd, _):
+        if win32gui.IsWindowVisible(hwnd):
+            if (class_name is None or win32gui.GetClassName(hwnd) == class_name) and \
+               (not titles or win32gui.GetWindowText(hwnd) in titles):
+                result.append(hwnd)
+
+    win32gui.EnumWindows(callback, None)
+    return result
+
+
+def get_hwnd_by_class_and_title(class_name: str, titles: list[str] | str) -> list:
     if isinstance(titles, str):
         titles = [titles]
-    window = None
-    for title in titles:
-        logger.debug("window class: %s, title: %s", class_name, title)
-        window = win32gui.FindWindow(class_name, title)
-        logger.debug("window: %s", window)
-        if window is not None and window != 0:
-            break
-    return window
+    windows = []
+    logger.debug("window class: %s, title: %s", class_name, titles)
+    # window = win32gui.FindWindow(class_name, title)  # 只会返回一个
+    find_windows = _find_all_windows(class_name, titles)
+    logger.debug("windows: %s", find_windows)
+    windows.extend(find_windows)
+    return windows
 
 
-# 获取游戏窗口句柄
-def get_hwnd():
+def get_hwnds() -> list:
     return get_hwnd_by_class_and_title(WUWA_HWND_CLASS_NAME, WUWA_HWND_TITLE)
+
+
+
+def get_hwnd(filter_path: str | None = None, force: bool = False) -> int | None:
+    """
+    获取游戏窗口句柄
+    :param filter_path: 指定游戏路径，用于多窗口时选出指定的窗口
+    :param force: 默认False宽松模式，没有匹配到就返回随机第一个；为True 则强制窗口路径必须为指定路径的程序，否则返回None
+    :return:
+    """
+    if filter_path is not None:
+        logger.debug(f"get_hwnd入参: {filter_path}")
+    hwnds = get_hwnds()
+    if not hwnds:
+        return None
+    # 同时有多个游戏进程在运行时
+    if filter_path:  # 找出指定的那个
+        hwnd = filter_hwnds(hwnds, filter_path)
+        if hwnd:
+            return hwnd
+        elif force:
+            return None
+    return hwnds[0]  # 默认返回找到的第一个窗口
+
+
+def filter_hwnds(hwnds: list, filter_path: str):
+    filter_wwg_path = get_wwg_path(filter_path)
+    if not filter_wwg_path:
+        return None
+    for hwnd in hwnds:
+        exe_path: str = get_exe_path_from_hwnd(hwnd)
+        wwg_path = get_wwg_path(exe_path)
+        if not wwg_path:
+            continue
+        # logger.info("filter_wwg_path: %s", filter_wwg_path)
+        # logger.info("wwg_path       : %s", wwg_path)
+        # logger.info(wwg_path.resolve() == filter_wwg_path.resolve())
+        if wwg_path.resolve() == filter_wwg_path.resolve():
+            return hwnd
+    return None
+
+
+def get_wwg_path(path_str: str) -> Path | None:
+    """ 获取Wuthering Waves Game目录绝对路径 """
+    if not path_str:
+        return None
+    try:
+        # 兼容Wuthering Waves.exe 和 Client-Win64-Shipping.exe
+        if path_str.endswith(WUTHERING_WAVES_EXE):
+            return Path(path_str).parent
+        if path_str.endswith(CLIENT_WIN64_SHIPPING_EXE):
+            return Path(path_str).parent.parent.parent.parent
+    except Exception:
+        return None
+
+
+def get_ww_exe_path(path_str: str) -> str:
+    ww_exe_path = get_wwg_path(path_str)
+    return str(ww_exe_path.joinpath(WUTHERING_WAVES_EXE).resolve())
 
 
 # 官服 获取账号登录界面窗口句柄 by wakening

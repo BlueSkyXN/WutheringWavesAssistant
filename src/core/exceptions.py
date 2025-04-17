@@ -53,3 +53,11 @@ class HwndError(WindowError):
 
     def __init__(self, message="Hwnd operation failed"):
         super().__init__(message)
+
+
+class StopError(Exception):
+    """Stop error"""
+
+    def __init__(self, message="Stopped intentionally"):
+        super().__init__(message)
+

@@ -25,12 +25,13 @@ class BannerWidget(QWidget):
 
         self.galleryLabel = QLabel(f'鸣潮\nWuthering Waves Assistant', self)
 
-        # # 创建阴影效果 TODO 不生效，Qt5有用
-        # shadow = QGraphicsDropShadowEffect()
+        # # 创建阴影效果
+        # shadow = QGraphicsDropShadowEffect(self.galleryLabel)
         # shadow.setBlurRadius(20)  # 阴影模糊半径
         # shadow.setColor(QColor("black"))  # 阴影颜色
         # shadow.setOffset(1.2, 1.2)  # 阴影偏移量
         # self.galleryLabel.setGraphicsEffect(shadow)
+        # self.galleryLabel.setStyleSheet("color: white;font-size: 30px; font-weight: 600;")
 
         # self.banner = QPixmap(':/gallery/images/header1.png')
 
@@ -191,6 +192,14 @@ class HomeInterface(ScrollArea):
             routeKey="basicInputInterface",
             index=-1
         )
+        # startGameWidget = runView.addRun(
+        #     icon=":/gallery/images/controls/ProgressRing.png",
+        #     title="启动游戏",
+        #     content=self.tr(
+        #         ""),
+        #     routeKey="basicInputInterface",
+        #     index=-1
+        # )
         self.vBoxLayout.addWidget(runView)
 
         for card in basicInputView.card_group:

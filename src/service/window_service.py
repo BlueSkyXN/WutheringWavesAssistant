@@ -16,7 +16,11 @@ class HwndServiceImpl(WindowService):
         hwnd_util.enable_dpi_awareness()
         super().__init__()
         self._context: Context = context
-        self._window = hwnd_util.get_hwnd()
+        self.game_path = context.param_config.gamePath
+        # 从gui提交的任务game_path必不为空（task monitor会为其赋值），选择强制模式用于兼容多游戏，
+        # 当指定的那个游戏异常退出后，因为运行中优先原则，将会误选另一个，强制必须是这个路径的
+        # 其他情况，目前没有。如无gui运行时，game_path可能没有，选择宽松模式
+        self._window = hwnd_util.get_hwnd(self.game_path, bool(self.game_path))
         self._rlock: RLock = RLock()
 
     @property

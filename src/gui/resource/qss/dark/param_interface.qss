@@ -1,0 +1,17 @@
+ConfigInterface, #scrollWidget {
+    background-color: transparent;
+}
+
+QScrollArea {
+    border: none;
+    background-color: transparent;
+}
+
+
+/* 标签 */
+QLabel#settingLabel {
+    font: 28px 'Microsoft YaHei';
+    background-color: transparent;
+    color: white;
+}
+

@@ -1,6 +1,4 @@
 import logging
-import os
-import winreg
 from typing import Optional, Dict, List
 
 from omegaconf import OmegaConf
@@ -79,8 +77,8 @@ class AppConfig(BaseModel):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        if not self.AppPath:
-            self.AppPath = get_wuthering_waves_path()
+        # if not self.AppPath:
+        #     self.AppPath = winreg_util.get_install_path()
 
     def __str__(self):
         return self.model_dump_json(indent=4)
@@ -91,52 +89,7 @@ class AppConfig(BaseModel):
             config_path = APP_CONFIG_PATH
         data = OmegaConf.load(config_path)
         app_config = AppConfig.model_validate(data)
-        if not app_config.AppPath:
-            app_config.AppPath = get_wuthering_waves_path()
+        # if not app_config.AppPath:
+        #     app_config.AppPath = winreg_util.get_install_path()
         logger.debug(app_config)
         return app_config
-
-
-def get_wuthering_waves_path():
-    key = None
-    # 打开注册表项
-    # key_path = r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\KRInstall Wuthering Waves"
-
-    key_paths = [
-        r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\KRInstall Wuthering Waves",
-        r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\KRInstall Wuthering Waves Overseas",
-    ]
-
-    for key_path in key_paths:
-        key = open_registry_key(key_path)
-
-        if key:
-            try:
-                # 读取安装路径
-                install_path, _ = winreg.QueryValueEx(key, "InstallPath")
-                if install_path:
-                    # 构造完整的程序路径
-                    program_path = os.path.join(
-                        install_path, "Wuthering Waves Game", "Wuthering Waves.exe"
-                    )
-                    # print(f"从注册表中加载到游戏目录：{program_path}")
-                    return program_path
-            except Exception as e:
-                logger.exception("获取游戏安装路径错误")
-            finally:
-                if "key" in locals():
-                    key.Close()
-
-    return None
-
-
-# 获取鸣潮游戏路径
-def open_registry_key(key_path):
-    try:
-        key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key_path)
-        return key
-    except FileNotFoundError:
-        logger.error(f"未找到注册表路径'{key_path}'")
-    except Exception as e:
-        logger.exception("访问注册表错误")
-    return None

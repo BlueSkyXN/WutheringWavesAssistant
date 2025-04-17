@@ -85,7 +85,7 @@ class AutoPickupServiceImpl(PageEventAbstractService):
 
         def auto_pickup_page_action(positions: dict[str, Position]) -> bool:
             position = TextPosition.get(positions, "自动拾取")
-            logger.debug("拾取: %s", position.text)
+            logger.info("拾取: %s", position.text)
             # sleep_seconds = round(random.uniform(0.0001, 0.002), 6)
             self._control_service.pick_up(0.0001)
             if position.text == "辉光奇藏箱":

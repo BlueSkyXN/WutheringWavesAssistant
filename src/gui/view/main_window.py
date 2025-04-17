@@ -11,9 +11,11 @@ from qfluentwidgets import FluentIcon as FIF
 from .notice_interface import NoticeInterface
 from .gallery_interface import GalleryInterface
 from .home_interface import HomeInterface
+from .param_interface import ParamInterface
 from .setting_interface import SettingInterface
 from .terminal_interface import TerminalInterface
 from ..common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg, VERSION
+from ..common.globals import globalSignal
 from ..common.icon import Icon
 from ..common.signal_bus import signalBus
 from ..common.translator import Translator
@@ -31,6 +33,7 @@ class MainWindow(FluentWindow):
 
         # create sub interface
         self.homeInterface = HomeInterface(self)
+        self.paramInterface = ParamInterface(self)
         self.noticeInterface = NoticeInterface(self)
         self.terminalInterface = TerminalInterface(self)
 
@@ -56,6 +59,8 @@ class MainWindow(FluentWindow):
     def initNavigation(self):
         # add navigation items
         self.addSubInterface(self.homeInterface, FIF.HOME, self.tr('Home'))
+        self.addSubInterface(self.paramInterface, Icon.PARAM, self.tr('Param'))
+        self.navigationInterface.addSeparator()
         self.addSubInterface(self.noticeInterface, FIF.MEGAPHONE, self.tr('Notice'))
         self.addSubInterface(self.terminalInterface, Icon.TERMINAL, self.tr('Terminal'))
 
@@ -66,7 +71,7 @@ class MainWindow(FluentWindow):
         self.resize(1280, 800)
         # self.resize(960, 780)
         self.setMinimumWidth(760)
-        self.setWindowIcon(QIcon(':/gallery/images/logo.png'))
+        self.setWindowIcon(QIcon(':/gallery/images/logo.ico'))
         self.setWindowTitle(f'Wuthering Waves Assistant {VERSION}')
 
         self.setMicaEffectEnabled(cfg.get(cfg.micaEnabled))
@@ -95,7 +100,7 @@ class MainWindow(FluentWindow):
             self.splashScreen.resize(self.size())
 
     def closeEvent(self, e):
-        signalBus.closeSignal.emit()
+        globalSignal.closeMainWindowSignal.emit()
         self.themeListener.terminate()
         self.themeListener.deleteLater()
         super().closeEvent(e)

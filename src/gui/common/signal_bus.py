@@ -9,7 +9,6 @@ class SignalBus(QObject):
     micaEnableChanged = Signal(bool)
     supportSignal = Signal()
 
-    closeSignal = Signal()  # gui关闭信号，右上角的关闭
     logQueueSignal = Signal(tuple)  # 日志队列信号，表明队列有新日志
 
 

@@ -98,7 +98,7 @@ class RapidOcrServiceImpl(OCRService):
     #         logger.error(f"Inference failed: {e}")
     #         return None
 
-    def wait_text(self, targets: str | list[str], timeout: int = 3,
+    def wait_text(self, targets: str | list[str], timeout: float = 3.0,
                   position: Position | DynamicPosition | None = None, wait_time: float = 0.1) -> TextPosition | None:
         if isinstance(targets, str):
             targets = [targets]
@@ -185,7 +185,7 @@ class PaddleOcrServiceImpl(OCRService):
                 return text_info
         return None
 
-    def wait_text(self, targets: str | list[str], timeout: int = 3,
+    def wait_text(self, targets: str | list[str], timeout: float = 3.0,
                   position: Position | DynamicPosition | None = None, wait_time: float = 0.1) -> TextPosition | None:
         if isinstance(targets, str):
             targets = [targets]

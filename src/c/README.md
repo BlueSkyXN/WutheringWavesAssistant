@@ -1,0 +1,25 @@
+# WWA Launcher
+
+### ico
+
+https://www.icoconverter.com/
+
+![logo](../gui/resource/images/logo.ico)
+
+### compiling
+
+x64 Native Tools Command Prompt for VS 2022
+
+```cmd
+rc wwa.rc
+
+cl wwa.c wwa.res /Fe:WWA.exe /link /SUBSYSTEM:WINDOWS /MANIFEST:EMBED /MANIFESTUAC:"level='requireAdministrator' uiAccess='false'"
+```
+
+```cmd
+rc updater.rc
+
+cl updater.c updater.res /Fe:WWA_updater.exe /link /SUBSYSTEM:WINDOWS /MANIFEST:EMBED /MANIFESTUAC:"level='requireAdministrator' uiAccess='false'"
+```
+
+
