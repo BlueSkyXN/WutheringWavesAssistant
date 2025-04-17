@@ -1,5 +1,5 @@
 <div align="center">
-<img src="src/gui/resource/images/logo.ico" alt="LOGO" />
+<img src="src/gui/resource/images/logo.ico" alt="LOGO" width="192" height="192" />
 
 # Wuthering Waves Assistant
 
