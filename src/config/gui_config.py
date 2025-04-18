@@ -34,7 +34,10 @@ class ParamConfig(BaseModel):
     @staticmethod
     def snapshot(path: str):
         """ 加载配置为json字符串 """
-        if not Path(path).exists():
+        try:
+            if not Path(path).exists():
+                return ""
+        except Exception:
             return ""
         with open(path, "r", encoding="utf-8") as f:
             data = f.read()
