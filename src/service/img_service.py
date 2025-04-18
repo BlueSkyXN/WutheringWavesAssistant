@@ -35,6 +35,10 @@ class ImgServiceImpl(ImgService):
         else:
             return self._background_screenshot(focus_rect_on_screen)
 
+    @raise_as(BackgroundScreenshotError)
+    def screenshot_window(self, window) -> np.ndarray:
+        return screenshot_util.screenshot(window)
+
     def set_capture_mode(self, capture_mode: ImgService.CaptureEnum):
         self._capture_mode = capture_mode
 

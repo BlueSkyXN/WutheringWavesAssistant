@@ -21,6 +21,7 @@ class HwndServiceImpl(WindowService):
         # 当指定的那个游戏异常退出后，因为运行中优先原则，将会误选另一个，强制必须是这个路径的
         # 其他情况，目前没有。如无gui运行时，game_path可能没有，选择宽松模式
         self._window = hwnd_util.get_hwnd(self.game_path, bool(self.game_path))
+        logger.debug("WindowService hwnd: %d", self._window)
         self._rlock: RLock = RLock()
 
     @property

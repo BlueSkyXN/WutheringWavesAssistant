@@ -62,6 +62,15 @@ class ImgService(ABC):
         pass
 
     @abstractmethod
+    def screenshot_window(self, window) -> np.ndarray:
+        """
+        从指定窗口截图
+        :param window: 窗口句柄
+        :return:
+        """
+        pass
+
+    @abstractmethod
     def set_capture_mode(self, capture_mode: CaptureEnum):
         pass
 
@@ -332,6 +341,15 @@ class ExtendedControlService(ABC):
 
     @abstractmethod
     def scroll_mouse(self, count: int, x: int | float = 0, y: int | float = 0, seconds: float = 0.0):
+        pass
+
+    @abstractmethod
+    def click_window(self, window, x: int = 0, y: int = 0):
+        """在指定窗口内点击"""
+        pass
+
+    @abstractmethod
+    def activate_window(self, window):
         pass
 
 

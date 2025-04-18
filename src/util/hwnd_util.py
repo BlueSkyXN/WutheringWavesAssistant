@@ -179,27 +179,31 @@ def get_ww_exe_path(path_str: str) -> str:
     return str(ww_exe_path.joinpath(WUTHERING_WAVES_EXE).resolve())
 
 
+def get_child_hwnds(hwnd):
+    child_hwnds = []
+    win32gui.EnumChildWindows(hwnd, lambda c_hwnd, _: child_hwnds.append(c_hwnd), None)
+    return child_hwnds
+
+
 # 官服 获取账号登录界面窗口句柄 by wakening
-def get_login_hwnd_official() -> tuple[list | None, list | None]:
-    hwnd_list_all = get_hwnd_by_exe_name(CLIENT_WIN64_SHIPPING_EXE)
-    if hwnd_list_all is None or len(hwnd_list_all) == 0:
-        return None, None
-    hwnd_list_visible = []
-    for hwnd in hwnd_list_all:
-        logger.debug("win32gui.IsWindow(hwnd): %s", win32gui.IsWindow(hwnd))
-        logger.debug("win32gui.IsWindowEnabled(hwnd): %s", win32gui.IsWindowEnabled(hwnd))
-        logger.debug("win32gui.IsWindowVisible(hwnd): %s", win32gui.IsWindowVisible(hwnd))
-        window_class = win32gui.GetClassName(hwnd)
-        logger.debug(f"window: {hwnd}, window class: {window_class}, title: {win32gui.GetWindowText(hwnd)}")
-        if win32gui.IsWindow(hwnd) and win32gui.IsWindowEnabled(hwnd) and win32gui.IsWindowVisible(hwnd):
+def get_login_hwnd_official() -> list | None:
+    # 只返回可见窗口
+    wd_hwnd_list = get_hwnd_by_exe_name(CLIENT_WIN64_SHIPPING_EXE)
+    if wd_hwnd_list is None or len(wd_hwnd_list) == 0:
+        return None
+    login_hwnd_list = []
+    for wd_hwnd in wd_hwnd_list:
+        if win32gui.IsWindow(wd_hwnd) and win32gui.IsWindowEnabled(wd_hwnd) and win32gui.IsWindowVisible(wd_hwnd):
+            window_class = win32gui.GetClassName(wd_hwnd)
+            # logger.debug(f"window: {wd_hwnd}, window class: {window_class}, title: {win32gui.GetWindowText(wd_hwnd)}")
             # window class: UnrealWindow, title: 鸣潮
             # window class: #32770, title:
             # 目前游戏v1.1版本有游戏本体窗口，账号登录窗口等
             # 账号登录窗口没有标题，类名#32770不确定是否会变，无法准确定位
             # 考虑到后续窗口可能变多，返回数组 by wakening
             if window_class != WUWA_HWND_CLASS_NAME:
-                hwnd_list_visible.append(hwnd)
-    return hwnd_list_all, hwnd_list_visible
+                login_hwnd_list.append(wd_hwnd)
+    return login_hwnd_list
 
 
 # b服 获取账号登录界面窗口句柄 by wakening

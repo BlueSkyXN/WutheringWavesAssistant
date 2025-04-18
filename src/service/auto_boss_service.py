@@ -1,15 +1,12 @@
 import logging
 import time
-import traceback
-from datetime import datetime, timedelta
-
-import numpy as np
+from datetime import datetime
 
 from src.core.contexts import Status, Context
 from src.core.interface import ControlService, OCRService, ODService, ImgService, WindowService
 from src.core.pages import Page, Position, TextMatch, ConditionalAction
 from src.service.page_event_service import PageEventAbstractService
-from src.util import hwnd_util, keymouse_util
+from src.util import hwnd_util, img_util
 
 logger = logging.getLogger(__name__)
 
@@ -526,32 +523,53 @@ class AutoBossServiceImpl(PageEventAbstractService):
         self._general_pages.append(network_timeout_page)
 
         def account_login_action(positions: dict[str, Position]) -> bool:
-            def click_login_page(ck_login_hwnd):
-                # TODO 登录
-                # try:
-                #     ocr_text_result = find_text_in_login_hwnd("^登录$", ck_login_hwnd)
-                #     if ocr_text_result is None:
-                #         return False
-                #     # 文本相对于登录框的位置
-                #     # logger.info(f"position: {ocr_text_result}")
-                #     click_position_in_login_hwnd(
-                #         ocr_text_result, specified_hwnd=ck_login_hwnd
-                #     )
-                # except Exception as e:
-                #     pass
-                # time.sleep(3)
-                return True
 
-            # 手机号登录窗口特殊，是遮盖在游戏上方的另一个窗口句柄，费老半天才搞明白 by wakening
+            def click_login_page(login_hwnds) -> bool:
+                contains_login_text = False
+
+                try:
+                    if not isinstance(login_hwnds, list):
+                        login_hwnds = [login_hwnds]
+
+                    for login_hwnd in login_hwnds:
+                        self._control_service.activate_window(login_hwnd)
+                        time.sleep(0.1)
+                        img = self._img_service.screenshot_window(login_hwnd)
+                        text_pos = self._ocr_service.find_text("^登录$", img)
+                        if not text_pos:
+                            continue
+
+                        contains_login_text = True
+                        child_hwnds = hwnd_util.get_child_hwnds(login_hwnd)
+                        for child_hwnd in child_hwnds:
+                            child_wh = hwnd_util.get_client_wh(child_hwnd)
+                            if child_wh[0] == 0 or child_wh[1] == 0:
+                                continue
+                            child_img = self._img_service.screenshot_window(child_hwnd)
+                            img_util.save_img_in_temp(child_img)
+                            child_ocr_result = self._ocr_service.ocr(child_img)
+                            logger.info("child_ocr_result: %s", child_ocr_result)
+                            search_result = self._ocr_service.search_text(child_ocr_result, "^登录$")
+                            if search_result is None:
+                                continue
+                            self._control_service.click_window(child_hwnd, *search_result.center)
+                            time.sleep(0.1)
+                            self._control_service.click_window(child_hwnd, *search_result.center)
+                            time.sleep(0.1)
+                            break
+                except Exception as e:
+                    logger.exception(e)
+
+                return contains_login_text
+
+            # 手机号登录窗口特殊，是遮盖在游戏上方的另一个窗口句柄
             # 调用游戏窗口截图会截取到登录窗口下层的游戏窗口，点击也是点不到上层
             # 先试官服
             login_hwnd_list = hwnd_util.get_login_hwnd_official()
-            if login_hwnd_list is not None and len(login_hwnd_list) > 0:
-                for login_hwnd in login_hwnd_list:
-                    if click_login_page(login_hwnd):
-                        logger.info("官服点击登录")
-                        return True
-
+            if click_login_page(login_hwnd_list):
+                logger.info("官服点击登录")
+                time.sleep(3)
+                return True
             # 再试b服
             login_hwnd = hwnd_util.get_login_hwnd_bilibili()
             if click_login_page(login_hwnd):

@@ -241,6 +241,14 @@ class Win32ExtendedControlServiceImpl(ExtendedControlService, BaseControlService
     def scroll_mouse(self, count: int, x: int | float = 0, y: int | float = 0, seconds: float = 0.0):
         keymouse_util.scroll_mouse(self._window_service.window, count, x, y, seconds)
 
+    def click_window(self, window, x: int = 0, y: int = 0):
+        keymouse_util.click(window, x, y, seconds=0.05)
+        return self
+
+    def activate_window(self, window):
+        keymouse_util.window_activate(window)
+        return self
+
 
 class Win32ControlServiceImpl(Win32GameControlServiceImpl,
                               Win32PlayerControlServiceImpl,

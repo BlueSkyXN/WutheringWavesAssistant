@@ -44,6 +44,15 @@ def get_window_info(hwnd):
     hwnd_util.get_client_wh(hwnd)
 
 
+def test_get_login_hwnd_official():
+    logger.debug("\n")
+    hwnd_util.enable_dpi_awareness()
+    hwnds, hwnds_visible = hwnd_util.get_login_hwnd_official()
+    hwnds_hex = [f"{hwnd:08X}" for hwnd in hwnds]
+    logger.debug(hwnds_hex)
+    logger.debug(hwnds_hex.index("00BE0AD6"))
+
+
 def test_pid():
     pid = hwnd_util.get_hwnd_by_exe_name(hwnd_util.CLIENT_WIN64_SHIPPING_EXE)
     logger.debug(pid)

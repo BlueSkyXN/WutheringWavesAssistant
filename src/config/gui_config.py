@@ -1,5 +1,6 @@
 import json
 import logging
+from pathlib import Path
 
 from pydantic import BaseModel, Field, ConfigDict
 
@@ -33,6 +34,8 @@ class ParamConfig(BaseModel):
     @staticmethod
     def snapshot(path: str):
         """ 加载配置为json字符串 """
+        if not Path(path).exists():
+            return ""
         with open(path, "r", encoding="utf-8") as f:
             data = f.read()
         logger.debug("Param config: %s", data)
@@ -51,13 +54,13 @@ class ParamConfig(BaseModel):
 
     @classmethod
     def build(cls, *, path: str | None = None, content: str | None = None):
-        if path is not None:
+        if path:
             logger.debug("Param config path: %s", path)
             with open(path, "r", encoding="utf-8") as f:
                 data = json.load(f)
             pre_data = cls.pre_date(data)
             config = cls.model_validate(pre_data)
-        elif content is not None:
+        elif content:
             logger.debug("Param config content: %s", content)
             data = json.loads(content)
             pre_data = cls.pre_date(data)
