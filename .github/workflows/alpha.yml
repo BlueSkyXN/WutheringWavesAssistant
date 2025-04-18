@@ -65,6 +65,7 @@ jobs:
           Remove-Item -Path "docs" -Recurse -Force -ErrorAction SilentlyContinue
           Remove-Item -Path "logs" -Recurse -Force -ErrorAction SilentlyContinue
           Remove-Item -Path "tests" -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path "src/c" -Recurse -Force -ErrorAction SilentlyContinue
           Remove-Item -Path "src/gui/resource" -Recurse -Force -ErrorAction SilentlyContinue
           Remove-Item -Path ".pre-commit-config.yaml" -Recurse -Force -ErrorAction SilentlyContinue
           7z a -mx=9 "wwa-${{ env.VERSION }}-alpha.7z" .

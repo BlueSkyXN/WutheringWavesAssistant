@@ -192,7 +192,7 @@ def mouse_reset_task_run(event: Event, **kwargs):
         if isinstance(v, str):
             os.environ[k] = v
     logging_config.setup_logging(kwargs.get("LOG_QUEUE"))
-    logger.info("鼠标重置进程开始运行")
+    logger.info("鼠标重置任务开始运行")
     mouse = Controller()
     last_position = mouse.position
     hwnd = None
@@ -209,22 +209,24 @@ def mouse_reset_task_run(event: Event, **kwargs):
                 time.sleep(5)
                 continue
             current_position = mouse.position
-            left, top, right, bottom = win32gui.GetWindowRect(hwnd)
+            left, top, right, bottom = win32gui.GetClientRect(hwnd)
             center_position = (left + right) / 2, (top + bottom) / 2
-            curr_pos_to_center_distance = math.sqrt(
+            cur_pos_to_center_distance = math.sqrt(
                 (current_position[0] - center_position[0]) ** 2
                 + (current_position[1] - center_position[1]) ** 2
             )
-            curr_pos_to_last_pos_distance = math.sqrt(
+            cur_pos_to_last_pos_distance = math.sqrt(
                 (current_position[0] - last_position[0]) ** 2
                 + (current_position[1] - last_position[1]) ** 2
             )
-            if curr_pos_to_last_pos_distance > 200 and curr_pos_to_center_distance < 50:
+            if cur_pos_to_last_pos_distance > 200 and cur_pos_to_center_distance < 50:
                 mouse.position = last_position
             else:
                 last_position = current_position
     except KeyboardInterrupt:
-        logger.info("鼠标重置进程结束")
+        pass
+    finally:
+        logger.info("鼠标重置任务结束")
 
 
 def auto_boss_task_run(event: Event, **kwargs):
@@ -247,7 +249,7 @@ def auto_boss_task_run(event: Event, **kwargs):
         context.param_config.gamePath = game_path
     # 新旧配置兼容
     context.app_config.TargetBoss = context.param_config.get_boss_name_list()
-    logger.debug("TargetBoss: %s", context.app_config.TargetBoss)
+    logger.info("Boss Rush: %s", context.app_config.TargetBoss)
     context.app_config.DungeonWeeklyBossLevel = context.param_config.get_boss_level_int()
 
     container = Container.build(context)

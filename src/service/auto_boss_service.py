@@ -548,7 +548,7 @@ class AutoBossServiceImpl(PageEventAbstractService):
                             child_img = self._img_service.screenshot_window(child_hwnd)
                             img_util.save_img_in_temp(child_img)
                             child_ocr_result = self._ocr_service.ocr(child_img)
-                            logger.info("child_ocr_result: %s", child_ocr_result)
+                            logger.debug("child_ocr_result: %s", child_ocr_result)
                             search_result = self._ocr_service.search_text(child_ocr_result, "^登录$")
                             if search_result is None:
                                 continue
@@ -558,7 +558,8 @@ class AutoBossServiceImpl(PageEventAbstractService):
                             time.sleep(0.1)
                             break
                 except Exception as e:
-                    logger.exception(e)
+                    # logger.exception(e)
+                    pass
 
                 return contains_login_text
 

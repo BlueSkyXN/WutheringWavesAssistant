@@ -82,6 +82,10 @@ def get_assets_template(file_name: str | None = None):
     return get_path("assets/template", file_name)
 
 
+def get_ico():
+    return get_path("src/gui/resource/images", "logo.ico")
+
+
 ###### File abspath ######
 
 def get_log_file() -> str:

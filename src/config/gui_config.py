@@ -32,14 +32,17 @@ class ParamConfig(BaseModel):
         return game_path
 
     @staticmethod
-    def snapshot(path: str):
+    def snapshot(path_str: str):
         """ 加载配置为json字符串 """
         try:
-            if not Path(path).exists():
+            path = Path(path_str)
+            if not path.exists() or not path.is_file():
+                logger.debug("Path does not exist: %s", path_str)
                 return ""
         except Exception:
             return ""
-        with open(path, "r", encoding="utf-8") as f:
+        # logger.debug("Path exist: %s", path_str)
+        with open(path_str, "r", encoding="utf-8") as f:
             data = f.read()
         logger.debug("Param config: %s", data)
         return data

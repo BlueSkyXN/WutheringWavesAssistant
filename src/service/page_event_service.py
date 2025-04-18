@@ -1091,8 +1091,8 @@ class PageEventAbstractService(PageEventService, ABC):
 
                 logger.info(f"最低推荐等级为{self._info.DungeonWeeklyBossLevel}级")
                 self._info.waitBoss = True
-                self._info.lastFightTime = datetime.now()
                 time.sleep(1)
+                self._info.lastFightTime = datetime.now()
                 return True
 
             action = default_action
