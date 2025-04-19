@@ -175,7 +175,7 @@ def create_parent_monitor(event: Event, parent_pid: str):
 
 
 def create_mouse_reset_monitor(event: Event, parent_pid: str, **kwargs):
-    if not parent_pid:
+    if not parent_pid:  # pid不存在就不用启动
         return
 
     def run(**run_kwargs):

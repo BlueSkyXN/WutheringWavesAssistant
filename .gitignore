@@ -176,10 +176,8 @@ cython_debug/
 git/
 temp/
 logs/
-docs/*.txt
-docs/*bak
-docs/*bak1
-docs/*bak2
-docs/*.toml*
-docs/*ini
+docs/
 assets/screenshot/
+config.yaml
+.pre-commit-config.yaml
+tests/test/

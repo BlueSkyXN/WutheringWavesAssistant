@@ -54,7 +54,7 @@ class Position(BaseModel):
         if position is None:
             return None
         if not isinstance(position, cls):
-            raise TypeError("不是TextPosition类或子类")
+            raise TypeError("不是Position类或子类")
         return position
 
     @classmethod

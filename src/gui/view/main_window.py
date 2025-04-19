@@ -1,11 +1,14 @@
 # coding: utf-8
+import logging
+import re
 from typing import List
-from PySide6.QtCore import Qt, Signal, QEasingCurve, QUrl, QSize, QTimer
+from PySide6.QtCore import Qt, Signal, QEasingCurve, QUrl, QSize, QTimer, QObject
 from PySide6.QtGui import QIcon, QDesktopServices
+from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 from PySide6.QtWidgets import QApplication, QHBoxLayout, QFrame, QWidget
 
 from qfluentwidgets import (NavigationAvatarWidget, NavigationItemPosition, MessageBox, FluentWindow,
-                            SplashScreen, SystemThemeListener, isDarkTheme)
+                            SplashScreen, SystemThemeListener, isDarkTheme, InfoBarPosition, InfoBar)
 from qfluentwidgets import FluentIcon as FIF
 
 from .notice_interface import NoticeInterface
@@ -14,15 +17,20 @@ from .home_interface import HomeInterface
 from .param_interface import ParamInterface
 from .setting_interface import SettingInterface
 from .terminal_interface import TerminalInterface
-from ..common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg, VERSION
+from ..common.config import ZH_SUPPORT_URL, EN_SUPPORT_URL, cfg, VERSION, VERSION_URLS
 from ..common.globals import globalSignal
 from ..common.icon import Icon
 from ..common.signal_bus import signalBus
 from ..common.translator import Translator
-from ..common import resource
+from ..common import resource  # noqa: F401
+from ..common.version_control import RemoteVersion
+
+logger = logging.getLogger(__name__)
 
 
 class MainWindow(FluentWindow):
+
+    remoteVersionFinishedSignal = Signal()
 
     def __init__(self):
         super().__init__()
@@ -51,10 +59,15 @@ class MainWindow(FluentWindow):
         # start theme listener
         self.themeListener.start()
 
+        self.remoteVersion = RemoteVersion(VERSION_URLS, self.remoteVersionFinishedSignal.emit, self)
+        if cfg.checkUpdateAtStartUpV2.value is True:
+            self.remoteVersion.request()
+
     def connectSignalToSlot(self):
         signalBus.micaEnableChanged.connect(self.setMicaEffectEnabled)
         signalBus.switchToSampleCard.connect(self.switchToSample)
         signalBus.supportSignal.connect(self.onSupport)
+        self.remoteVersionFinishedSignal.connect(self.showUpdateVersion)
 
     def initNavigation(self):
         # add navigation items
@@ -83,7 +96,7 @@ class MainWindow(FluentWindow):
 
         desktop = QApplication.screens()[0].availableGeometry()
         w, h = desktop.width(), desktop.height()
-        self.move(w//2 - self.width()//2, h//2 - self.height()//2)
+        self.move(w // 2 - self.width() // 2, h // 2 - self.height() // 2)
         self.show()
         QApplication.processEvents()
 
@@ -119,3 +132,16 @@ class MainWindow(FluentWindow):
             if w.objectName() == routeKey:
                 self.stackedWidget.setCurrentWidget(w, False)
                 w.scrollToCard(index)
+
+    def showUpdateVersion(self):
+        result = self.remoteVersion.checkVersion()
+        if result is None:
+            self.setWindowTitle(self.windowTitle() + self.tr(" *检查更新失败"))
+            return
+        if result is False:
+            logger.debug("无新版本需要更新")
+            return
+        if result is True:
+            msg = self.tr(" *有新版本 {version}").format(version=self.remoteVersion.version)
+            self.setWindowTitle(self.windowTitle() + msg)
+            self.remoteVersion.showInfoBar(msg, 5000, self.homeInterface)

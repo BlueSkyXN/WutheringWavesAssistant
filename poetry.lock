@@ -6545,6 +6545,27 @@ url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 reference = "tsinghua"
 
 [[package]]
+name = "python-dotenv"
+version = "1.1.0"
+description = "Read key-value pairs from a .env file and set them as environment variables"
+optional = true
+python-versions = ">=3.9"
+groups = ["main"]
+markers = "extra == \"dev\""
+files = [
+    {file = "python_dotenv-1.1.0-py3-none-any.whl", hash = "sha256:d7c01d9e2293916c18baf562d95698754b0dbbb5e74d457c45d4f6561fb9d55d"},
+    {file = "python_dotenv-1.1.0.tar.gz", hash = "sha256:41f90bc6f5f177fb41f53e87666db362025010eb28f60a01c9143bfa33a2b2d5"},
+]
+
+[package.extras]
+cli = ["click (>=5.0)"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+reference = "tsinghua"
+
+[[package]]
 name = "python-xlib"
 version = "0.33"
 description = "Python X Library"
@@ -7048,10 +7069,10 @@ reference = "tsinghua"
 [extras]
 cpu = ["onnxruntime"]
 cuda = ["onnxruntime-gpu", "paddlepaddle-gpu"]
-dev = ["matplotlib", "pytest"]
+dev = ["matplotlib", "pytest", "python-dotenv"]
 dml = ["onnxruntime-directml"]
 
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "c4d50f28588f9109392a8ac7ef25f9ccaacc8e4f78a895afd78865256dba11de"
+content-hash = "2b956fa6cd31cef5542dcb83cd2b198551c969fe80c2454129495fe953bcc434"

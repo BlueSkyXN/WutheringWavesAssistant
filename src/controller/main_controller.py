@@ -4,7 +4,7 @@ import subprocess
 import threading
 import time
 from enum import Enum
-from multiprocessing import Event, Lock
+from multiprocessing import Event
 
 from src.config.gui_config import ParamConfig
 from src.core import environs
@@ -261,7 +261,7 @@ class MainController:
             "DailyActivityProcessTask": DailyActivityProcessTask,
         }
         self.running_tasks: dict[str, tuple[ProcessTask, Event]] = {}
-        self._lock: Lock = Lock()
+        self._lock = threading.Lock()
 
         self.task_monitor = None
 

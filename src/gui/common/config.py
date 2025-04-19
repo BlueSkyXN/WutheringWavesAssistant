@@ -62,7 +62,8 @@ class Config(QConfig):
     # blurRadius  = RangeConfigItem("Material", "AcrylicBlurRadius", 15, RangeValidator(0, 40))
 
     # software update
-    checkUpdateAtStartUp = ConfigItem("Update", "CheckUpdateAtStartUp", False, BoolValidator())
+    # checkUpdateAtStartUp = ConfigItem("Update", "CheckUpdateAtStartUp", False, BoolValidator())
+    checkUpdateAtStartUpV2 = ConfigItem("Update", "CheckUpdateAtStartUpV2", True, BoolValidator())
 
 
 YEAR = datetime.now().year
@@ -76,6 +77,12 @@ RELEASE_URL = "https://github.com/wakening/WutheringWavesAssistant/releases/late
 ZH_SUPPORT_URL = "https://afdian.com/a/wakening"
 EN_SUPPORT_URL = "https://afdian.com/a/wakening"
 CHANGELOG_URL = "https://github.com/wakening/WutheringWavesAssistant/CHANGELOG.md" # TODO terminal
+
+VERSION_URLS = [
+    "https://ghfast.top/https://raw.githubusercontent.com/wakening/WutheringWavesAssistant/main/src/__init__.py",
+    "https://cdn.jsdelivr.net/gh/wakening/WutheringWavesAssistant@main/src/__init__.py",
+    "https://raw.githubusercontent.com/wakening/WutheringWavesAssistant/main/src/__init__.py",
+]
 
 
 cfg = Config()
@@ -222,7 +229,6 @@ class ParamConfig(QConfig):
 
     # Game
     gamePath = ConfigItem("Game", "GamePath", "Auto", GameFolderValidator())
-    # gamePath = ConfigItem("Game", "GamePath", "Auto")
 
 
     def save(self):

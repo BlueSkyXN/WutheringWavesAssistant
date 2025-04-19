@@ -50,6 +50,8 @@ class ParamConfig(BaseModel):
     @staticmethod
     def pre_date(data) -> dict:
         pre_data = {}
+        if not data:
+            return pre_data
         bossRush = data.get("BossRush", {})
         pre_data["bossName"] = bossRush.get("BossName")
         pre_data["bossLevel"] = bossRush.get("BossLevel")

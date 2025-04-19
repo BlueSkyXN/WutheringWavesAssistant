@@ -16,7 +16,6 @@ def before():
         logger.error("请以管理员身份运行！")
         windows_util.show_windows_notification("请以管理员身份运行！")
         sys.exit(0)
-    # TODO check update
 
 
 def gui_is_exist():

@@ -1,3 +1,4 @@
+import importlib.util
 import os
 from pathlib import Path
 
@@ -15,6 +16,19 @@ def __set_root_path():
 
 
 __set_root_path()
+
+
+def load_env():
+    if importlib.util.find_spec("dotenv"):
+        try:
+            from dotenv import load_dotenv
+            root_path = get_root_path()
+            dotenv_path = Path(root_path).joinpath(".env")
+            if dotenv_path.exists() and dotenv_path.is_file():
+                load_dotenv(dotenv_path)
+                # print(os.environ)
+        except:
+            pass
 
 
 def get_root_path():

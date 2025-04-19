@@ -46,6 +46,7 @@ cpu = [
 dev = [
     "pytest",
     "matplotlib",
+    "python-dotenv",
 ]
 
 

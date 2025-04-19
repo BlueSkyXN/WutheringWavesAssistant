@@ -1,4 +1,6 @@
 # coding:utf-8
+import logging
+
 from qfluentwidgets import (SettingCardGroup, SwitchSettingCard, FolderListSettingCard,
                             OptionsSettingCard, PushSettingCard,
                             HyperlinkCard, PrimaryPushSettingCard, ScrollArea,
@@ -10,13 +12,19 @@ from PySide6.QtCore import Qt, Signal, QUrl, QStandardPaths
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QWidget, QLabel, QFileDialog
 
-from ..common.config import cfg, HELP_URL, FEEDBACK_URL, AUTHOR, VERSION, YEAR, isWin11, RELEASE_URL, REPO_URL
+from ..common.config import cfg, HELP_URL, FEEDBACK_URL, AUTHOR, VERSION, YEAR, isWin11, RELEASE_URL, REPO_URL, \
+    VERSION_URLS
 from ..common.signal_bus import signalBus
 from ..common.style_sheet import StyleSheet
+from ..common.version_control import RemoteVersion
+
+logger = logging.getLogger(__name__)
 
 
 class SettingInterface(ScrollArea):
     """ Setting interface """
+
+    remoteVersionFinishedSignal = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -74,10 +82,9 @@ class SettingInterface(ScrollArea):
             FIF.UPDATE,
             self.tr('Check for updates when the application starts'),
             self.tr('The new version will be more stable and have more features'),
-            configItem=cfg.checkUpdateAtStartUp,
+            configItem=cfg.checkUpdateAtStartUpV2,
             parent=self.updateSoftwareGroup
         )
-        self.updateOnStartUpCard.setEnabled(False)
 
         # application
         self.aboutGroup = SettingCardGroup(self.tr('About'), self.scrollWidget)
@@ -105,6 +112,8 @@ class SettingInterface(ScrollArea):
             self.tr('Version') + " " + VERSION,
             self.aboutGroup
         )
+
+        self.remoteVersion = RemoteVersion(VERSION_URLS, self.remoteVersionFinishedSignal.emit, self)
 
         self.__initWidget()
 
@@ -170,7 +179,17 @@ class SettingInterface(ScrollArea):
         self.feedbackCard.clicked.connect(
             lambda: QDesktopServices.openUrl(QUrl(FEEDBACK_URL)))
 
-        self.aboutCard.clicked.connect(
-            lambda: QDesktopServices.openUrl(QUrl(REPO_URL)))
+        self.remoteVersionFinishedSignal.connect(self.showUpdateVersion)
+        self.aboutCard.clicked.connect(self.remoteVersion.request)
 
-
+    def showUpdateVersion(self):
+        result = self.remoteVersion.checkVersion()
+        if result is None:
+            self.remoteVersion.showErrorBar(self.tr("检查更新失败"), 5000, self)
+            return
+        if result is False:
+            self.remoteVersion.showInfoBar(self.tr("无需更新"), 5000, self)
+            return
+        if result is True:
+            msg = self.tr(" *有新版本 {version}").format(version=self.remoteVersion.version)
+            self.remoteVersion.showSuccessBar(msg, 5000, self)

@@ -1,6 +1,10 @@
 import logging
 import os
 
+from src.core import environs
+
+environs.load_env()
+
 from src.config import logging_config
 
 logging_config.setup_logging()
