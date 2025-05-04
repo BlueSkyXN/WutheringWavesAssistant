@@ -50,14 +50,14 @@ class RemoteVersion(QObject):
 
             error = reply.error()
             if error != QNetworkReply.NoError:
-                logger.error(f"Error: {reply.errorString()} (Code: {error})")
+                logger.debug(f"Error: {reply.errorString()} (Code: {error})")
                 self._index += 1
                 self._tryNextUrl()
                 return
 
             data_bytes = reply.readAll()
             if data_bytes.isEmpty():
-                logger.error("Error: Empty reply received (but NoError reported)")
+                logger.debug("Error: Empty reply received (but NoError reported)")
                 self._index += 1
                 self._tryNextUrl()
                 return
@@ -67,7 +67,7 @@ class RemoteVersion(QObject):
 
             match = re.search(r"__version__\s*=\s*['\"](.+?)['\"]", data)
             if not match:
-                logger.warning("Could not extract version from response.")
+                logger.debug("Could not extract version from response.")
                 self._index += 1
                 self._tryNextUrl()
                 return
@@ -96,6 +96,8 @@ class RemoteVersion(QObject):
             curVers = re.split(r"\s+", VERSION.strip())[0].split(".")
             len = 3
             for i in range(len):  # 检查版本号的数值大小
+                if int(remoteVers[i]) < int(curVers[i]):
+                    return False
                 if int(remoteVers[i]) > int(curVers[i]):
                     break
                 if i == len - 1:
