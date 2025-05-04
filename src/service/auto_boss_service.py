@@ -3,7 +3,7 @@ import time
 from datetime import datetime
 
 from src.core.contexts import Status, Context
-from src.core.interface import ControlService, OCRService, ODService, ImgService, WindowService
+from src.core.interface import ControlService, OCRService, ODService, ImgService, WindowService, BossInfoService
 from src.core.pages import Page, Position, TextMatch, ConditionalAction
 from src.service.page_event_service import PageEventAbstractService
 from src.util import hwnd_util, img_util
@@ -15,9 +15,10 @@ class AutoBossServiceImpl(PageEventAbstractService):
     """自动刷boss"""
 
     def __init__(self, context: Context, window_service: WindowService, img_service: ImgService,
-                 ocr_service: OCRService, control_service: ControlService, od_service: ODService):
+                 ocr_service: OCRService, control_service: ControlService, od_service: ODService,
+                 boss_info_service: BossInfoService):
         logger.debug("Initializing %s", self.__class__.__name__)
-        super().__init__(context, window_service, img_service, ocr_service, control_service, od_service)
+        super().__init__(context, window_service, img_service, ocr_service, control_service, od_service, boss_info_service)
         self._img_service.set_capture_mode(ImgService.CaptureEnum.BG)
 
         self._boss_pages: list[Page] = []
@@ -100,8 +101,9 @@ class AutoBossServiceImpl(PageEventAbstractService):
             :param positions: 位置信息
             :return:
             """
-            position = positions["退出"]
-            self._control_service.click(*position.center)
+            # position = positions["退出"]
+            # self._control_service.click(*position.center)
+            self._window_service.close_window()
             time.sleep(2)
             return True
 
@@ -205,8 +207,8 @@ class AutoBossServiceImpl(PageEventAbstractService):
         #     action=fight_success_action,
         # )
         #
-        # fight_success_page = self.build_Fight_ChallengeSuccess()
-        # self._general_pages.append(fight_success_page)
+        fight_success_page = self.build_Fight_ChallengeSuccess()
+        self._general_pages.append(fight_success_page)
 
         # # 选择复苏物品
         # def select_recovery_items(positions: dict[str, Position]) -> bool:
@@ -889,6 +891,9 @@ class AutoBossServiceImpl(PageEventAbstractService):
         # 战斗完成 等待搜索声骸 吸收
         def judgment_absorption() -> bool:
             time.sleep(0.1)
+            is_nightmare = self._boss_info_service.is_nightmare(self._info.lastBossName)
+            if is_nightmare:
+                return False
             return (
                     self._info.needAbsorption  # 未吸收
                     # 空闲时间未超过最大空闲时间 且 空闲时间超过最大空闲时间的一半
@@ -905,9 +910,13 @@ class AutoBossServiceImpl(PageEventAbstractService):
         # 超过最大空闲时间
         def judgment_idle() -> bool:
             time.sleep(0.1)
+            max_idle_time = self._config.MaxIdleTime
+            is_nightmare = self._boss_info_service.is_nightmare(self._info.lastBossName)
+            if is_nightmare:
+                max_idle_time = 100
             return (
                     not self._info.in_dungeon and
-                    (datetime.now() - self._info.lastFightTime).seconds > self._config.MaxIdleTime
+                    (datetime.now() - self._info.lastFightTime).seconds > max_idle_time
             )
 
         def judgment_idle_action() -> bool:
@@ -924,9 +933,13 @@ class AutoBossServiceImpl(PageEventAbstractService):
         # 超过最大战斗时间 大世界boss，非独立场景boss（无妄者）
         def judgment_fight() -> bool:
             time.sleep(0.1)
+            max_fight_time = self._config.MaxFightTime
+            is_nightmare = self._boss_info_service.is_nightmare(self._info.lastBossName)
+            if is_nightmare:
+                max_fight_time = 1200
             return (
                     not self._info.in_dungeon and
-                    (datetime.now() - self._info.fightTime).seconds > self._config.MaxFightTime
+                    (datetime.now() - self._info.fightTime).seconds > max_fight_time
             )
 
         def judgment_fight_action() -> bool:

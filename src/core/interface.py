@@ -368,3 +368,10 @@ class ControlService(GameControlService, PlayerControlService, ExtendedControlSe
     @abstractmethod
     def extended(self) -> ExtendedControlService:
         pass
+
+
+class BossInfoService(ABC):
+
+    @abstractmethod
+    def is_nightmare(self, boss_name: str) -> bool:
+        pass

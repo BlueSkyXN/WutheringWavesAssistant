@@ -8,7 +8,7 @@ from enum import Enum
 from pydantic import BaseModel, Field
 
 from src.core.contexts import Context, Status
-from src.core.interface import ControlService, OCRService, ImgService, WindowService, ODService
+from src.core.interface import ControlService, OCRService, ImgService, WindowService, ODService, BossInfoService
 from src.core.pages import Page, ConditionalAction
 from src.core.regions import Position, TextPosition
 from src.service.page_event_service import PageEventAbstractService
@@ -74,9 +74,10 @@ class DailyActivityServiceImpl(PageEventAbstractService, ABC):
     """每日活动"""
 
     def __init__(self, context: Context, window_service: WindowService, img_service: ImgService,
-                 ocr_service: OCRService, control_service: ControlService, od_service: ODService):
+                 ocr_service: OCRService, control_service: ControlService, od_service: ODService,
+                 boss_info_service: BossInfoService):
         logger.debug("Initializing %s", self.__class__.__name__)
-        super().__init__(context, window_service, img_service, ocr_service, control_service, od_service)
+        super().__init__(context, window_service, img_service, ocr_service, control_service, od_service, boss_info_service)
         self._where_am_i_esc_check_pages: list[Page] = [
             self._UI_ESC_Terminal,
             self._UI_ESC_LeaveInstance,

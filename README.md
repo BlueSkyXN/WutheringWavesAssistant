@@ -6,7 +6,7 @@
 ![license](https://img.shields.io/github/license/wakening/WutheringWavesAssistant)
 ![commit](https://img.shields.io/github/commit-activity/m/wakening/WutheringWavesAssistant?color=%23ff69b4)  
 [![QQ](https://img.shields.io/badge/QQ-加群-blue?logo=tencentqq)](https://qm.qq.com/q/tDWAi0LCj8)
-[![Discord](https://img.shields.io/badge/Discord-加入社区-5865F2?logo=discord&logoColor=white)](https://discord.gg/CQtp2ZYs)  
+[![Discord](https://img.shields.io/badge/Discord-加入社区-5865F2?logo=discord&logoColor=white)](https://discord.gg/Ug8aXjvp)  
 
 鸣潮自动化助手
 
@@ -71,7 +71,7 @@ cd WutheringWavesAssistant
 ### 6️⃣ 配置文件
 
 - **老用户**（使用过 `mc_auto_boss` 的用户）：请复制 `config.yaml` 到本目录并覆盖  
-- **新用户**：直接运行，详细可修改config.yaml  
+- **新用户**：直接运行，并在页面上⭐️页面上修改参数，仅连招需修改config.yaml，其他参数修改config.yaml无效  
 
 ### 7️⃣ 启动脚本
 

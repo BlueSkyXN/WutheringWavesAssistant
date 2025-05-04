@@ -7,7 +7,8 @@ from typing import Callable
 import numpy as np
 
 from src.core.contexts import Context, Status
-from src.core.interface import ControlService, OCRService, PageEventService, ImgService, WindowService, ODService
+from src.core.interface import ControlService, OCRService, PageEventService, ImgService, WindowService, ODService, \
+    BossInfoService
 from src.core.languages import Languages
 from src.core.pages import ConditionalAction, TextMatch, Page
 from src.core.regions import TextPosition, DynamicPosition, Position
@@ -20,13 +21,15 @@ class PageEventAbstractService(PageEventService, ABC):
     """通过页面ocr所得文字匹配关键字触发相应事件，触发动作"""
 
     def __init__(self, context: Context, window_service: WindowService, img_service: ImgService,
-                 ocr_service: OCRService, control_service: ControlService, od_service: ODService):
+                 ocr_service: OCRService, control_service: ControlService, od_service: ODService,
+                 boss_info_service: BossInfoService):
         self._context: Context = context
         self._window_service: WindowService = window_service
         self._img_service: ImgService = img_service
         self._ocr_service: OCRService = ocr_service
         self._control_service: ControlService = control_service
         self._od_service: ODService = od_service
+        self._boss_info_service: BossInfoService = boss_info_service
         # page
         self._UI_F2_Guidebook_Activity = self.build_UI_F2_Guidebook_Activity()
         self._UI_F2_Guidebook_RecurringChallenges = self.build_UI_F2_Guidebook_RecurringChallenges()
@@ -747,9 +750,23 @@ class PageEventAbstractService(PageEventService, ABC):
 
         if action is None:
             def default_action(positions: dict[str, Position]) -> bool:
-                time.sleep(1)
-                self._control_service.forward_run(2)
-                time.sleep(0.5)
+                is_nightmare = self._boss_info_service.is_nightmare(self._info.lastBossName)
+                if not is_nightmare:
+                    time.sleep(0.2)
+                    return True
+
+                time.sleep(1.5)
+                self.search_echo()
+
+                if self._config.CharacterHeal is not True:
+                    return True
+                self._check_heal()
+                if self._info.needHeal:
+                    logger.info("有角色阵亡，开始治疗")
+                    time.sleep(1)
+                    self._info.lastBossName = "治疗"
+                    self.transfer()
+                    time.sleep(0.5)
                 return True
 
             action = default_action
@@ -1192,8 +1209,14 @@ class PageEventAbstractService(PageEventService, ABC):
         tactics = self._config.FightTactics[self._info.roleIndex - 1].split(",")
         # else:
         #     tactics = ["a"]
-        for tactic in tactics:  # 遍历对应角色的战斗策略
+
+        is_nightmare = self._boss_info_service.is_nightmare(self._info.lastBossName)
+        if is_nightmare:
+            self._control_service.fight_tap("F", 0.01)
+        for index, tactic in enumerate(tactics):  # 遍历对应角色的战斗策略
             try:
+                if is_nightmare and index % 2 == 0:
+                    self._control_service.fight_tap("F", 0.01)
                 try:
                     wait_time = float(tactic)  # 如果是数字，等待时间
                     time.sleep(wait_time)
@@ -1966,3 +1989,57 @@ class PageEventAbstractService(PageEventService, ABC):
             return self._od_service.search_reward(img)
         else:
             raise NotImplemented("未实现的搜索方式")
+
+    def search_echo(self):
+        # img = self._img_service.screenshot()
+        # search_region = DynamicPosition(
+        #     rate=(
+        #         788 / 1280,
+        #         300 / 720,
+        #         1100 / 1280,
+        #         560 / 720,
+        #     ),
+        # )
+        # absorb = self._ocr_service.find_text("^吸收$", img, search_region)
+        # if absorb:
+        #     self._control_service.pick_up()
+        #     return
+
+        start_time = time.monotonic()
+        max_search_seconds = 3.5
+        while time.monotonic() - start_time < max_search_seconds:
+            self._control_service.pick_up()
+            img = self._img_service.screenshot()
+            echo_box = self._od_service.search_echo(img)
+            if echo_box is None:
+                logger.debug("未发现声骸")
+                return
+
+            # 前往声骸
+            window_width = self._window_service.get_client_wh()[0]
+            # role_width = int(window_width * 50 / 1280)
+            echo_x1, echo_y1, echo_width, echo_height = echo_box
+            echo_x2 = echo_x1 + echo_width
+            # echo_y2 = echo_y1 + echo_height
+            half_window_width = window_width // 2
+            # half_role_width = role_width // 2
+
+            # echo_search_config_mapping = {"角": (8, 4, 4, 7)}
+
+            if echo_x1 > half_window_width:  # 声骸中在角色右侧
+                logger.info("发现声骸 向右移动")
+                self._control_service.right(0.1)
+                time.sleep(0.05)
+            elif echo_x2 < half_window_width:  # 声骸中在角色左侧
+                logger.info("发现声骸 向左移动")
+                self._control_service.left(0.1)
+                time.sleep(0.05)
+            else:
+                logger.info("发现声骸 向前移动")
+                # self._control_service.up(0.1)
+                # time.sleep(0.01)
+                for _ in range(5):
+                    self._control_service.up(0.1)
+                    time.sleep(0.05)
+                time.sleep(0.5)
+            self._control_service.pick_up()

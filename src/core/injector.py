@@ -10,6 +10,7 @@ class Container(containers.DeclarativeContainer):
     from src.service.auto_boss_service import AutoBossServiceImpl
     from src.service.auto_pickup_service import AutoPickupServiceImpl
     from src.service.auto_story_service import AutoStoryServiceImpl
+    from src.service.boss_info_service import BossInfoServiceImpl
     from src.service.control_service import Win32ControlServiceImpl
     from src.service.daily_activity_service import DailyActivityServiceImpl
     from src.service.img_service import ImgServiceImpl
@@ -43,6 +44,9 @@ class Container(containers.DeclarativeContainer):
         context=context,
         window_service=window_service
     )
+    boss_info_service = providers.Singleton(
+        BossInfoServiceImpl
+    )
     auto_boss_service = providers.Singleton(
         AutoBossServiceImpl,
         context=context,
@@ -51,6 +55,7 @@ class Container(containers.DeclarativeContainer):
         ocr_service=ocr_service,
         control_service=control_service,
         od_service=od_service,
+        boss_info_service=boss_info_service,
     )
     auto_pickup_service = providers.Singleton(
         AutoPickupServiceImpl,
@@ -60,6 +65,7 @@ class Container(containers.DeclarativeContainer):
         ocr_service=ocr_service,
         control_service=control_service,
         od_service=None,
+        boss_info_service=boss_info_service,
     )
     auto_story_service = providers.Singleton(
         AutoStoryServiceImpl,
@@ -69,6 +75,7 @@ class Container(containers.DeclarativeContainer):
         ocr_service=ocr_service,
         control_service=control_service,
         od_service=None,
+        boss_info_service=boss_info_service,
     )
     daily_activity_service = providers.Singleton(
         DailyActivityServiceImpl,
@@ -78,6 +85,7 @@ class Container(containers.DeclarativeContainer):
         ocr_service=ocr_service,
         control_service=control_service,
         od_service=od_service,
+        boss_info_service=boss_info_service,
     )
 
     def __init__(self, **kwargs):

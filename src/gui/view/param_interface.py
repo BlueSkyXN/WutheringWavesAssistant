@@ -916,7 +916,7 @@ class ParamInterface(ScrollArea):
             # self.tr('选择刷哪些boss'),
             self.tr('Target Boss Names'),
             # self.tr("可任选，大世界的建议选三个循环刷，副本里的建议单刷"),
-            self.tr("Choose any bosses, suggested: three for open world, one for instances"),
+            self.tr("Choose any bosses, suggested: one for instances and nightmare, three for open world"),
             texts=None,
             parent=self.bossGroup
         )
