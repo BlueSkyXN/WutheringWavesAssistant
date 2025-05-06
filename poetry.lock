@@ -12,11 +12,6 @@ files = [
     {file = "annotated_types-0.7.0.tar.gz", hash = "sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89"},
 ]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "antlr4-python3-runtime"
 version = "4.9.3"
@@ -27,11 +22,6 @@ groups = ["main"]
 files = [
     {file = "antlr4-python3-runtime-4.9.3.tar.gz", hash = "sha256:f224469b4168294902bb1efa80a8bf7855f24c99aef99cbefc1bcd3cce77881b"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "anyio"
@@ -57,11 +47,6 @@ doc = ["Sphinx (>=8.2,<9.0)", "packaging", "sphinx-autodoc-typehints (>=1.2.0)",
 test = ["anyio[trio]", "blockbuster (>=1.5.23)", "coverage[toml] (>=7)", "exceptiongroup (>=1.2.0)", "hypothesis (>=4.0)", "psutil (>=5.9)", "pytest (>=7.0)", "trustme", "truststore (>=0.9.1) ; python_version >= \"3.10\"", "uvloop (>=0.21) ; platform_python_implementation == \"CPython\" and platform_system != \"Windows\" and python_version < \"3.14\""]
 trio = ["trio (>=0.26.1)"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "astor"
 version = "0.8.1"
@@ -75,11 +60,6 @@ files = [
     {file = "astor-0.8.1.tar.gz", hash = "sha256:6a6effda93f4e1ce9f618779b2dd1d9d84f1e32812c23a29b3fff6fd7f63fa5e"},
 ]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "certifi"
 version = "2025.1.31"
@@ -91,11 +71,6 @@ files = [
     {file = "certifi-2025.1.31-py3-none-any.whl", hash = "sha256:ca78db4565a652026a4db2bcdf68f2fb589ea80d0be70e03929ed730746b84fe"},
     {file = "certifi-2025.1.31.tar.gz", hash = "sha256:3d5da6925056f6f18f119200434a4780a94263f10d1c21d032a6f6b2baa20651"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "charset-normalizer"
@@ -199,11 +174,6 @@ files = [
     {file = "charset_normalizer-3.4.1.tar.gz", hash = "sha256:44251f18cd68a75b56585dd00dae26183e102cd5e0f9f1466e6df5da2ed64ea3"},
 ]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "colorama"
 version = "0.4.6"
@@ -216,11 +186,6 @@ files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "coloredlogs"
@@ -241,11 +206,6 @@ humanfriendly = ">=9.1"
 [package.extras]
 cron = ["capturer (>=2.4)"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "colorlog"
 version = "6.9.0"
@@ -264,11 +224,6 @@ colorama = {version = "*", markers = "sys_platform == \"win32\""}
 [package.extras]
 development = ["black", "flake8", "mypy", "pytest", "types-colorama"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "colorthief"
 version = "0.2.1"
@@ -284,11 +239,6 @@ files = [
 [package.dependencies]
 Pillow = "*"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "comtypes"
 version = "1.4.10"
@@ -300,11 +250,6 @@ files = [
     {file = "comtypes-1.4.10-py3-none-any.whl", hash = "sha256:e078555721ee7ab40648a3363697d420b845b323e5944b55846e96aff97d2534"},
     {file = "comtypes-1.4.10.zip", hash = "sha256:b92372e76299836177b41aeda784225e18c5071c6bacdab88a7433224a4dc912"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "contourpy"
@@ -381,11 +326,6 @@ mypy = ["contourpy[bokeh,docs]", "docutils-stubs", "mypy (==1.11.1)", "types-Pil
 test = ["Pillow", "contourpy[test-no-images]", "matplotlib"]
 test-no-images = ["pytest", "pytest-cov", "pytest-rerunfailures", "pytest-xdist", "wurlitzer"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "cycler"
 version = "0.12.1"
@@ -403,11 +343,6 @@ files = [
 docs = ["ipython", "matplotlib", "numpydoc", "sphinx"]
 tests = ["pytest", "pytest-cov", "pytest-xdist"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "darkdetect"
 version = "0.8.0"
@@ -423,11 +358,6 @@ files = [
 [package.extras]
 macos-listener = ["pyobjc-framework-Cocoa ; platform_system == \"Darwin\""]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "decorator"
 version = "5.2.1"
@@ -440,11 +370,6 @@ files = [
     {file = "decorator-5.2.1-py3-none-any.whl", hash = "sha256:d316bb415a2d9e2d2b3abcc4084c6502fc09240e292cd76a76afc106a1c8e04a"},
     {file = "decorator-5.2.1.tar.gz", hash = "sha256:65f266143752f734b0a7cc83c46f4618af75b8c5911b00ccb61d0ac9b6da0360"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "dependency-injector"
@@ -545,11 +470,6 @@ pydantic = ["pydantic"]
 pydantic2 = ["pydantic-settings"]
 yaml = ["pyyaml"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "evdev"
 version = "1.9.1"
@@ -561,11 +481,6 @@ markers = "\"linux\" in sys_platform"
 files = [
     {file = "evdev-1.9.1.tar.gz", hash = "sha256:dc640a064cb1c9fe1f8b970dc2039945a2a275d7b7ee62284bf427238abe45ee"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "exceptiongroup"
@@ -583,11 +498,6 @@ files = [
 [package.extras]
 test = ["pytest (>=6)"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "flatbuffers"
 version = "25.2.10"
@@ -600,11 +510,6 @@ files = [
     {file = "flatbuffers-25.2.10-py2.py3-none-any.whl", hash = "sha256:ebba5f4d5ea615af3f7fd70fc310636fbb2bbd1f566ac0a23d98dd412de50051"},
     {file = "flatbuffers-25.2.10.tar.gz", hash = "sha256:97e451377a41262f8d9bd4295cc836133415cc03d8cb966410a4af92eb00d26e"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "fonttools"
@@ -681,11 +586,6 @@ ufo = ["fs (>=2.2.0,<3)"]
 unicode = ["unicodedata2 (>=15.1.0) ; python_version <= \"3.12\""]
 woff = ["brotli (>=1.0.1) ; platform_python_implementation == \"CPython\"", "brotlicffi (>=0.8.0) ; platform_python_implementation != \"CPython\"", "zopfli (>=0.1.4)"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "gputil"
 version = "1.4.0"
@@ -696,11 +596,6 @@ groups = ["main"]
 files = [
     {file = "GPUtil-1.4.0.tar.gz", hash = "sha256:099e52c65e512cdfa8c8763fca67f5a5c2afb63469602d5dcb4d296b3661efb9"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "h11"
@@ -714,11 +609,6 @@ files = [
     {file = "h11-0.14.0-py3-none-any.whl", hash = "sha256:e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761"},
     {file = "h11-0.14.0.tar.gz", hash = "sha256:8f19fbbe99e72420ff35c00b27a34cb9937e902a8b810e2c88300c6f0a3b699d"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "httpcore"
@@ -742,11 +632,6 @@ asyncio = ["anyio (>=4.0,<5.0)"]
 http2 = ["h2 (>=3,<5)"]
 socks = ["socksio (==1.*)"]
 trio = ["trio (>=0.22.0,<1.0)"]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "httpx"
@@ -774,11 +659,6 @@ http2 = ["h2 (>=3,<5)"]
 socks = ["socksio (==1.*)"]
 zstd = ["zstandard (>=0.18.0)"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "humanfriendly"
 version = "10.0"
@@ -795,11 +675,6 @@ files = [
 [package.dependencies]
 pyreadline3 = {version = "*", markers = "sys_platform == \"win32\" and python_version >= \"3.8\""}
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "idna"
 version = "3.10"
@@ -815,11 +690,6 @@ files = [
 [package.extras]
 all = ["flake8 (>=7.1.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2)"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "iniconfig"
 version = "2.1.0"
@@ -832,11 +702,6 @@ files = [
     {file = "iniconfig-2.1.0-py3-none-any.whl", hash = "sha256:9deba5723312380e77435581c6bf4935c94cbfab9b1ed33ef8d238ea168eb760"},
     {file = "iniconfig-2.1.0.tar.gz", hash = "sha256:3abbd2e30b36733fee78f9c7f7308f2d0050e88f0087fd25c2645f63c773e1c7"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "kiwisolver"
@@ -929,11 +794,6 @@ files = [
     {file = "kiwisolver-1.4.8.tar.gz", hash = "sha256:23d5f023bdc8c7e54eb65f03ca5d5bb25b601eac4d7f1a042888a1f45237987e"},
 ]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "matplotlib"
 version = "3.10.1"
@@ -993,11 +853,6 @@ python-dateutil = ">=2.7"
 [package.extras]
 dev = ["meson-python (>=0.13.1,<0.17.0)", "pybind11 (>=2.13.2,!=2.13.3)", "setuptools (>=64)", "setuptools_scm (>=7)"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "mpmath"
 version = "1.3.0"
@@ -1017,11 +872,6 @@ docs = ["sphinx"]
 gmpy = ["gmpy2 (>=2.1.0a4) ; platform_python_implementation != \"PyPy\""]
 tests = ["pytest (>=4.6)"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "mss"
 version = "10.0.0"
@@ -1038,11 +888,6 @@ files = [
 dev = ["build (==1.2.2.post1)", "mypy (==1.13.0)", "ruff (==0.7.3)", "twine (==5.1.1)"]
 docs = ["sphinx (==8.1.3)"]
 tests = ["numpy (==2.1.3) ; sys_platform == \"linux\" and python_version == \"3.13\"", "pillow (==11.0.0) ; sys_platform == \"linux\" and python_version == \"3.13\"", "pytest (==8.3.3)", "pytest-cov (==6.0.0)", "pytest-rerunfailures (==14.0.0)", "pyvirtualdisplay (==3.0) ; sys_platform == \"linux\""]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "networkx"
@@ -1064,11 +909,6 @@ doc = ["intersphinx-registry", "myst-nb (>=1.1)", "numpydoc (>=1.8.0)", "pillow 
 example = ["cairocffi (>=1.7)", "contextily (>=1.6)", "igraph (>=0.11)", "momepy (>=0.7.2)", "osmnx (>=1.9)", "scikit-learn (>=1.5)", "seaborn (>=0.13)"]
 extra = ["lxml (>=4.6)", "pydot (>=3.0.1)", "pygraphviz (>=1.14)", "sympy (>=1.10)"]
 test = ["pytest (>=7.2)", "pytest-cov (>=4.0)"]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "numpy"
@@ -1116,11 +956,6 @@ files = [
     {file = "numpy-1.26.4.tar.gz", hash = "sha256:2a02aba9ed12e4ac4eb3ea9421c420301a0c6460d9830d74a9df87efa4912010"},
 ]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "nvidia-cublas-cu12"
 version = "12.6.4.1"
@@ -1134,11 +969,6 @@ files = [
     {file = "nvidia_cublas_cu12-12.6.4.1-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:235f728d6e2a409eddf1df58d5b0921cf80cfa9e72b9f2775ccb7b4a87984668"},
     {file = "nvidia_cublas_cu12-12.6.4.1-py3-none-win_amd64.whl", hash = "sha256:9e4fa264f4d8a4eb0cdbd34beadc029f453b3bafae02401e999cf3d5a5af75f8"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "nvidia-cuda-cupti-cu12"
@@ -1156,11 +986,6 @@ files = [
     {file = "nvidia_cuda_cupti_cu12-12.6.80-py3-none-win_amd64.whl", hash = "sha256:bbe6ae76e83ce5251b56e8c8e61a964f757175682bbad058b170b136266ab00a"},
 ]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "nvidia-cuda-nvrtc-cu12"
 version = "12.6.77"
@@ -1174,11 +999,6 @@ files = [
     {file = "nvidia_cuda_nvrtc_cu12-12.6.77-py3-none-manylinux2014_x86_64.whl", hash = "sha256:35b0cc6ee3a9636d5409133e79273ce1f3fd087abb0532d2d2e8fff1fe9efc53"},
     {file = "nvidia_cuda_nvrtc_cu12-12.6.77-py3-none-win_amd64.whl", hash = "sha256:f7007dbd914c56bd80ea31bc43e8e149da38f68158f423ba845fc3292684e45a"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "nvidia-cuda-runtime-cu12"
@@ -1196,11 +1016,6 @@ files = [
     {file = "nvidia_cuda_runtime_cu12-12.6.77-py3-none-win_amd64.whl", hash = "sha256:86c58044c824bf3c173c49a2dbc7a6c8b53cb4e4dca50068be0bf64e9dab3f7f"},
 ]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "nvidia-cudnn-cu12"
 version = "9.5.1.17"
@@ -1217,11 +1032,6 @@ files = [
 
 [package.dependencies]
 nvidia-cublas-cu12 = "*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "nvidia-cufft-cu12"
@@ -1242,11 +1052,6 @@ files = [
 [package.dependencies]
 nvidia-nvjitlink-cu12 = "*"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "nvidia-cufile-cu12"
 version = "1.11.1.6"
@@ -1259,11 +1064,6 @@ files = [
     {file = "nvidia_cufile_cu12-1.11.1.6-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:cc23469d1c7e52ce6c1d55253273d32c565dd22068647f3aa59b3c6b005bf159"},
     {file = "nvidia_cufile_cu12-1.11.1.6-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:8f57a0051dcf2543f6dc2b98a98cb2719c37d3cee1baba8965d57f3bbc90d4db"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "nvidia-curand-cu12"
@@ -1280,11 +1080,6 @@ files = [
     {file = "nvidia_curand_cu12-10.3.7.77-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:7b2ed8e95595c3591d984ea3603dd66fe6ce6812b886d59049988a712ed06b6e"},
     {file = "nvidia_curand_cu12-10.3.7.77-py3-none-win_amd64.whl", hash = "sha256:6d6d935ffba0f3d439b7cd968192ff068fafd9018dbf1b85b37261b13cfc9905"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "nvidia-cusolver-cu12"
@@ -1307,11 +1102,6 @@ nvidia-cublas-cu12 = "*"
 nvidia-cusparse-cu12 = "*"
 nvidia-nvjitlink-cu12 = "*"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "nvidia-cusparse-cu12"
 version = "12.5.4.2"
@@ -1331,11 +1121,6 @@ files = [
 [package.dependencies]
 nvidia-nvjitlink-cu12 = "*"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "nvidia-cusparselt-cu12"
 version = "0.6.3"
@@ -1350,11 +1135,6 @@ files = [
     {file = "nvidia_cusparselt_cu12-0.6.3-py3-none-win_amd64.whl", hash = "sha256:3b325bcbd9b754ba43df5a311488fca11a6b5dc3d11df4d190c000cf1a0765c7"},
 ]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "nvidia-nccl-cu12"
 version = "2.25.1"
@@ -1367,11 +1147,6 @@ files = [
     {file = "nvidia_nccl_cu12-2.25.1-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:4ab428bc915785cc66e8c57cb34c7a64cf739c46702b8db748b6ad6cc7180cf8"},
     {file = "nvidia_nccl_cu12-2.25.1-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:362aed5963fb9ea2ed2f264409baae30143498fd0e5c503aeaa1badd88cdc54a"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "nvidia-nvjitlink-cu12"
@@ -1386,11 +1161,6 @@ files = [
     {file = "nvidia_nvjitlink_cu12-12.6.85-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:cf4eaa7d4b6b543ffd69d6abfb11efdeb2db48270d94dfd3a452c24150829e41"},
     {file = "nvidia_nvjitlink_cu12-12.6.85-py3-none-win_amd64.whl", hash = "sha256:e61120e52ed675747825cdd16febc6a0730537451d867ee58bee3853b1b13d1c"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "nvidia-nvtx-cu12"
@@ -1408,11 +1178,6 @@ files = [
     {file = "nvidia_nvtx_cu12-12.6.77-py3-none-win_amd64.whl", hash = "sha256:2fb11a4af04a5e6c84073e6404d26588a34afd35379f0855a99797897efa75c0"},
 ]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "omegaconf"
 version = "2.3.0"
@@ -1428,11 +1193,6 @@ files = [
 [package.dependencies]
 antlr4-python3-runtime = "==4.9.*"
 PyYAML = ">=5.1.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "onnxruntime"
@@ -1474,11 +1234,6 @@ packaging = "*"
 protobuf = "*"
 sympy = "*"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "onnxruntime-directml"
 version = "1.20.0"
@@ -1501,11 +1256,6 @@ numpy = ">=1.21.6"
 packaging = "*"
 protobuf = "*"
 sympy = "*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "onnxruntime-gpu"
@@ -1535,11 +1285,6 @@ packaging = "*"
 protobuf = "*"
 sympy = "*"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "opencv-python"
 version = "4.11.0.86"
@@ -1565,11 +1310,6 @@ numpy = [
     {version = ">=1.21.2", markers = "platform_system != \"Darwin\" and python_version == \"3.10\""},
 ]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "opt-einsum"
 version = "3.3.0"
@@ -1590,11 +1330,6 @@ numpy = ">=1.7"
 docs = ["numpydoc", "sphinx (==1.2.3)", "sphinx-rtd-theme", "sphinxcontrib-napoleon"]
 tests = ["pytest", "pytest-cov", "pytest-pep8"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "packaging"
 version = "24.2"
@@ -1607,11 +1342,6 @@ files = [
     {file = "packaging-24.2-py3-none-any.whl", hash = "sha256:09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759"},
     {file = "packaging-24.2.tar.gz", hash = "sha256:c228a6dc5e932d346bc5739379109d49e8853dd8223571c7c5b55260edc0b97f"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "paddlepaddle-gpu"
@@ -1755,11 +1485,6 @@ tests = ["check-manifest", "coverage (>=7.4.2)", "defusedxml", "markdown2", "ole
 typing = ["typing-extensions ; python_version < \"3.10\""]
 xmp = ["defusedxml"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pluggy"
 version = "1.5.0"
@@ -1776,11 +1501,6 @@ files = [
 [package.extras]
 dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "protobuf"
@@ -1801,11 +1521,6 @@ files = [
     {file = "protobuf-6.30.1-py3-none-any.whl", hash = "sha256:3c25e51e1359f1f5fa3b298faa6016e650d148f214db2e47671131b9063c53be"},
     {file = "protobuf-6.30.1.tar.gz", hash = "sha256:535fb4e44d0236893d5cf1263a0f706f1160b689a7ab962e9da8a9ce4050b780"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "psutil"
@@ -1828,13 +1543,8 @@ files = [
 ]
 
 [package.extras]
-dev = ["abi3audit", "black (==24.10.0)", "check-manifest", "coverage", "packaging", "pylint", "pyperf", "pypinfo", "pytest", "pytest-cov", "pytest-xdist", "requests", "rstcheck", "ruff", "setuptools", "sphinx", "sphinx-rtd-theme", "toml-sort", "twine", "virtualenv", "vulture", "wheel"]
+dev = ["abi3audit", "black (==24.10.0)", "check-manifest", "coverage", "packaging", "pylint", "pyperf", "pypinfo", "pytest", "pytest-cov", "pytest-xdist", "requests", "rstcheck", "ruff", "setuptools", "sphinx", "sphinx_rtd_theme", "toml-sort", "twine", "virtualenv", "vulture", "wheel"]
 test = ["pytest", "pytest-xdist", "setuptools"]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pycaw"
@@ -1851,11 +1561,6 @@ files = [
 [package.dependencies]
 comtypes = "*"
 psutil = "*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyclipper"
@@ -1917,11 +1622,6 @@ files = [
     {file = "pyclipper-1.3.0.post6.tar.gz", hash = "sha256:42bff0102fa7a7f2abdd795a2594654d62b786d0c6cd67b72d469114fdeb608c"},
 ]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pycocoa"
 version = "25.2.28"
@@ -1934,11 +1634,6 @@ files = [
     {file = "pycocoa-25.2.28-py2.py3-none-any.whl", hash = "sha256:efb03ab5817a1ae0b013f68834e3fa08e17a0b4d8489ff9a0b25b77e4ab4159d"},
     {file = "pycocoa-25.2.28.tar.gz", hash = "sha256:2ea19e97c1806236b020ed4d4419d4b00174a6d7e8330dd519e448287c73e5da"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pydantic"
@@ -1960,11 +1655,6 @@ typing-extensions = ">=4.12.2"
 [package.extras]
 email = ["email-validator (>=2.0.0)"]
 timezone = ["tzdata ; python_version >= \"3.9\" and platform_system == \"Windows\""]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pydantic-core"
@@ -2079,11 +1769,6 @@ files = [
 [package.dependencies]
 typing-extensions = ">=4.6.0,<4.7.0 || >4.7.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pydirectinput"
 version = "1.0.4"
@@ -2095,11 +1780,6 @@ files = [
     {file = "PyDirectInput-1.0.4-py3-none-any.whl", hash = "sha256:238bbe97f505f9c8728a47ea6a787750dbe834ec1fb42b98b3d703d827eda83e"},
     {file = "PyDirectInput-1.0.4.tar.gz", hash = "sha256:bebe65102c69208688402f9f4cbd2ae7afc174fd2123e156e178b1304e7f80a2"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pynput"
@@ -2119,11 +1799,6 @@ pyobjc-framework-ApplicationServices = {version = ">=8.0", markers = "sys_platfo
 pyobjc-framework-Quartz = {version = ">=8.0", markers = "sys_platform == \"darwin\""}
 python-xlib = {version = ">=0.17", markers = "\"linux\" in sys_platform"}
 six = "*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc"
@@ -2300,11 +1975,6 @@ pyobjc-framework-WebKit = "11.0"
 [package.extras]
 allbindings = ["pyobjc-core (==11.0)", "pyobjc-framework-AVFoundation (==11.0)", "pyobjc-framework-AVKit (==11.0)", "pyobjc-framework-AVRouting (==11.0)", "pyobjc-framework-Accessibility (==11.0)", "pyobjc-framework-Accounts (==11.0)", "pyobjc-framework-AdServices (==11.0)", "pyobjc-framework-AdSupport (==11.0)", "pyobjc-framework-AddressBook (==11.0)", "pyobjc-framework-AppTrackingTransparency (==11.0)", "pyobjc-framework-AppleScriptKit (==11.0)", "pyobjc-framework-AppleScriptObjC (==11.0)", "pyobjc-framework-ApplicationServices (==11.0)", "pyobjc-framework-AudioVideoBridging (==11.0)", "pyobjc-framework-AuthenticationServices (==11.0)", "pyobjc-framework-AutomaticAssessmentConfiguration (==11.0)", "pyobjc-framework-Automator (==11.0)", "pyobjc-framework-BackgroundAssets (==11.0)", "pyobjc-framework-BrowserEngineKit (==11.0)", "pyobjc-framework-BusinessChat (==11.0)", "pyobjc-framework-CFNetwork (==11.0)", "pyobjc-framework-CalendarStore (==11.0)", "pyobjc-framework-CallKit (==11.0)", "pyobjc-framework-Carbon (==11.0)", "pyobjc-framework-Cinematic (==11.0)", "pyobjc-framework-ClassKit (==11.0)", "pyobjc-framework-CloudKit (==11.0)", "pyobjc-framework-Cocoa (==11.0)", "pyobjc-framework-Collaboration (==11.0)", "pyobjc-framework-ColorSync (==11.0)", "pyobjc-framework-Contacts (==11.0)", "pyobjc-framework-ContactsUI (==11.0)", "pyobjc-framework-CoreAudio (==11.0)", "pyobjc-framework-CoreAudioKit (==11.0)", "pyobjc-framework-CoreBluetooth (==11.0)", "pyobjc-framework-CoreData (==11.0)", "pyobjc-framework-CoreHaptics (==11.0)", "pyobjc-framework-CoreLocation (==11.0)", "pyobjc-framework-CoreMIDI (==11.0)", "pyobjc-framework-CoreML (==11.0)", "pyobjc-framework-CoreMedia (==11.0)", "pyobjc-framework-CoreMediaIO (==11.0)", "pyobjc-framework-CoreMotion (==11.0)", "pyobjc-framework-CoreServices (==11.0)", "pyobjc-framework-CoreSpotlight (==11.0)", "pyobjc-framework-CoreText (==11.0)", "pyobjc-framework-CoreWLAN (==11.0)", "pyobjc-framework-CryptoTokenKit (==11.0)", "pyobjc-framework-DVDPlayback (==11.0)", "pyobjc-framework-DataDetection (==11.0)", "pyobjc-framework-DeviceCheck (==11.0)", "pyobjc-framework-DeviceDiscoveryExtension (==11.0)", "pyobjc-framework-DictionaryServices (==11.0)", "pyobjc-framework-DiscRecording (==11.0)", "pyobjc-framework-DiscRecordingUI (==11.0)", "pyobjc-framework-DiskArbitration (==11.0)", "pyobjc-framework-EventKit (==11.0)", "pyobjc-framework-ExceptionHandling (==11.0)", "pyobjc-framework-ExecutionPolicy (==11.0)", "pyobjc-framework-ExtensionKit (==11.0)", "pyobjc-framework-ExternalAccessory (==11.0)", "pyobjc-framework-FSEvents (==11.0)", "pyobjc-framework-FileProvider (==11.0)", "pyobjc-framework-FileProviderUI (==11.0)", "pyobjc-framework-FinderSync (==11.0)", "pyobjc-framework-GameCenter (==11.0)", "pyobjc-framework-GameController (==11.0)", "pyobjc-framework-GameKit (==11.0)", "pyobjc-framework-GameplayKit (==11.0)", "pyobjc-framework-HealthKit (==11.0)", "pyobjc-framework-IOBluetooth (==11.0)", "pyobjc-framework-IOBluetoothUI (==11.0)", "pyobjc-framework-IOSurface (==11.0)", "pyobjc-framework-ImageCaptureCore (==11.0)", "pyobjc-framework-InputMethodKit (==11.0)", "pyobjc-framework-InstallerPlugins (==11.0)", "pyobjc-framework-InstantMessage (==11.0)", "pyobjc-framework-Intents (==11.0)", "pyobjc-framework-IntentsUI (==11.0)", "pyobjc-framework-KernelManagement (==11.0)", "pyobjc-framework-LatentSemanticMapping (==11.0)", "pyobjc-framework-LaunchServices (==11.0)", "pyobjc-framework-LinkPresentation (==11.0)", "pyobjc-framework-LocalAuthentication (==11.0)", "pyobjc-framework-LocalAuthenticationEmbeddedUI (==11.0)", "pyobjc-framework-MLCompute (==11.0)", "pyobjc-framework-MailKit (==11.0)", "pyobjc-framework-MapKit (==11.0)", "pyobjc-framework-MediaAccessibility (==11.0)", "pyobjc-framework-MediaExtension (==11.0)", "pyobjc-framework-MediaLibrary (==11.0)", "pyobjc-framework-MediaPlayer (==11.0)", "pyobjc-framework-MediaToolbox (==11.0)", "pyobjc-framework-Metal (==11.0)", "pyobjc-framework-MetalFX (==11.0)", "pyobjc-framework-MetalKit (==11.0)", "pyobjc-framework-MetalPerformanceShaders (==11.0)", "pyobjc-framework-MetalPerformanceShadersGraph (==11.0)", "pyobjc-framework-MetricKit (==11.0)", "pyobjc-framework-ModelIO (==11.0)", "pyobjc-framework-MultipeerConnectivity (==11.0)", "pyobjc-framework-NaturalLanguage (==11.0)", "pyobjc-framework-NetFS (==11.0)", "pyobjc-framework-Network (==11.0)", "pyobjc-framework-NetworkExtension (==11.0)", "pyobjc-framework-NotificationCenter (==11.0)", "pyobjc-framework-OSAKit (==11.0)", "pyobjc-framework-OSLog (==11.0)", "pyobjc-framework-OpenDirectory (==11.0)", "pyobjc-framework-PHASE (==11.0)", "pyobjc-framework-PassKit (==11.0)", "pyobjc-framework-PencilKit (==11.0)", "pyobjc-framework-Photos (==11.0)", "pyobjc-framework-PhotosUI (==11.0)", "pyobjc-framework-PreferencePanes (==11.0)", "pyobjc-framework-PubSub (==11.0)", "pyobjc-framework-PushKit (==11.0)", "pyobjc-framework-Quartz (==11.0)", "pyobjc-framework-QuickLookThumbnailing (==11.0)", "pyobjc-framework-ReplayKit (==11.0)", "pyobjc-framework-SafariServices (==11.0)", "pyobjc-framework-SafetyKit (==11.0)", "pyobjc-framework-SceneKit (==11.0)", "pyobjc-framework-ScreenCaptureKit (==11.0)", "pyobjc-framework-ScreenSaver (==11.0)", "pyobjc-framework-ScreenTime (==11.0)", "pyobjc-framework-ScriptingBridge (==11.0)", "pyobjc-framework-SearchKit (==11.0)", "pyobjc-framework-Security (==11.0)", "pyobjc-framework-SecurityFoundation (==11.0)", "pyobjc-framework-SecurityInterface (==11.0)", "pyobjc-framework-SensitiveContentAnalysis (==11.0)", "pyobjc-framework-ServiceManagement (==11.0)", "pyobjc-framework-SharedWithYou (==11.0)", "pyobjc-framework-SharedWithYouCore (==11.0)", "pyobjc-framework-ShazamKit (==11.0)", "pyobjc-framework-Social (==11.0)", "pyobjc-framework-SoundAnalysis (==11.0)", "pyobjc-framework-Speech (==11.0)", "pyobjc-framework-SpriteKit (==11.0)", "pyobjc-framework-StoreKit (==11.0)", "pyobjc-framework-Symbols (==11.0)", "pyobjc-framework-SyncServices (==11.0)", "pyobjc-framework-SystemConfiguration (==11.0)", "pyobjc-framework-SystemExtensions (==11.0)", "pyobjc-framework-ThreadNetwork (==11.0)", "pyobjc-framework-UniformTypeIdentifiers (==11.0)", "pyobjc-framework-UserNotifications (==11.0)", "pyobjc-framework-UserNotificationsUI (==11.0)", "pyobjc-framework-VideoSubscriberAccount (==11.0)", "pyobjc-framework-VideoToolbox (==11.0)", "pyobjc-framework-Virtualization (==11.0)", "pyobjc-framework-Vision (==11.0)", "pyobjc-framework-WebKit (==11.0)", "pyobjc-framework-iTunesLibrary (==11.0)", "pyobjc-framework-libdispatch (==11.0)", "pyobjc-framework-libxpc (==11.0)"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-core"
 version = "11.0"
@@ -2322,11 +1992,6 @@ files = [
     {file = "pyobjc_core-11.0-cp39-cp39-macosx_10_9_universal2.whl", hash = "sha256:02406ece449d0f41b31e579e47ca77ced3eb57533df955281bfcecc99da74fba"},
     {file = "pyobjc_core-11.0.tar.gz", hash = "sha256:63bced211cb8a8fb5c8ff46473603da30e51112861bd02c438fbbbc8578d9a70"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-accessibility"
@@ -2351,11 +2016,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-accounts"
 version = "11.0"
@@ -2373,11 +2033,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-addressbook"
@@ -2401,11 +2056,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-adservices"
 version = "11.0"
@@ -2423,11 +2073,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-adsupport"
@@ -2447,11 +2092,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-applescriptkit"
 version = "11.0"
@@ -2470,11 +2110,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-applescriptobjc"
 version = "11.0"
@@ -2492,11 +2127,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-applicationservices"
@@ -2522,11 +2152,6 @@ pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-CoreText = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-apptrackingtransparency"
 version = "11.0"
@@ -2544,11 +2169,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-audiovideobridging"
@@ -2572,11 +2192,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-authenticationservices"
 version = "11.0"
@@ -2598,11 +2213,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-automaticassessmentconfiguration"
@@ -2626,11 +2236,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-automator"
 version = "11.0"
@@ -2652,11 +2257,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-avfoundation"
@@ -2683,11 +2283,6 @@ pyobjc-framework-CoreAudio = ">=11.0"
 pyobjc-framework-CoreMedia = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-avkit"
 version = "11.0"
@@ -2711,11 +2306,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-avrouting"
 version = "11.0"
@@ -2738,11 +2328,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-backgroundassets"
 version = "11.0"
@@ -2764,11 +2349,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-browserenginekit"
@@ -2795,11 +2375,6 @@ pyobjc-framework-CoreAudio = ">=11.0"
 pyobjc-framework-CoreMedia = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-businesschat"
 version = "11.0"
@@ -2817,11 +2392,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-calendarstore"
@@ -2841,11 +2411,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-callkit"
 version = "11.0"
@@ -2864,11 +2429,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-carbon"
 version = "11.0"
@@ -2886,11 +2446,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-cfnetwork"
@@ -2914,11 +2469,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-cinematic"
 version = "11.0"
@@ -2939,11 +2489,6 @@ pyobjc-framework-AVFoundation = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-CoreMedia = ">=11.0"
 pyobjc-framework-Metal = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-classkit"
@@ -2967,11 +2512,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-cloudkit"
 version = "11.0"
@@ -2992,11 +2532,6 @@ pyobjc-framework-Accounts = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-CoreData = ">=11.0"
 pyobjc-framework-CoreLocation = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-cocoa"
@@ -3019,11 +2554,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-collaboration"
 version = "11.0"
@@ -3042,11 +2572,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-colorsync"
 version = "11.0"
@@ -3064,11 +2589,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-contacts"
@@ -3091,11 +2611,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-contactsui"
@@ -3120,11 +2635,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-Contacts = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-coreaudio"
 version = "11.0"
@@ -3146,11 +2656,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-coreaudiokit"
@@ -3175,11 +2680,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-CoreAudio = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-corebluetooth"
 version = "11.0"
@@ -3201,11 +2701,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-coredata"
@@ -3229,11 +2724,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-corehaptics"
 version = "11.0"
@@ -3251,11 +2741,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-corelocation"
@@ -3279,11 +2764,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-coremedia"
 version = "11.0"
@@ -3305,11 +2785,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-coremediaio"
@@ -3333,11 +2808,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-coremidi"
 version = "11.0"
@@ -3359,11 +2829,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-coreml"
@@ -3387,11 +2852,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-coremotion"
 version = "11.0"
@@ -3413,11 +2873,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-coreservices"
@@ -3442,11 +2897,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-FSEvents = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-corespotlight"
 version = "11.0"
@@ -3468,11 +2918,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-coretext"
@@ -3497,11 +2942,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-corewlan"
 version = "11.0"
@@ -3523,11 +2963,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-cryptotokenkit"
@@ -3551,11 +2986,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-datadetection"
 version = "11.0"
@@ -3573,11 +3003,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-devicecheck"
@@ -3597,11 +3022,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-devicediscoveryextension"
 version = "11.0"
@@ -3620,11 +3040,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-dictionaryservices"
 version = "11.0"
@@ -3642,11 +3057,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-CoreServices = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-discrecording"
@@ -3670,11 +3080,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-discrecordingui"
 version = "11.0"
@@ -3694,11 +3099,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-DiscRecording = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-diskarbitration"
 version = "11.0"
@@ -3716,11 +3116,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-dvdplayback"
@@ -3740,11 +3135,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-eventkit"
 version = "11.0"
@@ -3762,11 +3152,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-exceptionhandling"
@@ -3786,11 +3171,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-executionpolicy"
 version = "11.0"
@@ -3808,11 +3188,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-extensionkit"
@@ -3836,11 +3211,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-externalaccessory"
 version = "11.0"
@@ -3862,11 +3232,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-fileprovider"
@@ -3890,11 +3255,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-fileproviderui"
 version = "11.0"
@@ -3913,11 +3273,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-FileProvider = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-findersync"
 version = "11.0"
@@ -3935,11 +3290,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-fsevents"
@@ -3963,11 +3313,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-gamecenter"
 version = "11.0"
@@ -3990,11 +3335,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-gamecontroller"
 version = "11.0"
@@ -4016,11 +3356,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-gamekit"
@@ -4045,11 +3380,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-gameplaykit"
 version = "11.0"
@@ -4073,11 +3403,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-SpriteKit = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-healthkit"
 version = "11.0"
@@ -4099,11 +3424,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-imagecapturecore"
@@ -4127,11 +3447,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-inputmethodkit"
 version = "11.0"
@@ -4154,11 +3469,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-installerplugins"
 version = "11.0"
@@ -4176,11 +3486,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-instantmessage"
@@ -4200,11 +3505,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-intents"
@@ -4228,11 +3528,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-intentsui"
 version = "11.0"
@@ -4254,11 +3549,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Intents = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-iobluetooth"
@@ -4282,11 +3572,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-iobluetoothui"
 version = "11.0"
@@ -4304,11 +3589,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-IOBluetooth = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-iosurface"
@@ -4328,11 +3608,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-ituneslibrary"
 version = "11.0"
@@ -4350,11 +3625,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-kernelmanagement"
@@ -4374,11 +3644,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-latentsemanticmapping"
 version = "11.0"
@@ -4397,11 +3662,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-launchservices"
 version = "11.0"
@@ -4419,11 +3679,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-CoreServices = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-libdispatch"
@@ -4447,11 +3702,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-libxpc"
 version = "11.0"
@@ -4474,11 +3724,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-linkpresentation"
 version = "11.0"
@@ -4497,11 +3742,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-localauthentication"
@@ -4526,11 +3766,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-Security = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-localauthenticationembeddedui"
 version = "11.0"
@@ -4550,11 +3785,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-LocalAuthentication = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-mailkit"
 version = "11.0"
@@ -4572,11 +3802,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-mapkit"
@@ -4602,11 +3827,6 @@ pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-CoreLocation = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-mediaaccessibility"
 version = "11.0"
@@ -4624,11 +3844,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-mediaextension"
@@ -4654,11 +3869,6 @@ pyobjc-framework-AVFoundation = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-CoreMedia = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-medialibrary"
 version = "11.0"
@@ -4678,11 +3888,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-mediaplayer"
 version = "11.0"
@@ -4700,11 +3905,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-AVFoundation = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-mediatoolbox"
@@ -4728,11 +3928,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-metal"
 version = "11.0"
@@ -4755,11 +3950,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-metalfx"
 version = "11.0"
@@ -4781,11 +3971,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Metal = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-metalkit"
@@ -4810,11 +3995,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-Metal = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-metalperformanceshaders"
 version = "11.0"
@@ -4837,11 +4017,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Metal = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-metalperformanceshadersgraph"
 version = "11.0"
@@ -4859,11 +4034,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-MetalPerformanceShaders = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-metrickit"
@@ -4887,11 +4057,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-mlcompute"
 version = "11.0"
@@ -4909,11 +4074,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-modelio"
@@ -4938,11 +4098,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-multipeerconnectivity"
 version = "11.0"
@@ -4965,11 +4120,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-naturallanguage"
 version = "11.0"
@@ -4988,11 +4138,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-netfs"
 version = "11.0"
@@ -5010,11 +4155,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-network"
@@ -5038,11 +4178,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-networkextension"
 version = "11.0"
@@ -5064,11 +4199,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-notificationcenter"
@@ -5092,11 +4222,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-opendirectory"
 version = "11.0"
@@ -5115,11 +4240,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-osakit"
 version = "11.0"
@@ -5137,11 +4257,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-oslog"
@@ -5167,11 +4282,6 @@ pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-CoreMedia = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-passkit"
 version = "11.0"
@@ -5194,11 +4304,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-pencilkit"
 version = "11.0"
@@ -5217,11 +4322,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-phase"
 version = "11.0"
@@ -5239,11 +4339,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-AVFoundation = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-photos"
@@ -5267,11 +4362,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-photosui"
 version = "11.0"
@@ -5294,11 +4384,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-preferencepanes"
 version = "11.0"
@@ -5317,11 +4402,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-pubsub"
 version = "11.0"
@@ -5339,11 +4419,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-pushkit"
@@ -5367,11 +4442,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-quartz"
 version = "11.0"
@@ -5394,11 +4464,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-quicklookthumbnailing"
 version = "11.0"
@@ -5417,11 +4482,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-replaykit"
@@ -5445,11 +4505,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-safariservices"
 version = "11.0"
@@ -5471,11 +4526,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-safetykit"
@@ -5500,11 +4550,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-scenekit"
 version = "11.0"
@@ -5527,11 +4572,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-screencapturekit"
@@ -5556,11 +4596,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-CoreMedia = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-screensaver"
 version = "11.0"
@@ -5583,11 +4618,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-screentime"
 version = "11.0"
@@ -5605,11 +4635,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-scriptingbridge"
@@ -5633,11 +4658,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-searchkit"
 version = "11.0"
@@ -5655,11 +4675,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-CoreServices = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-security"
@@ -5683,11 +4698,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-securityfoundation"
 version = "11.0"
@@ -5706,11 +4716,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-Security = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-securityinterface"
@@ -5735,11 +4740,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-Security = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-sensitivecontentanalysis"
 version = "11.0"
@@ -5759,11 +4759,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-servicemanagement"
 version = "11.0"
@@ -5781,11 +4776,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-sharedwithyou"
@@ -5809,11 +4799,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-SharedWithYouCore = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-sharedwithyoucore"
 version = "11.0"
@@ -5835,11 +4820,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-shazamkit"
@@ -5863,11 +4843,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-social"
 version = "11.0"
@@ -5886,11 +4861,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-soundanalysis"
 version = "11.0"
@@ -5908,11 +4878,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-speech"
@@ -5935,11 +4900,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-spritekit"
@@ -5964,11 +4924,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-storekit"
 version = "11.0"
@@ -5991,11 +4946,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-symbols"
 version = "11.0"
@@ -6013,11 +4963,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-syncservices"
@@ -6042,11 +4987,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-CoreData = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-systemconfiguration"
 version = "11.0"
@@ -6068,11 +5008,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-systemextensions"
@@ -6096,11 +5031,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-threadnetwork"
 version = "11.0"
@@ -6119,11 +5049,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-uniformtypeidentifiers"
 version = "11.0"
@@ -6141,11 +5066,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-usernotifications"
@@ -6169,11 +5089,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-usernotificationsui"
 version = "11.0"
@@ -6193,11 +5108,6 @@ pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-UserNotifications = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-videosubscriberaccount"
 version = "11.0"
@@ -6215,11 +5125,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-videotoolbox"
@@ -6245,11 +5150,6 @@ pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-CoreMedia = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-virtualization"
 version = "11.0"
@@ -6271,11 +5171,6 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyobjc-framework-vision"
@@ -6301,11 +5196,6 @@ pyobjc-framework-Cocoa = ">=11.0"
 pyobjc-framework-CoreML = ">=11.0"
 pyobjc-framework-Quartz = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyobjc-framework-webkit"
 version = "11.0"
@@ -6328,11 +5218,6 @@ files = [
 pyobjc-core = ">=11.0"
 pyobjc-framework-Cocoa = ">=11.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyparsing"
 version = "3.2.3"
@@ -6349,11 +5234,6 @@ files = [
 [package.extras]
 diagrams = ["jinja2", "railroad-diagrams"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyreadline3"
 version = "3.5.4"
@@ -6369,11 +5249,6 @@ files = [
 
 [package.extras]
 dev = ["build", "flake8", "mypy", "pytest", "twine"]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyside6"
@@ -6394,11 +5269,6 @@ PySide6-Addons = "6.8.2.1"
 PySide6-Essentials = "6.8.2.1"
 shiboken6 = "6.8.2.1"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyside6-addons"
 version = "6.8.2.1"
@@ -6417,11 +5287,6 @@ files = [
 PySide6-Essentials = "6.8.2.1"
 shiboken6 = "6.8.2.1"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "pyside6-essentials"
 version = "6.8.2.1"
@@ -6438,11 +5303,6 @@ files = [
 
 [package.dependencies]
 shiboken6 = "6.8.2.1"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyside6-fluent-widgets"
@@ -6466,11 +5326,6 @@ scipy = {version = "*", optional = true, markers = "extra == \"full\""}
 
 [package.extras]
 full = ["colorthief", "pillow", "scipy"]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pysidesix-frameless-window"
@@ -6518,11 +5373,6 @@ tomli = {version = ">=1", markers = "python_version < \"3.11\""}
 [package.extras]
 dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "python-dateutil"
 version = "2.9.0.post0"
@@ -6538,11 +5388,6 @@ files = [
 
 [package.dependencies]
 six = ">=1.5"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "python-dotenv"
@@ -6560,11 +5405,6 @@ files = [
 [package.extras]
 cli = ["click (>=5.0)"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "python-xlib"
 version = "0.33"
@@ -6580,11 +5420,6 @@ files = [
 
 [package.dependencies]
 six = ">=1.10.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pywin32"
@@ -6611,11 +5446,6 @@ files = [
     {file = "pywin32-310-cp39-cp39-win32.whl", hash = "sha256:851c8d927af0d879221e616ae1f66145253537bbdd321a77e8ef701b443a9a1a"},
     {file = "pywin32-310-cp39-cp39-win_amd64.whl", hash = "sha256:96867217335559ac619f00ad70e513c0fcf84b8a3af9fc2bba3b59b97da70475"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pyyaml"
@@ -6680,17 +5510,12 @@ files = [
     {file = "pyyaml-6.0.2.tar.gz", hash = "sha256:d584d9ec91ad65861cc08d42e834324ef890a082e591037abe114850ff7bbc3e"},
 ]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "rapidocr"
 version = "2.0.6"
 description = "Awesome OCR Library"
 optional = false
-python-versions = ">=3.6,<4"
+python-versions = "<4,>=3.6"
 groups = ["main"]
 files = [
     {file = "rapidocr-2.0.6-py3-none-any.whl", hash = "sha256:21c11b1741bcce6d2577cafa43941c3836a75ba09cd21481afcd4ce18179873b"},
@@ -6707,11 +5532,6 @@ requests = "*"
 Shapely = ">=1.7.1,<2.0.4 || >2.0.4"
 six = ">=1.15.0"
 tqdm = "*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "requests"
@@ -6734,11 +5554,6 @@ urllib3 = ">=1.21.1,<3"
 [package.extras]
 socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "scipy"
@@ -6804,11 +5619,6 @@ dev = ["cython-lint (>=0.12.2)", "doit (>=0.36.0)", "mypy (==1.10.0)", "pycodest
 doc = ["intersphinx_registry", "jupyterlite-pyodide-kernel", "jupyterlite-sphinx (>=0.16.5)", "jupytext", "matplotlib (>=3.5)", "myst-nb", "numpydoc", "pooch", "pydata-sphinx-theme (>=0.15.2)", "sphinx (>=5.0.0,<8.0.0)", "sphinx-copybutton", "sphinx-design (>=0.4.0)"]
 test = ["Cython", "array-api-strict (>=2.0,<2.1.1)", "asv", "gmpy2", "hypothesis (>=6.30)", "meson", "mpmath", "ninja ; sys_platform != \"emscripten\"", "pooch", "pytest", "pytest-cov", "pytest-timeout", "pytest-xdist", "scikit-umfpack", "threadpoolctl"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "shapely"
 version = "2.0.7"
@@ -6868,11 +5678,6 @@ numpy = ">=1.14,<3"
 docs = ["matplotlib", "numpydoc (==1.1.*)", "sphinx", "sphinx-book-theme", "sphinx-remove-toctrees"]
 test = ["pytest", "pytest-cov"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "shiboken6"
 version = "6.8.2.1"
@@ -6887,27 +5692,17 @@ files = [
     {file = "shiboken6-6.8.2.1-cp39-abi3-win_amd64.whl", hash = "sha256:1b751d47b759762b7ca31bad278d52eca4105d3028880d93979261ebbfba810c"},
 ]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "six"
 version = "1.17.0"
 description = "Python 2 and 3 compatibility utilities"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 groups = ["main"]
 files = [
     {file = "six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"},
     {file = "six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "sniffio"
@@ -6921,11 +5716,6 @@ files = [
     {file = "sniffio-1.3.1-py3-none-any.whl", hash = "sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2"},
     {file = "sniffio-1.3.1.tar.gz", hash = "sha256:f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "sympy"
@@ -6945,11 +5735,6 @@ mpmath = ">=1.1.0,<1.4"
 
 [package.extras]
 dev = ["hypothesis (>=6.70.0)", "pytest (>=7.1.0)"]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "tomli"
@@ -6994,11 +5779,6 @@ files = [
     {file = "tomli-2.2.1.tar.gz", hash = "sha256:cd45e1dc79c835ce60f7404ec8119f2eb06d38b1deba146f07ced3bbc44505ff"},
 ]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "tqdm"
 version = "4.67.1"
@@ -7021,11 +5801,6 @@ notebook = ["ipywidgets (>=6)"]
 slack = ["slack-sdk"]
 telegram = ["requests"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [[package]]
 name = "typing-extensions"
 version = "4.13.0"
@@ -7037,11 +5812,6 @@ files = [
     {file = "typing_extensions-4.13.0-py3-none-any.whl", hash = "sha256:c8dd92cc0d6425a97c18fbb9d1954e5ff92c1ca881a309c45f06ebc0b79058e5"},
     {file = "typing_extensions-4.13.0.tar.gz", hash = "sha256:0a4ac55a5820789d87e297727d229866c9650f6521b64206413c4fbada24d95b"},
 ]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "urllib3"
@@ -7061,11 +5831,6 @@ h2 = ["h2 (>=4,<5)"]
 socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
-
 [extras]
 cpu = ["onnxruntime"]
 cuda = ["onnxruntime-gpu", "paddlepaddle-gpu"]
@@ -7075,4 +5840,4 @@ dml = ["onnxruntime-directml"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "2b956fa6cd31cef5542dcb83cd2b198551c969fe80c2454129495fe953bcc434"
+content-hash = "01130e25be785ebbd8499de4591b6c376fd8a149c81482dd00acbd77421855a2"

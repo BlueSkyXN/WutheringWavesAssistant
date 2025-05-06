@@ -60,7 +60,7 @@ git clone https://gitclone.com/github.com/wakening/WutheringWavesAssistant.git
 ```powershell
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
-开始安装依赖，无需梯子
+开始安装依赖
 ```powershell
 cd WutheringWavesAssistant
 ./scripts/rebuild_conda_env.ps1

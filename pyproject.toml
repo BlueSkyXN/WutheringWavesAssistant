@@ -75,13 +75,13 @@ package-mode = false
 
 
 [[tool.poetry.source]]
-name = "tsinghua"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+name = "PyPI"
 priority = "primary"
 
 
 [[tool.poetry.source]]
-name = "PyPI"
+name = "tsinghua"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
 priority = "primary"
 
 
