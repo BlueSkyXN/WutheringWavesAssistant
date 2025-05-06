@@ -5329,25 +5329,20 @@ full = ["colorthief", "pillow", "scipy"]
 
 [[package]]
 name = "pysidesix-frameless-window"
-version = "0.5.1"
+version = "0.6.2"
 description = "A cross-platform frameless window based on pyside6, support Win32, Linux and macOS."
 optional = false
 python-versions = "*"
 groups = ["main"]
 files = [
-    {file = "pysidesix_frameless_window-0.5.1-py3-none-any.whl", hash = "sha256:684c452defecacb380e81a0ef10347d8259517635875433d496f6e4265fd4ecc"},
-    {file = "pysidesix_frameless_window-0.5.1.tar.gz", hash = "sha256:ce6c5da45d0b122e4cb7537482d6c6b7a1fe28fc30117a105515e333eb11f94c"},
+    {file = "PySideSix-Frameless-Window-0.6.2.tar.gz", hash = "sha256:5f620fa30ade67da405e8e9648f86f64e58e51a52525715ced953dd9ff954087"},
+    {file = "PySideSix_Frameless_Window-0.6.2-py3-none-any.whl", hash = "sha256:1dda91032069c9613803c059df6bcdf50afe431e493e38b5cbef93c026671127"},
 ]
 
 [package.dependencies]
 PyCocoa = {version = "*", markers = "platform_system == \"Darwin\""}
 pyobjc = {version = "*", markers = "platform_system == \"Darwin\""}
 pywin32 = {version = "*", markers = "platform_system == \"Windows\""}
-
-[package.source]
-type = "legacy"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
-reference = "tsinghua"
 
 [[package]]
 name = "pytest"
