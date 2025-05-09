@@ -11,7 +11,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     if (CreateProcess(
             NULL,
-            (LPSTR)"conda run -n wwa-cuda python main.py",
+            // (LPSTR)"conda run -n wwa-cuda python main.py",
+            // (LPSTR)"cmd.exe /c conda run -n wwa-cuda python main.py",
+            (LPSTR)"powershell.exe -Command \"conda run -n wwa-cuda python main.py\"",
             NULL,
             NULL,
             FALSE,

@@ -12,7 +12,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // === 执行 git pull ===
     if (CreateProcess(
             NULL,
-            (LPSTR)"git pull",
+            // (LPSTR)"git pull",
+            // (LPSTR)"cmd.exe /c git pull",
+            (LPSTR)"powershell.exe -Command \"git pull\"",
             NULL,
             NULL,
             FALSE,
@@ -43,7 +45,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // === 执行 conda run ===
     if (CreateProcess(
             NULL,
-            (LPSTR)"conda run -n wwa-cuda python main.py",
+            // (LPSTR)"conda run -n wwa-cuda python main.py",
+            // (LPSTR)"cmd.exe /c conda run -n wwa-cuda python main.py",
+            (LPSTR)"powershell.exe -Command \"conda run -n wwa-cuda python main.py\"",
             NULL,
             NULL,
             FALSE,
