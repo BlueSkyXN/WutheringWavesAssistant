@@ -86,7 +86,7 @@ conda activate wwa-cuda
 python main.py
 ```
 
-若能正常运行，后续可双击启动器 WWA.exe 运行  
+若能正常运行，后续可双击启动器 WWA.exe 运行，AMD用户到群里下载CPU版启动器  
 
 ### 8️⃣ 更新脚本
 
