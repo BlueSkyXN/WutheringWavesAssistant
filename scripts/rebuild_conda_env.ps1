@@ -15,7 +15,7 @@ if (-not $poetryExtra) {
     Write-Host "1: cuda, NVIDIA gpu RTX 40/30 Series, cuda12.6"
 #    Write-Host "2: dml, AMD gpu or intel gpu"
     Write-Host "3: cpu"
-    Write-Host "4: cuda11, NVIDIA gpu RTX 10/20 Series, cuda11.8"
+    Write-Host "4: cuda11, NVIDIA gpu RTX 10/20/30/40 Series, cuda11.8"
     Write-Host "0: exit..."
 
     $selectPoetryExtra = Read-Host "Enter your choice (1, 2, 3, 4, or 0)"
