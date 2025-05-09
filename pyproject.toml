@@ -12,9 +12,10 @@ dependencies = [
     "numpy (==1.26.4)",
     "opencv-python (>=4.11.0.0)",
     "rapidocr (==2.0.6)",
-    "onnxruntime (==1.20.0) ; extra != 'cuda' and extra != 'dml' and extra == 'cpu' ",
-    "onnxruntime-directml (==1.20.0) ; extra != 'cuda' and extra == 'dml' and extra != 'cpu' ",
-    "onnxruntime-gpu (==1.20.0) ; extra == 'cuda' and extra != 'dml' and extra != 'cpu' ",
+    "onnxruntime (==1.20.0) ; extra != 'cuda' and extra != 'cuda11' and extra != 'dml' and extra == 'cpu' ",
+    "onnxruntime-directml (==1.20.0) ; extra != 'cuda' and extra != 'cuda11' and extra == 'dml' and extra != 'cpu' ",
+    "onnxruntime-gpu (==1.20.0) ; extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu' ",
+    "onnxruntime-gpu (==1.20.0) ; extra == 'cuda11' and extra != 'cuda' and extra != 'dml' and extra != 'cpu' ",
     "pyside6-fluent-widgets[full] (==1.7.6)",
     "pyside6 (>=6.8.0,<7.0.0)",
     "dependency-injector (>=4.45.0,<5.0.0)",
@@ -37,11 +38,18 @@ cuda = [
     "paddlepaddle-gpu (==3.0.0)",
     "onnxruntime-gpu (==1.20.0)",
 ]
+cuda11 = [
+    "paddlepaddle-gpu (==3.0.0)",
+    "onnxruntime-gpu (==1.20.0)",
+]
 dml = [
     "onnxruntime-directml (==1.20.0)",
 ]
 cpu = [
     "onnxruntime (==1.20.0)",
+]
+paddleocr = [
+    "paddleocr (==2.10.0)",
 ]
 dev = [
     "pytest",
@@ -52,16 +60,18 @@ dev = [
 
 [tool.poetry.dependencies]
 onnxruntime = [
-    { markers = "extra != 'cuda' and extra != 'dml' and extra == 'cpu' " },
+    { markers = "extra != 'cuda' and extra != 'cuda11' and extra != 'dml' and extra == 'cpu'" },
 ]
 onnxruntime-directml = [
-    { markers = "extra != 'cuda' and extra == 'dml' and extra != 'cpu' " },
+    { markers = "extra != 'cuda' and extra != 'cuda11' and extra == 'dml' and extra != 'cpu'"},
 ]
 onnxruntime-gpu = [
-    { markers = "extra == 'cuda' and extra != 'dml' and extra != 'cpu' " },
+    { markers = "extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu'"},
+    { markers = "extra == 'cuda11' and extra != 'cuda' and extra != 'dml' and extra != 'cpu'", source = "onnxruntime-cu118"},
 ]
 paddlepaddle-gpu = [
-    { markers = "extra == 'cuda' and extra != 'dml' and extra != 'cpu' ", source = "paddlepaddle-cu126" },
+    { markers = "extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu126"},
+    { markers = "extra == 'cuda11' and extra != 'cuda' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu118"},
 ]
 
 
@@ -104,14 +114,14 @@ priority = "explicit"
 
 
 [[tool.poetry.source]]
-name = "onnxruntime-cu120"
-url = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/"
+name = "paddlepaddle-cu118"
+url = "https://www.paddlepaddle.org.cn/packages/stable/cu118/"
 priority = "explicit"
 
 
 [[tool.poetry.source]]
-name = "paddlepaddle-cu118"
-url = "https://www.paddlepaddle.org.cn/packages/stable/cu118/"
+name = "onnxruntime-cu120"
+url = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/"
 priority = "explicit"
 
 

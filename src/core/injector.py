@@ -1,3 +1,4 @@
+import importlib.util
 import logging
 
 from dependency_injector import containers, providers
@@ -15,9 +16,25 @@ class Container(containers.DeclarativeContainer):
     from src.service.daily_activity_service import DailyActivityServiceImpl
     from src.service.img_service import ImgServiceImpl
     # from src.service.ocr_service import PaddleOcrServiceImpl
-    from src.service.ocr_service import RapidOcrServiceImpl
+    # from src.service.ocr_service import RapidOcrServiceImpl
     from src.service.od_service import YoloServiceImpl
     from src.service.window_service import HwndServiceImpl
+
+    ocr_engine_impl = None
+    try:
+        # 若安装paddleocr则是用paddleocr作为ocr引擎
+        if importlib.util.find_spec("paddleocr"):
+            from paddleocr import PaddleOCR
+            from src.service.ocr_service import PaddleOcrServiceImpl
+            ocr_engine_impl = PaddleOcrServiceImpl
+            logger.info("paddleocr detected")
+    except Exception:
+        pass
+    # 默认ocr引擎
+    if ocr_engine_impl is None:
+        from src.service.ocr_service import RapidOcrServiceImpl
+        ocr_engine_impl = RapidOcrServiceImpl
+        logger.debug("rapidocr detected")
 
     context = providers.Dependency()
     keyboard_mapping = providers.Object({})
@@ -28,7 +45,7 @@ class Container(containers.DeclarativeContainer):
         window_service=window_service
     )
     ocr_service = providers.Singleton(
-        RapidOcrServiceImpl,
+        ocr_engine_impl,
         context=context,
         window_service=window_service,
         img_service=img_service

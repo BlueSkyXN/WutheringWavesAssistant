@@ -5,6 +5,9 @@ from src.util import file_util, img_util, paddleocr_util, screenshot_util, hwnd_
 logger = logging.getLogger(__name__)
 
 
+hwnd_util.enable_dpi_awareness()
+
+
 def test_ocr_from_game():
     logger.debug("\n")
     hwnd = hwnd_util.get_hwnd()

@@ -2,22 +2,29 @@ param (
     [string]$poetryExtra
 )
 
+try {
+    $nvidiaInfo = nvidia-smi | Select-String "Driver Version"
+    Write-Host "`n$nvidiaInfo`n"
+} catch {
+#    Write-Output "nvidia-smi not available or NVIDIA GPU not detected."
+}
+
 if (-not $poetryExtra) {
     Write-Host "Please select an option:"
-#    Write-Host "1: cu120, NVDIA gpu cuda12.4 + cudnn9"
-    Write-Host "1: cuda, NVDIA gpu"
+#    nvidia-smi
+    Write-Host "1: cuda, NVIDIA gpu cuda12.6"
 #    Write-Host "2: dml, AMD gpu or intel gpu"
     Write-Host "3: cpu"
-    #Write-Host "4: cu118, nvdia gpu cuda11.8 + cudnn8.9"
+    Write-Host "4: cuda11, NVIDIA gpu cuda11.8"
     Write-Host "0: exit..."
 
-    $selectPoetryExtra = Read-Host "Enter your choice (1, 2, 3, or 0)"
+    $selectPoetryExtra = Read-Host "Enter your choice (1, 2, 3, 4, or 0)"
 
-    while ($selectPoetryExtra -notin "1", "2", "3", "0") {
+    while ($selectPoetryExtra -notin "1", "2", "3", "4", "0") {
         Write-Host "Invalid selection. Please choose 1, 2, 3, or 0."
         $selectPoetryExtra = Read-Host "Enter your choice (1, 2, 3, or 0)"
     }
-    if ($selectPoetryExtra -in "2", "4") {
+    if ($selectPoetryExtra -in "2") {
         Write-Host "Unsupport..."
         exit
     }
@@ -43,7 +50,11 @@ if ($poetryExtra -notin $poetryExtraAll) {
     exit
 }
 
-$condaEnvName = $condaEnvNamePrefix + "-" + $poetryExtra
+$condaEnvNameSubfix = $poetryExtra
+if ($poetryExtra -eq "cuda11") {
+    $condaEnvNameSubfix = "cuda"
+}
+$condaEnvName = $condaEnvNamePrefix + "-" + $condaEnvNameSubfix
 Write-Host "Conda virtual environment: $condaEnvName"
 
 # Check if Conda is available
@@ -116,13 +127,13 @@ if ($poetryExtra -eq "cuda") {
     $cudatoolkitVersion = "12.6.1"
     Write-Host "Conda is installing cuda-toolkit version $cudatoolkitVersion..."
 #    conda install cuda-toolkit=$cudatoolkitVersion -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
-    conda install cuda-toolkit=$cudatoolkitVersion -y -c https://mirrors.sustech.edu.cn/anaconda-extra/cloud/nvidia/
+    conda install cuda-toolkit=$cudatoolkitVersion -y -c https://mirrors.sustech.edu.cn/anaconda-extra/cloud/nvidia/ -c nvidia
 
     $cudnnVersion = "9.3.0.75"
     $cudnnBuild = "cuda12.6"
     Write-Host "Conda is installing cudnn version $cudnnVersion build $cudnnBuild..."
 #    conda install cudnn=$cudnnVersion=$cudnnBuild -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
-    conda install cudnn=$cudnnVersion=$cudnnBuild -y -c https://mirrors.sustech.edu.cn/anaconda-extra/cloud/nvidia/
+    conda install cudnn=$cudnnVersion=$cudnnBuild -y -c https://mirrors.sustech.edu.cn/anaconda-extra/cloud/nvidia/ -c nvidia
 
     #$zlibwapiVersion = "1.3.1"
     #Write-Host "Conda is installing zlib-wapi version $zlibwapiVersion..."
@@ -146,7 +157,7 @@ if ($poetryExtra -eq "cuda") {
     $zlibwapiVersion = "1.3.1"
     Write-Host "Conda is installing zlib-wapi version $zlibwapiVersion..."
     #conda install zlib-wapi=$zlibwapiVersion -c conda-forge -y
-    conda install zlib-wapi=$zlibwapiVersion -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+    conda install zlib-wapi=$zlibwapiVersion -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/ -c conda-forge
 
     Write-Host "`nListing installed versions of CUDA:"
     conda list | Select-String -Pattern "cudatoolkit|cudnn|poetry"

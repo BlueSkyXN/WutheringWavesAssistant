@@ -19,6 +19,24 @@ from src.util.wrap_util import timeit
 logger = logging.getLogger(__name__)
 
 
+def is_ocr_use_gpu() -> bool:
+    ocr_use_gpu = None
+    if environs.get_ocr_use_gpu() == "True":
+        if importlib.util.find_spec("paddle") and importlib.util.find_spec("onnxruntime"):
+            import paddle
+            import onnxruntime
+            if paddle.is_compiled_with_cuda() and "CUDAExecutionProvider" in onnxruntime.get_available_providers():
+                ocr_use_gpu = True
+                logger.info("OCR is running on GPU ✅")
+        if ocr_use_gpu is None:
+            ocr_use_gpu = False
+            logger.warning("OCR expected GPU, falling back to CPU ⚠️")
+    if ocr_use_gpu is None:
+        ocr_use_gpu = False
+        logger.info("OCR is running on CPU ✅")
+    return ocr_use_gpu
+
+
 class RapidOcrServiceImpl(OCRService):
 
     def __init__(self, context: Context, window_service: WindowService, img_service: ImgService):
@@ -28,24 +46,9 @@ class RapidOcrServiceImpl(OCRService):
         self._window_service: WindowService = window_service
         self._img_service: ImgService = img_service
 
-        self.ocr_use_gpu = None
-        if environs.get_ocr_use_gpu() == "True":
-            if importlib.util.find_spec("paddle") and importlib.util.find_spec("onnxruntime"):
-                import paddle
-                import onnxruntime
-                if paddle.is_compiled_with_cuda() and "CUDAExecutionProvider" in onnxruntime.get_available_providers():
-                    self.ocr_use_gpu = True
-                    logger.info("OCR is running on GPU ✅")
-            if self.ocr_use_gpu is None:
-                self.ocr_use_gpu = False
-                logger.warning("OCR expected GPU, falling back to CPU ⚠️")
-        if self.ocr_use_gpu is None:
-            self.ocr_use_gpu = False
-            logger.info("OCR is running on CPU ✅")
+        self.ocr_use_gpu = is_ocr_use_gpu()
 
-        # self._engine = rapidocr_util.create_ocr(use_gpu=True)
         self._engine = rapidocr_util.create_ocr(use_gpu=self.ocr_use_gpu)
-        # self._engine = paddleocr_util.create_paddleocr(use_gpu=True, precision="int8")
         # self._collection: set[str] = set()
         self._last_time = time.time()
         # self._executor = ThreadPoolExecutor(max_workers=2)
@@ -155,7 +158,8 @@ class PaddleOcrServiceImpl(OCRService):
         self._window_service: WindowService = window_service
         self._img_service: ImgService = img_service
 
-        self.ocr_use_gpu = True
+        self.ocr_use_gpu = is_ocr_use_gpu()
+
         from src.util import paddleocr_util
         self._engine = paddleocr_util.create_paddleocr(use_gpu=self.ocr_use_gpu)
         self._last_time = time.time()
