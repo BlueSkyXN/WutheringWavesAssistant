@@ -22,7 +22,7 @@
 
 ### 1️⃣ 安装 Conda
 
-群文件里有，或点击 [Miniconda官方链接](https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe) 下载
+群文件里有，或点击 [Miniconda官方链接](https://repo.anaconda.com/miniconda/Miniconda3-py312_24.11.1-0-Windows-x86_64.exe) 下载
 Miniconda  
 安装时点击选项：  
 Next -> I agree ->  Just Me (recommended) -> Next -> Next ->  
