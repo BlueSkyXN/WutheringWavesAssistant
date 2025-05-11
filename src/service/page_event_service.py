@@ -6,6 +6,7 @@ from typing import Callable
 
 import numpy as np
 
+from src.core.combat.combat_system import CombatSystem
 from src.core.contexts import Context, Status
 from src.core.interface import ControlService, OCRService, PageEventService, ImgService, WindowService, ODService, \
     BossInfoService
@@ -44,6 +45,9 @@ class PageEventAbstractService(PageEventService, ABC):
         self._Challenge_EnterSoloChallenge = self.build_Challenge_EnterSoloChallenge()
         self._Reward_ClaimRewards_ForgeryChallenge = self.build_Reward_ClaimRewards_ForgeryChallenge()
         self._Reward_ClaimRewards_TacetSuppression = self.build_Reward_ClaimRewards_TacetSuppression()
+
+        self.combat_system = CombatSystem(control_service, img_service)
+        self.combat_system.is_async = True
 
     def execute(self,
                 src_img: np.ndarray | None = None,
@@ -750,6 +754,9 @@ class PageEventAbstractService(PageEventService, ABC):
 
         if action is None:
             def default_action(positions: dict[str, Position]) -> bool:
+                if self._context.param_config.autoCombatBeta is True:
+                    self.combat_system.pause()
+
                 is_nightmare = self._boss_info_service.is_nightmare(self._info.lastBossName)
                 if not is_nightmare:
                     time.sleep(0.2)
@@ -812,7 +819,14 @@ class PageEventAbstractService(PageEventService, ABC):
                     self._info.fightCount += 1
                     self._info.needAbsorption = True
                     self._info.fightTime = datetime.now()
-                self.release_skills()
+                if self._context.param_config.autoCombatBeta is True:
+                    if self._info.waitBoss:
+                        logger.info("智能连招beta开启")
+                        self.boss_wait(self._info.lastBossName)
+                    self.combat_system.start(3.5)
+                    time.sleep(1)
+                else:
+                    self.release_skills()
                 self._info.status = Status.fight
                 self._info.lastFightTime = datetime.now()
                 return True
@@ -2012,7 +2026,7 @@ class PageEventAbstractService(PageEventService, ABC):
             img = self._img_service.screenshot()
             echo_box = self._od_service.search_echo(img)
             if echo_box is None:
-                logger.debug("未发现声骸")
+                logger.info("未发现声骸")
                 return
 
             # 前往声骸

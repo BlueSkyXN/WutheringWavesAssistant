@@ -6,7 +6,7 @@ from PySide6.QtCore import Qt, Signal, QSize
 from PySide6.QtGui import QIcon, QColor, QIntValidator
 from PySide6.QtWidgets import QWidget, QLabel, QFileDialog, QFrame, QVBoxLayout, QButtonGroup, QHBoxLayout, QPushButton, \
     QApplication, QSizePolicy
-from qfluentwidgets import FluentIcon as FIF, OptionsSettingCard
+from qfluentwidgets import FluentIcon as FIF, OptionsSettingCard, SwitchSettingCard, SwitchButton, IndicatorPosition
 from qfluentwidgets import InfoBar
 from qfluentwidgets import (SettingCardGroup, ScrollArea,
                             ExpandLayout, ExpandSettingCard, FluentIconBase,
@@ -281,6 +281,66 @@ class AutoRestartPeriodSettingCard(ExpandGroupSettingCard):
         self.customValueLast = strValue
         self._updateChoiceLabel(strValue)
         self.autoRestartPeriodChanged.emit(strValue)
+
+
+class AutoCombatSwitchSettingCard(SettingCard):
+    """ Setting card with switch button """
+
+    checkedChanged = Signal(bool)
+
+    def __init__(self, icon: Union[str, QIcon, FluentIconBase], title, content=None,
+                 configItem: ConfigItem = None, parent=None):
+        """
+        Parameters
+        ----------
+        icon: str | QIcon | FluentIconBase
+            the icon to be drawn
+
+        title: str
+            the title of card
+
+        content: str
+            the content of card
+
+        configItem: ConfigItem
+            configuration item operated by the card
+
+        parent: QWidget
+            parent widget
+        """
+        super().__init__(icon, title, content, parent)
+        self.configItem = configItem
+        self.switchButton = SwitchButton(
+            self.tr('Off'), self, IndicatorPosition.RIGHT)
+
+        if configItem:
+            self.setValue(paramConfig.get(configItem))
+            configItem.valueChanged.connect(self.setValue)
+
+        # add switch button to layout
+        self.hBoxLayout.addWidget(self.switchButton, 0, Qt.AlignRight)
+        self.hBoxLayout.addSpacing(16)
+
+        self.switchButton.checkedChanged.connect(self.__onCheckedChanged)
+
+    def __onCheckedChanged(self, isChecked: bool):
+        """ switch button checked state changed slot """
+        self.setValue(isChecked)
+        self.checkedChanged.emit(isChecked)
+
+    def setValue(self, isChecked: bool):
+        if self.configItem:
+            paramConfig.set(self.configItem, isChecked)
+
+        self.switchButton.setChecked(isChecked)
+        self.switchButton.setText(
+            self.tr('On') if isChecked else self.tr('Off'))
+
+    def setChecked(self, isChecked: bool):
+        self.setValue(isChecked)
+
+    def isChecked(self):
+        return self.switchButton.isChecked()
 
 
 class ComboSequenceDialog(MaskDialogBase):
@@ -959,6 +1019,14 @@ class ParamInterface(ScrollArea):
             self.bossGroup
         )
 
+        self.autoCombatCard = AutoCombatSwitchSettingCard(
+            FIF.LABEL,
+            self.tr('智能连招 测试V0.1 编队顺序必须是：1守岸人 2长离 3今汐，替代无效，暂时只适配了这三个'),
+            self.tr('默认关闭，关闭则是config.yaml里的连招，此开关仅在测试阶段可见'),
+            configItem=paramConfig.autoCombat,
+            parent=self.bossGroup
+        )
+
         # game folders
         self.gameGroup = SettingCardGroup(
             self.tr("Game Parameters"), self.scrollWidget)
@@ -999,6 +1067,7 @@ class ParamInterface(ScrollArea):
         self.bossGroup.addSettingCard(self.bossNameCard)
         self.bossGroup.addSettingCard(self.bossLevelCard)
         # self.bossGroup.addSettingCard(self.comboSequenceCard)
+        self.bossGroup.addSettingCard(self.autoCombatCard)
         self.bossGroup.addSettingCard(self.autoRestartPeriodCard)
 
         # add setting card group to layout

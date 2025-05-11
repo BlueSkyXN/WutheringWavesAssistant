@@ -8,7 +8,6 @@ from src.core.exceptions import ForegroundScreenshotError, BackgroundScreenshotE
 from src.core.interface import ImgService, WindowService
 from src.core.regions import Position, DynamicPosition
 from src.util import screenshot_util, img_util, file_util, mss_util
-from src.util.wrap_util import timeit
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +24,7 @@ class ImgServiceImpl(ImgService):
         # self._dx_camera = dxcam_util.create_camera()
         self._capture_mode: Enum = ImgService.CaptureEnum.BG
 
-    @timeit(ignore=3)
+    # @timeit(ignore=3)
     def screenshot(self, region: tuple[float, float, float, float] | DynamicPosition | None = None) -> np.ndarray:
         if isinstance(region, DynamicPosition):
             region = region.rate
@@ -50,7 +49,10 @@ class ImgServiceImpl(ImgService):
 
     @raise_as(BackgroundScreenshotError)
     def _background_screenshot(self, region: tuple[int, int, int, int] | None = None) -> np.ndarray:
-        return screenshot_util.screenshot(self._window_service.window)
+        try:
+            return screenshot_util.screenshot(self._window_service.window)
+        except Exception:  # 重试一次
+            return screenshot_util.screenshot(self._window_service.window)
 
     def match_template(self,
                        img: np.ndarray | None,

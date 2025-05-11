@@ -913,7 +913,7 @@ class AutoBossServiceImpl(PageEventAbstractService):
             max_idle_time = self._config.MaxIdleTime
             is_nightmare = self._boss_info_service.is_nightmare(self._info.lastBossName)
             if is_nightmare:
-                max_idle_time = 100
+                max_idle_time = 50
             return (
                     not self._info.in_dungeon and
                     (datetime.now() - self._info.lastFightTime).seconds > max_idle_time
@@ -936,7 +936,7 @@ class AutoBossServiceImpl(PageEventAbstractService):
             max_fight_time = self._config.MaxFightTime
             is_nightmare = self._boss_info_service.is_nightmare(self._info.lastBossName)
             if is_nightmare:
-                max_fight_time = 1200
+                max_fight_time = 600
             return (
                     not self._info.in_dungeon and
                     (datetime.now() - self._info.fightTime).seconds > max_fight_time

@@ -303,6 +303,14 @@ class PlayerControlService(ABC):
     def fight_tap(self, key: str, seconds: float | None = None):
         pass
 
+    @abstractmethod
+    def key_down(self, key: str, seconds: float | None = None):
+        pass
+
+    @abstractmethod
+    def key_up(self, key: str, seconds: float | None = None):
+        pass
+
 
 class ExtendedControlService(ABC):
     """拓展操作键鼠控制"""

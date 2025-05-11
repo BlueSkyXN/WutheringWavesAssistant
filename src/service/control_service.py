@@ -184,6 +184,14 @@ class Win32PlayerControlServiceImpl(PlayerControlService, BaseControlService):
             while (seconds := np.round(np.random.uniform(0, 0.01), 5)) == 0: pass
         keymouse_util.tap_key(self._window_service.window, key, seconds)
 
+    def key_down(self, key: str, seconds: float | None = None):
+        key = self._get_mapping_key(key, key)
+        keymouse_util.key_down(self._window_service.window, key, seconds)
+
+    def key_up(self, key: str, seconds: float | None = None):
+        key = self._get_mapping_key(key, key)
+        keymouse_util.key_up(self._window_service.window, key, seconds)
+
 
 class Win32ExtendedControlServiceImpl(ExtendedControlService, BaseControlService):
 

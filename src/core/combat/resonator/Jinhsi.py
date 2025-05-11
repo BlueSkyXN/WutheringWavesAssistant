@@ -1,0 +1,311 @@
+import logging
+import time
+
+import numpy as np
+
+from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo
+from src.core.interface import ControlService, ImgService
+
+logger = logging.getLogger(__name__)
+
+
+class BaseJinhsi(BaseResonator):
+
+    def __init__(self, control_service: ControlService, img_service: ImgService):
+        super().__init__(control_service)
+        self.img_service = img_service
+
+        self.name = "今汐"
+
+        # 协奏 左下血条旁黄圈
+        self._concerto_energy_point = [(513, 669), (514, 669), (514, 670), (514, 671)]
+        self._concerto_energy_color = [(105, 204, 217)]
+        self._concerto_energy_checker = ColorChecker(self._concerto_energy_point, self._concerto_energy_color)
+
+        # # TODO 同奏 左下血条旁黄圈
+        # self._concerto_energy_point = [(513, 669), (514, 669), (514, 670), (514, 671)]
+        # self._concerto_energy_color = [(81, 112, 210)]
+        # self._concerto_energy_checker = ColorChecker(self._concerto_energy_point, self._concerto_energy_color)
+
+        # 共鸣技能 E1 流光夕影
+        self._resonance_skill_point = [(1045, 651), (1059, 664)]
+        self._resonance_skill_color = [(255, 255, 255)]
+        self._resonance_skill_checker = ColorChecker(
+            self._resonance_skill_point, self._resonance_skill_color, logic=ColorChecker.LogicEnum.AND)
+
+        # 共鸣技能 E2 神霓飞芒 进入乘岁凌霄
+        self._resonance_skill_2_point = [(1064, 634), (1070, 636), (1061, 650)]
+        self._resonance_skill_2_color = [(255, 255, 255)]
+        self._resonance_skill_2_checker = ColorChecker(
+            self._resonance_skill_2_point, self._resonance_skill_color, logic=ColorChecker.LogicEnum.AND)
+
+        # 共鸣技能 E3 逐天取月
+        self._resonance_skill_3_point = [(1061, 630), (1059, 635), (1069, 663)]
+        self._resonance_skill_3_color = [(255, 255, 255)]
+        self._resonance_skill_3_checker = ColorChecker(
+            self._resonance_skill_3_point, self._resonance_skill_color, logic=ColorChecker.LogicEnum.AND)
+
+        # 共鸣技能 E4 惊龙破空
+        self._resonance_skill_4_point = [(1063, 642), (1069, 655), (1078, 653), (1072, 643)]
+        self._resonance_skill_4_color = [(255, 255, 255)]
+        self._resonance_skill_4_checker = ColorChecker(
+            self._resonance_skill_4_point, self._resonance_skill_color, logic=ColorChecker.LogicEnum.AND)
+
+        # 声骸技能
+        self._echo_skill_point = [(1135, 654), (1136, 659)]
+        self._echo_skill_color = [(255, 255, 255)]
+        self._echo_skill_checker = ColorChecker(self._echo_skill_point, self._echo_skill_color)
+
+        # 共鸣解放
+        self._resonance_liberation_point = [(1205, 632), (1208, 662), (1223, 656)]
+        self._resonance_liberation_color = [(255, 255, 255)]
+        self._resonance_liberation_checker = ColorChecker(
+            self._resonance_liberation_point, self._resonance_liberation_color)
+
+    def is_concerto_energy_ready(self, img: np.ndarray) -> bool:
+        is_ready = self._concerto_energy_checker.check(img)
+        logger.debug(f"{self.name}-协奏: {is_ready}")
+        return is_ready
+
+    def is_resonance_skill_ready(self, img: np.ndarray) -> bool:
+        is_ready = self._resonance_skill_checker.check(img)
+        logger.debug(f"{self.name}-共鸣技能-流光夕影: {is_ready}")
+        return is_ready
+
+    def is_resonance_skill_2_ready(self, img: np.ndarray) -> bool:
+        is_ready = self._resonance_skill_2_checker.check(img)
+        logger.debug(f"{self.name}-共鸣技能2-神霓飞芒: {is_ready}")
+        return is_ready
+
+    def is_resonance_skill_3_ready(self, img: np.ndarray) -> bool:
+        is_ready = self._resonance_skill_3_checker.check(img)
+        logger.debug(f"{self.name}-共鸣技能3-逐天取月: {is_ready}")
+        return is_ready
+
+    def is_resonance_skill_4_ready(self, img: np.ndarray) -> bool:
+        is_ready = self._resonance_skill_4_checker.check(img)
+        logger.debug(f"{self.name}-共鸣技能4-惊龙破空: {is_ready}")
+        return is_ready
+
+    def is_echo_skill_ready(self, img: np.ndarray) -> bool:
+        is_ready = self._echo_skill_checker.check(img)
+        logger.debug(f"{self.name}-声骸技能: {is_ready}")
+        return is_ready
+
+    def is_resonance_liberation_ready(self, img: np.ndarray) -> bool:
+        is_ready = self._resonance_liberation_checker.check(img)
+        logger.debug(f"{self.name}-共鸣解放: {is_ready}")
+        return is_ready
+
+
+class Jinhsi(BaseJinhsi, BaseCombo):
+    # COMBO_SEQ 为训练场单人静态完整连段，后续开发以此为准从中拆分截取
+
+    # 常规轴
+    COMBO_SEQ_0 = [
+        ["a", 0.05, 0.45],
+        ["a", 0.05, 0.45],
+        ["a", 0.05, 0.90],
+        ["a", 0.05, 0.35],
+        ["E", 0.05, 0.00],
+        # 间隔
+        ["w", 0.00, 0.75],  # 间隔(合轴点)需足够，否则二段开始，角色却还在一段的后摇中，会吞按键
+
+        ["a", 0.05, 0.45],
+        ["a", 0.05, 0.55],
+        ["a", 0.05, 0.25],
+        ["E", 0.05, 0.75],
+        ["a", 0.05, 0.35],
+        ["a", 0.05, 0.30],
+        ["a", 0.05, 0.10],  # 多打一个普攻，冗余
+        ["E", 0.05, 0.00],
+    ]
+
+    # 进阶轴
+    COMBO_SEQ = [
+        ["a", 0.05, 0.45],
+        ["a", 0.05, 0.45],
+        ["a", 0.05, 0.90],
+        ["a", 0.05, 0.40],
+
+        ["E", 0.05, 0.05],
+        ["d", 0.05, 0.20],
+        ["a", 0.05, 0.05],
+        ["j", 0.05, 0.01],
+
+        ["W", 0.00, 0.00, "down"],
+        ["a", 0.05, 0.05],
+        ["d", 0.05, 0.20],
+        ["W", 0.00, 0.00, "up"],
+        ["a", 0.05, 0.05],
+        ["d", 0.05, 0.20],
+
+        ## 直接喷 E4
+        # ["a", 0.05, 0.05],
+        # ["E", 0.05, 0.00],
+
+        # 升龙再喷 E3E4
+        ["E", 0.05, 1.00],
+        ["a", 0.05, 0.20],
+        ["a", 0.05, 0.20],
+        ["a", 0.05, 0.10],  # 多打一个普攻，冗余
+        ["E", 0.05, 0.00],
+
+        ["w", 0.00, 2.50],
+        # ["j", 0.05, 0.15],
+    ]
+
+    def __init__(self, control_service: ControlService, img_service: ImgService):
+        super().__init__(control_service, img_service)
+
+    def a4(self):
+        """ 普攻打出E2 """
+        logger.debug("a4")
+        return [
+            ["a", 0.05, 0.45],
+            ["a", 0.05, 0.45],
+
+            # ["a", 0.05, 0.90],
+            ["a", 0.05, 0.40],
+            ["a", 0.05, 0.40],
+
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.10],  # 冗余多打一个普攻
+        ]
+
+    def a3(self):
+        """ 普攻 """
+        logger.debug("a3")
+        return [
+            ["a", 0.05, 0.45],
+            ["a", 0.05, 0.55],
+            ["a", 0.05, 0.35],
+        ]
+
+    def E2_full_combo(self):
+        """ E2起手的一整套 """
+        logger.debug("E2_full_combo")
+        return [
+            ["E", 0.05, 0.05],
+            ["d", 0.05, 0.20],
+            ["a", 0.05, 0.05],
+            ["j", 0.05, 0.01],
+
+            # ["W", 0.00, 0.00, "down"],
+            ["a", 0.05, 0.05],
+            ["d", 0.05, 0.20],
+            # ["W", 0.00, 0.00, "up"],
+            ["a", 0.05, 0.05],
+            ["d", 0.05, 0.20],
+
+            ## 直接喷 E4
+            # ["a", 0.05, 0.05],
+            # ["E", 0.05, 0.00],
+
+            # 升龙再喷 E3E4
+            # ["E", 0.05, 1.00],  # 实战若被打断普攻次数不够会原地发呆，E后接普攻保证有事可做
+            ["E", 0.05, 0.10],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.10],
+            ["E", 0.05, 0.10],
+
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.10],  # 冗余多打一个普攻
+            ["E", 0.05, 0.00],
+
+            ["w", 0.00, 2.50],
+        ]
+
+    def E3_full_combo(self):
+        """ E3起手的一整套 """
+        logger.debug("E3_full_combo")
+        return [
+            ["a", 0.05, 0.45],
+            ["a", 0.05, 0.55],
+            ["a", 0.05, 0.35],
+            ["a", 0.05, 0.10],  # 冗余多打一个普攻
+
+            # ["E", 0.05, 0.75],  # 实战若被打断普攻次数不够会原地发呆，E后接普攻保证有事可做
+            ["E", 0.05, 0.10],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.30],
+            ["E", 0.05, 0.00],
+
+            ["a", 0.05, 0.35],
+            ["a", 0.05, 0.40],
+            ["a", 0.05, 0.10],  # 冗余多打一个普攻
+            ["E", 0.05, 0.00],
+
+            ["w", 0.00, 2.50],
+        ]
+
+    def E(self):
+        """ E4起手的一整套 """
+        return [
+            ["E", 0.05, 0.00],
+        ]
+
+    def Q(self):
+        return [
+            # 声骸技能
+            ["Q", 0.05, 0.00],
+        ]
+
+    def R(self):
+        return [
+            ["R", 0.05, 2.00],
+        ]
+
+    def full_combo(self):
+        # 测试用，一整套连招
+        return self.COMBO_SEQ
+
+    def combo(self):
+
+        img = self.img_service.screenshot()
+        is_resonance_skill_ready = self.is_resonance_skill_ready(img)
+        is_resonance_skill_2_ready = self.is_resonance_skill_2_ready(img)
+        is_resonance_skill_3_ready = self.is_resonance_skill_3_ready(img)
+        is_resonance_skill_4_ready = self.is_resonance_skill_4_ready(img)
+        is_echo_skill_ready = self.is_echo_skill_ready(img)
+        is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
+
+        if is_echo_skill_ready:
+            self.combo_action(self.Q(), False)
+
+        if is_resonance_skill_4_ready:
+            self.combo_action(self.E(), False)
+            return
+
+        if is_resonance_liberation_ready:
+            self.combo_action(self.R(), False)
+            return
+
+        if is_resonance_skill_3_ready:
+            self.combo_action(self.E3_full_combo(), False)
+            return
+
+        if is_resonance_skill_2_ready:
+            self.combo_action(self.E2_full_combo(), False)
+            return
+
+        # E1作为共鸣技能是否CD的指标
+        if is_resonance_skill_ready:
+            self.combo_action(self.a4(), False)
+            img = self.img_service.screenshot()
+            is_resonance_skill_2_ready = self.is_resonance_skill_2_ready(img)
+            if is_resonance_skill_2_ready:
+                self.combo_action(self.E2_full_combo(), False)
+            else:
+                self.combo_action(self.E(), False)
+            return
+
+        # 兜底，共鸣技能还没好，随便打几下
+        self.combo_action(self.a4(), False)
+        # time.sleep(0.2)
+        img = self.img_service.screenshot()
+        is_resonance_skill_4_ready = self.is_resonance_skill_4_ready(img)
+        if is_resonance_skill_4_ready:
+            self.combo_action(self.E(), False)

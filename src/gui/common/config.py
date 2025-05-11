@@ -225,6 +225,9 @@ class ParamConfig(QConfig):
     #     ["Verina"],
     # ]
     # comboSequence = ConfigItem("BossRush", "ComboSequence", defaultComboSequence)
+
+    autoCombat = ConfigItem("BossRush", "AutoCombatBeta", False, BoolValidator())
+
     autoRestartPeriod = ConfigItem("BossRush", "AutoRestartPeriod", 'Close')
 
     # Game
