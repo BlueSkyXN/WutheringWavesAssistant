@@ -173,15 +173,43 @@ class Shorekeeper(BaseShorekeeper, BaseCombo):
             ["w", 0.00, 0.55],
         ]
 
-    def a3Eaz(self):
-        logger.debug("a3Eaz")
+    # def a3Eaz(self):
+    #     logger.debug("a3Eaz")
+    #     return [
+    #         # 3a E az
+    #         ["a", 0.05, 0.31],
+    #         ["a", 0.05, 0.43],
+    #         ["a", 0.05, 0.40],
+    #         # ["E", 0.05, 0.32],
+    #         ["E", 0.05, 0.00],
+    #         ["a", 0.05, 0.32],
+    #
+    #         ["a", 0.05, 0.35],
+    #         # 清空能量
+    #         ## 常规重击
+    #         # ["z", 0.50, 0.45],
+    #         ["z", 0.50, 0.05],
+    #         ["a", 0.05, 0.05],  # 多一个普攻打断z防止一直飞
+    #         ["a", 0.05, 0.05],  # 多一个普攻打断z防止一直飞
+    #     ]
+
+    def a3Ea(self):
+        logger.debug("a3Ea")
         return [
             # 3a E az
             ["a", 0.05, 0.31],
             ["a", 0.05, 0.43],
             ["a", 0.05, 0.40],
-            ["E", 0.05, 0.32],
+            # ["E", 0.05, 0.32],
+            ["E", 0.05, 0.00],
+            ["a", 0.05, 0.32],  # E后接a，防止E没好原地发呆
+
             ["a", 0.05, 0.35],
+        ]
+
+    def za(self):
+        logger.debug("za")
+        return [
             # 清空能量
             ## 常规重击
             # ["z", 0.50, 0.45],
@@ -222,7 +250,11 @@ class Shorekeeper(BaseShorekeeper, BaseCombo):
             self.combo_action(self.zaEja(), is_resonance_liberation_ready)
             time.sleep(0.05)
         elif energy_count < 3:
-            self.combo_action(self.a3Eaz(), is_resonance_liberation_ready)
+            self.combo_action(self.a3Ea(), True)
+            img = self.img_service.screenshot()
+            energy_count = self.energy_count(img)
+            if energy_count == 5:
+                self.combo_action(self.za(), False)
 
         # 最后开声骸和大招
         self.combo_action(self.Q(), False)

@@ -193,7 +193,7 @@ class TeamMemberSelector:
             if event is not None and not event.is_set():
                 return False
             self.control_service.toggle_team_member(member)
-            time.sleep(0.15)
+            time.sleep(0.2)
             img = self.img_service.screenshot()
             is_toggled = team_member_checker.check(img)
             if is_toggled:

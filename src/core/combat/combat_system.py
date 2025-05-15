@@ -62,7 +62,7 @@ class CombatSystem:
                 self.control_service.activate()
             if index % 2 == 0:
                 self.control_service.camera_reset()
-            is_toggled = self.team_member_selector.toggle(member_number_map.get(resonator.name), event=self.event)
+            is_toggled = self.team_member_selector.toggle(member_number_map.get(resonator.name), event=event)
             if not is_toggled:
                 continue
             resonator.event = event

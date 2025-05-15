@@ -166,8 +166,9 @@ class Jinhsi(BaseJinhsi, BaseCombo):
             ["a", 0.05, 0.45],
 
             # ["a", 0.05, 0.90],
-            ["a", 0.05, 0.40],
-            ["a", 0.05, 0.40],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.25],
 
             ["a", 0.05, 0.30],
             ["a", 0.05, 0.10],  # 冗余多打一个普攻
@@ -206,14 +207,17 @@ class Jinhsi(BaseJinhsi, BaseCombo):
             # ["E", 0.05, 1.00],  # 实战若被打断普攻次数不够会原地发呆，E后接普攻保证有事可做
             ["E", 0.05, 0.10],
             ["a", 0.05, 0.30],
-            ["a", 0.05, 0.30],
+            # ["a", 0.05, 0.30],  # 提高a的点击频率，保证实战普攻次数覆盖
+            ["a", 0.05, 0.15],
+            ["a", 0.05, 0.15],
             ["a", 0.05, 0.10],
             ["E", 0.05, 0.10],
 
             ["a", 0.05, 0.20],
             ["a", 0.05, 0.20],
             ["a", 0.05, 0.10],  # 冗余多打一个普攻
-            ["E", 0.05, 0.00],
+            ["E", 0.05, 0.10],
+            ["E", 0.05, 0.00],  # 冗余多打一个E
 
             ["w", 0.00, 2.50],
         ]
@@ -300,12 +304,15 @@ class Jinhsi(BaseJinhsi, BaseCombo):
                 self.combo_action(self.E2_full_combo(), False)
             else:
                 self.combo_action(self.E(), False)
+                time.sleep(0.05)
+            self.combo_action(self.R(), False)  # 共鸣技能被检测到的频率太高，大招总是没机会打出来，不管条件直接R
             return
 
         # 兜底，共鸣技能还没好，随便打几下
         self.combo_action(self.a4(), False)
-        # time.sleep(0.2)
         img = self.img_service.screenshot()
         is_resonance_skill_4_ready = self.is_resonance_skill_4_ready(img)
         if is_resonance_skill_4_ready:
             self.combo_action(self.E(), False)
+            time.sleep(0.05)
+        self.combo_action(self.R(), False)
