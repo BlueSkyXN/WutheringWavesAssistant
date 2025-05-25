@@ -1110,6 +1110,10 @@ class PageEventAbstractService(PageEventService, ABC):
                         time.sleep(0.5)
                         break
                     elif self._ocr_service.search_text([result], "结晶波片不足"):
+                        result = self._ocr_service.find_text("本次登录不再提示")
+                        if result:
+                            self._control_service.click(*result.center)
+                            time.sleep(0.1)
                         result = self._ocr_service.find_text("^确认$")
                         if result:
                             self._control_service.click(*result.center)

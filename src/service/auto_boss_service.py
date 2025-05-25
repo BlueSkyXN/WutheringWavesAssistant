@@ -246,6 +246,18 @@ class AutoBossServiceImpl(PageEventAbstractService):
             if result is not None and self._need_retry():
                 logger.debug("点击重新挑战: %s", result)
                 self.click_position(result)
+                time.sleep(0.2)
+                # 检查体力弹窗
+                img = self._img_service.screenshot()
+                results = self._ocr_service.ocr(img)
+                result = self._ocr_service.search_text(results, "本次登录不再提示")
+                if result:
+                    self.click_position(result)
+                    time.sleep(0.1)
+                result = self._ocr_service.search_text(results, "^确认$")
+                if result:
+                    self.click_position(result)
+                    time.sleep(0.1)
                 return True
             position = positions.get("退出副本", None)
             if position is None:
