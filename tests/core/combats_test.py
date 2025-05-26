@@ -4,7 +4,7 @@ import time
 import pytest
 
 from src.core.combat.combat_system import CombatSystem
-from src.core.combat.resonator import Shorekeeper
+from src.core.combat.resonator.encore import Encore
 from src.core.contexts import Context
 from src.core.injector import Container
 from src.core.interface import ControlService, WindowService, ImgService
@@ -136,6 +136,21 @@ def test_combo_Jinhsi_AdvancedCombo(control_service):
     combo_action(control_service, seq, 10.0)
 
 
+def test_combo_Jinhsi_AdvancedCombo2(control_service):
+    # 汐汐 瞬喷2 BV1rS5Vz4Egy
+    # 下落攻击 落地瞬间跳 E闪a跳 a闪a闪 aE
+    seq = [
+        ["j", 0.05, 0.27],
+        ["a", 0.05, 0.27],
+        ["a", 0.05, 0.05],
+        ["j", 0.05, 0.05],
+        ["j", 0.05, 0.05],
+        ["E", 0.05, 0.05],
+        ["E", 0.05, 0.05],
+    ]
+    combo_action(control_service, seq, 10.0)
+
+
 def test_combo_Changli(control_service):
     # 长离
     seq = [
@@ -248,6 +263,71 @@ def test_combo_Shorekeeper_AdvancedCombo(control_service):
     combo_action(control_service, seq, 2)
 
 
+def test_combo_Encore(control_service):
+    # 安可 BnB combo
+    seq = [
+        # Ea
+        ["E", 0.05, 1.90],
+        ["a", 0.05, 0.90],
+        ["j", 0.05, 1.20],
+
+        # 普攻5a
+        ["a", 0.05, 0.30],
+        ["a", 0.05, 0.40],
+        ["a", 0.05, 0.52],
+        ["a", 0.05, 0.62],
+        ["a", 0.05, 1.22],
+        ["j", 0.05, 1.20],
+
+        # R
+        ["R", 0.05, 2.63],
+        ["j", 0.05, 1.20],
+
+        # R E普攻E，普攻连点打满一套的时间
+        ["E", 0.05, 0.28],
+        ["a", 0.05, 0.30],
+        ["a", 0.05, 0.30],
+        ["a", 0.05, 0.30],
+        ["a", 0.05, 0.30],
+        ["a", 0.05, 0.30],
+        ["a", 0.05, 0.30],
+        ["a", 0.05, 0.30],
+        ["a", 0.05, 0.30],
+        ["a", 0.05, 0.30],
+        ["a", 0.05, 0.30],
+        ["a", 0.05, 0.30],
+        ["E", 0.05, 0.28],
+        ["w", 0.05, 1.20],
+        ["j", 0.05, 1.20],
+    ]
+    combo_action(control_service, seq, 2)
+
+
+def test_combo_verina(control_service):
+    # 维里奈 BnB combo
+    seq = [
+        # 普攻5a
+        ["a", 0.05, 0.40],
+        ["a", 0.05, 0.40],
+        ["a", 0.05, 0.70],
+        ["a", 0.05, 0.55],
+        ["a", 0.05, 0.90],
+        ["j", 0.05, 1.20],
+
+        # (切人) aa EQ 跳aaa
+        ["a", 0.05, 0.35],
+        ["a", 0.05, 0.32],
+        ["E", 0.05, 0.10],
+        ["Q", 0.05, 0.10],
+        ["j", 0.05, 0.10],
+        ["a", 0.05, 0.20],
+        ["a", 0.05, 0.20],
+        ["a", 0.05, 1.17],
+        ["j", 0.05, 1.20],
+    ]
+    combo_action(control_service, seq, 2)
+
+
 def test_combat(container, control_service):
     window_service: WindowService = container.window_service()
     img_service: ImgService = container.img_service()
@@ -257,17 +337,17 @@ def test_combat(container, control_service):
     # img = img_util.read_img(img_path)
     img = img_service.screenshot()
 
-    shorekeeper = Shorekeeper(control_service, img_service)
-    shorekeeper.energy_count(img)
-    shorekeeper.is_concerto_energy_ready(img)
-    shorekeeper.is_resonance_skill_ready(img)
-    shorekeeper.is_echo_skill_ready(img)
-    shorekeeper.is_resonance_liberation_ready(img)
+    # resonator = Shorekeeper(control_service, img_service)
+    resonator = Encore(control_service, img_service)
+    resonator.energy_count(img)
+    resonator.is_concerto_energy_ready(img)
+    resonator.is_resonance_skill_ready(img)
+    resonator.is_echo_skill_ready(img)
+    resonator.is_resonance_liberation_ready(img)
 
-    for _ in range(50):
-        img = img_service.screenshot()
-        shorekeeper.combo_action(img)
-        time.sleep(1.5)
+    # for _ in range(50):
+    #     shorekeeper.full_combo()
+    #     time.sleep(1.5)
 
     # 延奏 OutroSkill
     # 变奏 IntroSkill
@@ -278,5 +358,4 @@ def test_combat(container, control_service):
 def test_CombatSystem(container, control_service):
     img_service: ImgService = container.img_service()
     combat_system = CombatSystem(control_service, img_service)
-    combat_system.is_running = True
-    combat_system.run()
+    combat_system.start()

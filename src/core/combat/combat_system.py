@@ -3,9 +3,11 @@ import threading
 import time
 
 from src.core.combat.combat_core import TeamMemberSelector
-from src.core.combat.resonator.Changli import Changli
-from src.core.combat.resonator.Jinhsi import Jinhsi
-from src.core.combat.resonator.Shorekeeper import Shorekeeper
+from src.core.combat.resonator.changli import Changli
+from src.core.combat.resonator.encore import Encore
+from src.core.combat.resonator.jinhsi import Jinhsi
+from src.core.combat.resonator.shorekeeper import Shorekeeper
+from src.core.combat.resonator.verina import Verina
 from src.core.exceptions import StopError
 from src.core.interface import ControlService, ImgService
 
@@ -32,6 +34,8 @@ class CombatSystem:
         self.jinhsi = Jinhsi(self.control_service, self.img_service)
         self.changli = Changli(self.control_service, self.img_service)
         self.shorekeeper = Shorekeeper(self.control_service, self.img_service)
+        self.encore = Encore(self.control_service, self.img_service)
+        self.verina = Verina(self.control_service, self.img_service)
 
     def run(self, event: threading.Event):
         resonators = [
@@ -50,7 +54,7 @@ class CombatSystem:
                 # logger.info("暂停中，event.is_set()")
                 time.sleep(0.3)
                 continue
-            if self._delay_time - time.monotonic() < 0.0:
+            if self.is_async and self._delay_time - time.monotonic() < 0.0:
                 # logger.info("暂停中，delay_time")
                 time.sleep(0.3)
                 continue
@@ -79,10 +83,10 @@ class CombatSystem:
         return next_index
 
     def start(self, delay_seconds: float = 0.0):
-        with self._lock:
-            # logger.info("Combat system started.")
-            self.event.set()
-            if self.is_async:
+        if self.is_async:
+            with self._lock:
+                # logger.info("Combat system started.")
+                self.event.set()
                 if delay_seconds > 0.0:
                     self._delay_seconds = delay_seconds
                     self._delay_time = time.monotonic() + delay_seconds
@@ -91,8 +95,9 @@ class CombatSystem:
                     self._thread.daemon = True
                     self._delay_seconds = delay_seconds
                     self._thread.start()
-            else:
-                self.run(self.event)
+        else:
+            self.event.set()
+            self.run(self.event)
 
     # def stop(self):
     #     with self._lock:
@@ -104,6 +109,6 @@ class CombatSystem:
         with self._lock:
             self.event.clear()
 
-    def is_running(self):
-        with self._lock:
-            return self.event.is_set()
+    # def is_running(self):
+    #     with self._lock:
+    #         return self.event.is_set()

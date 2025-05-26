@@ -30,6 +30,8 @@ class BaseChecker:
 
 
 class ColorChecker(BaseChecker):
+    """ 像素颜色校验器 """
+
     class LogicEnum(Enum):
         """
         多点匹配，逻辑或、与
@@ -37,7 +39,7 @@ class ColorChecker(BaseChecker):
         OR = "or"
         AND = "and"
 
-    def __init__(self, points: Sequence[tuple[int, int]], colors: Sequence[tuple[int, int, int]], tolerance=30,
+    def __init__(self, points: Sequence[tuple[int, int]], colors: Sequence[tuple[int, int, int]], tolerance: int = 30,
                  logic=LogicEnum.OR):
         super().__init__()
         self.points = points  # 坐标 x,y
@@ -49,7 +51,7 @@ class ColorChecker(BaseChecker):
         if self.points is None or len(self.points) == 0:
             raise ValueError("Points is empty")
         if self.logic == self.LogicEnum.OR:
-            # 多点匹配，一点的颜色匹配上就为真
+            # 多点匹配，一个点的颜色匹配上就为真
             scale = self.get_scale(img)
             for point in self.points:
                 target = img[int(scale * point[1]), int(scale * point[0])]
@@ -77,6 +79,28 @@ class ColorChecker(BaseChecker):
                     return False
             return True
         raise NotImplementedError("Unknown logic")
+
+    @staticmethod
+    def concerto_spectro():
+        """ 衍射 协奏能量校验器，左下血条旁黄圈 """
+        concerto_energy_point = [(513, 669), (514, 669), (514, 670), (514, 671)]
+        concerto_energy_color = [(105, 204, 217)]  # BGR
+        return ColorChecker(concerto_energy_point, concerto_energy_color)
+
+    @staticmethod
+    def concerto_fusion():
+        """ 热熔 协奏能量校验器，左下血条旁黄圈 """
+        concerto_energy_point = [(513, 669), (514, 669), (514, 670), (514, 671)]
+        concerto_energy_color = [(81, 112, 210)]  # BGR
+        return ColorChecker(concerto_energy_point, concerto_energy_color)
+
+    @staticmethod
+    def concerto_havoc():
+        """ 湮灭 协奏能量校验器，左下血条旁黄圈 """
+        # concerto_energy_point = [(513, 669), (514, 669), (514, 670), (514, 671)]
+        # concerto_energy_color = [(105, 204, 217)]  # BGR
+        # return ColorChecker(concerto_energy_point, concerto_energy_color)
+        pass
 
 
 class BaseCombo:
@@ -193,11 +217,12 @@ class TeamMemberSelector:
             if event is not None and not event.is_set():
                 return False
             self.control_service.toggle_team_member(member)
-            time.sleep(0.2)
+            time.sleep(0.15)
             img = self.img_service.screenshot()
             is_toggled = team_member_checker.check(img)
             if is_toggled:
                 return True
+            time.sleep(0.1)
         return False
 
 # circular import

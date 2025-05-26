@@ -18,9 +18,7 @@ class BaseJinhsi(BaseResonator):
         self.name = "今汐"
 
         # 协奏 左下血条旁黄圈
-        self._concerto_energy_point = [(513, 669), (514, 669), (514, 670), (514, 671)]
-        self._concerto_energy_color = [(105, 204, 217)]
-        self._concerto_energy_checker = ColorChecker(self._concerto_energy_point, self._concerto_energy_color)
+        self._concerto_energy_checker = ColorChecker.concerto_spectro()
 
         # # TODO 同奏 左下血条旁黄圈
         # self._concerto_energy_point = [(513, 669), (514, 669), (514, 670), (514, 671)]
@@ -29,36 +27,36 @@ class BaseJinhsi(BaseResonator):
 
         # 共鸣技能 E1 流光夕影
         self._resonance_skill_point = [(1045, 651), (1059, 664)]
-        self._resonance_skill_color = [(255, 255, 255)]
+        self._resonance_skill_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_checker = ColorChecker(
             self._resonance_skill_point, self._resonance_skill_color, logic=ColorChecker.LogicEnum.AND)
 
         # 共鸣技能 E2 神霓飞芒 进入乘岁凌霄
         self._resonance_skill_2_point = [(1064, 634), (1070, 636), (1061, 650)]
-        self._resonance_skill_2_color = [(255, 255, 255)]
+        self._resonance_skill_2_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_2_checker = ColorChecker(
             self._resonance_skill_2_point, self._resonance_skill_color, logic=ColorChecker.LogicEnum.AND)
 
         # 共鸣技能 E3 逐天取月
         self._resonance_skill_3_point = [(1061, 630), (1059, 635), (1069, 663)]
-        self._resonance_skill_3_color = [(255, 255, 255)]
+        self._resonance_skill_3_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_3_checker = ColorChecker(
             self._resonance_skill_3_point, self._resonance_skill_color, logic=ColorChecker.LogicEnum.AND)
 
         # 共鸣技能 E4 惊龙破空
         self._resonance_skill_4_point = [(1063, 642), (1069, 655), (1078, 653), (1072, 643)]
-        self._resonance_skill_4_color = [(255, 255, 255)]
+        self._resonance_skill_4_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_4_checker = ColorChecker(
             self._resonance_skill_4_point, self._resonance_skill_color, logic=ColorChecker.LogicEnum.AND)
 
         # 声骸技能
         self._echo_skill_point = [(1135, 654), (1136, 659)]
-        self._echo_skill_color = [(255, 255, 255)]
+        self._echo_skill_color = [(255, 255, 255)]  # BGR
         self._echo_skill_checker = ColorChecker(self._echo_skill_point, self._echo_skill_color)
 
         # 共鸣解放
         self._resonance_liberation_point = [(1205, 632), (1208, 662), (1223, 656)]
-        self._resonance_liberation_color = [(255, 255, 255)]
+        self._resonance_liberation_color = [(255, 255, 255)]  # BGR
         self._resonance_liberation_checker = ColorChecker(
             self._resonance_liberation_point, self._resonance_liberation_color)
 
@@ -222,12 +220,27 @@ class Jinhsi(BaseJinhsi, BaseCombo):
             ["w", 0.00, 2.50],
         ]
 
+    def E2(self):
+        """ E2 """
+        logger.debug("E2")
+        return [
+            # 变奏入场或在空中，容易出下落攻击，只打E
+            ["E", 0.05, 0.20],
+            ["E", 0.05, 0.20],
+            ["E", 0.05, 0.10],
+        ]
+
     def E3_full_combo(self):
         """ E3起手的一整套 """
         logger.debug("E3_full_combo")
         return [
-            ["a", 0.05, 0.45],
-            ["a", 0.05, 0.55],
+            # ["a", 0.05, 0.45],  # 等待时间太长，拆分
+            # ["a", 0.05, 0.55],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.15],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.20],
+
             ["a", 0.05, 0.35],
             ["a", 0.05, 0.10],  # 冗余多打一个普攻
 
@@ -238,17 +251,19 @@ class Jinhsi(BaseJinhsi, BaseCombo):
             ["E", 0.05, 0.00],
 
             ["a", 0.05, 0.35],
-            ["a", 0.05, 0.40],
+            ["a", 0.05, 0.35],
             ["a", 0.05, 0.10],  # 冗余多打一个普攻
+            ["E", 0.05, 0.00],
             ["E", 0.05, 0.00],
 
             ["w", 0.00, 2.50],
         ]
 
     def E(self):
-        """ E4起手的一整套 """
+        """ 只打E，E4/E2使用 """
         return [
-            ["E", 0.05, 0.00],
+            ["E", 0.05, 0.10],
+            ["E", 0.05, 0.10],
         ]
 
     def Q(self):
@@ -269,6 +284,7 @@ class Jinhsi(BaseJinhsi, BaseCombo):
     def combo(self):
 
         img = self.img_service.screenshot()
+        # is_concerto_energy_ready = self.is_concerto_energy_ready(img)
         is_resonance_skill_ready = self.is_resonance_skill_ready(img)
         is_resonance_skill_2_ready = self.is_resonance_skill_2_ready(img)
         is_resonance_skill_3_ready = self.is_resonance_skill_3_ready(img)
@@ -276,8 +292,8 @@ class Jinhsi(BaseJinhsi, BaseCombo):
         is_echo_skill_ready = self.is_echo_skill_ready(img)
         is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
 
-        if is_echo_skill_ready:
-            self.combo_action(self.Q(), False)
+        # if is_echo_skill_ready:
+        self.combo_action(self.Q(), False)
 
         if is_resonance_skill_4_ready:
             self.combo_action(self.E(), False)
@@ -292,7 +308,8 @@ class Jinhsi(BaseJinhsi, BaseCombo):
             return
 
         if is_resonance_skill_2_ready:
-            self.combo_action(self.E2_full_combo(), False)
+            # self.combo_action(self.E2_full_combo(), False)
+            self.combo_action(self.E2(), False)
             return
 
         # E1作为共鸣技能是否CD的指标
@@ -312,7 +329,8 @@ class Jinhsi(BaseJinhsi, BaseCombo):
         self.combo_action(self.a4(), False)
         img = self.img_service.screenshot()
         is_resonance_skill_4_ready = self.is_resonance_skill_4_ready(img)
-        if is_resonance_skill_4_ready:
+        is_resonance_skill_2_ready = self.is_resonance_skill_2_ready(img)
+        if is_resonance_skill_4_ready or is_resonance_skill_2_ready:
             self.combo_action(self.E(), False)
             time.sleep(0.05)
         self.combo_action(self.R(), False)

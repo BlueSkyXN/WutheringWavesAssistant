@@ -18,13 +18,11 @@ class BaseShorekeeper(BaseResonator):
         self.name = "守岸人"
 
         # 协奏 左下血条旁黄圈
-        self._concerto_energy_point = [(513, 669), (514, 669), (514, 670), (514, 671)]
-        self._concerto_energy_color = [(105, 204, 217)]
-        self._concerto_energy_checker = ColorChecker(self._concerto_energy_point, self._concerto_energy_color)
+        self._concerto_energy_checker = ColorChecker.concerto_spectro()
 
         # 能量1 血条上方的5格能量
         self._energy1_point = [(547, 668), (548, 668), (552, 668)]
-        self._energy1_color = [(114, 241, 255)]
+        self._energy1_color = [(114, 241, 255)]  # BGR
         self._energy1_checker = ColorChecker(self._energy1_point, self._energy1_color)
 
         # 能量2 血条上方的5格能量
@@ -44,22 +42,22 @@ class BaseShorekeeper(BaseResonator):
 
         # 能量5 血条上方的5格能量 两侧的蝴蝶
         self._energy5_point = [(701, 668), (710, 668), (514, 669), (732, 669)]
-        self._energy5_color = [*self._energy1_color, (93, 92, 79)]
+        self._energy5_color = [*self._energy1_color, (93, 92, 79)]  # BGR
         self._energy5_checker = ColorChecker(self._energy5_point, self._energy5_color)
 
         # 共鸣技能
         self._resonance_skill_point = [(1061, 629), (1060, 660), (1080, 657)]
-        self._resonance_skill_color = [(255, 255, 255)]
+        self._resonance_skill_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_checker = ColorChecker(self._resonance_skill_point, self._resonance_skill_color)
 
         # 声骸技能
         self._echo_skill_point = [(1136, 632), (1143, 656), (1136, 660)]
-        self._echo_skill_color = [(255, 255, 255)]
+        self._echo_skill_color = [(255, 255, 255)]  # BGR
         self._echo_skill_checker = ColorChecker(self._echo_skill_point, self._echo_skill_color)
 
         # 共鸣解放
         self._resonance_liberation_point = [(1208, 632), (1205, 655)]
-        self._resonance_liberation_color = [(255, 255, 255)]
+        self._resonance_liberation_color = [(255, 255, 255)]  # BGR
         self._resonance_liberation_checker = ColorChecker(
             self._resonance_liberation_point, self._resonance_liberation_color)
 
@@ -238,9 +236,9 @@ class Shorekeeper(BaseShorekeeper, BaseCombo):
     def combo(self):
         img = self.img_service.screenshot()
         energy_count = self.energy_count(img)
-        is_concerto_energy_ready = self.is_concerto_energy_ready(img)
-        is_resonance_skill_ready = self.is_resonance_skill_ready(img)
-        is_echo_skill_ready = self.is_echo_skill_ready(img)
+        # is_concerto_energy_ready = self.is_concerto_energy_ready(img)
+        # is_resonance_skill_ready = self.is_resonance_skill_ready(img)
+        # is_echo_skill_ready = self.is_echo_skill_ready(img)
         is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
 
         # 打满能量，释放重击和E

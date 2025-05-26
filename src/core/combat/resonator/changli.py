@@ -19,13 +19,11 @@ class BaseChangli(BaseResonator):
         self.name = "长离"
 
         # 协奏 左下血条旁红圈
-        self._concerto_energy_point = [(513, 669), (514, 669), (514, 670), (514, 671)]
-        self._concerto_energy_color = [(81, 112, 210)]
-        self._concerto_energy_checker = ColorChecker(self._concerto_energy_point, self._concerto_energy_color)
+        self._concerto_energy_checker = ColorChecker.concerto_fusion()
 
         # 能量1 血条上方的4格能量
         self._energy1_point = [(547, 668), (548, 668), (552, 668)]
-        self._energy1_color = [(107, 97, 250)]
+        self._energy1_color = [(107, 97, 250)]  # BGR
         self._energy1_checker = ColorChecker(self._energy1_point, self._energy1_color)
 
         # 能量2 血条上方的4格能量
@@ -45,17 +43,17 @@ class BaseChangli(BaseResonator):
 
         # 共鸣技能
         self._resonance_skill_point = [(1051, 632), (1077, 630), (1065, 665)]
-        self._resonance_skill_color = [(255, 255, 255)]
+        self._resonance_skill_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_checker = ColorChecker(self._resonance_skill_point, self._resonance_skill_color)
 
         # 声骸技能
         self._echo_skill_point = [(1135, 632), (1130, 654), (1150, 658)]
-        self._echo_skill_color = [(255, 255, 255)]
+        self._echo_skill_color = [(255, 255, 255)]  # BGR
         self._echo_skill_checker = ColorChecker(self._echo_skill_point, self._echo_skill_color)
 
         # 共鸣解放
         self._resonance_liberation_point = [(1203, 654), (1210, 654)]
-        self._resonance_liberation_color = [(255, 255, 255)]
+        self._resonance_liberation_color = [(255, 255, 255)]  # BGR
         self._resonance_liberation_checker = ColorChecker(
             self._resonance_liberation_point, self._resonance_liberation_color)
 
@@ -292,7 +290,7 @@ class Changli(BaseChangli, BaseCombo):
 
         img = self.img_service.screenshot()
         energy_count = self.energy_count(img)
-        is_concerto_energy_ready = self.is_concerto_energy_ready(img)
+        # is_concerto_energy_ready = self.is_concerto_energy_ready(img)
         is_resonance_skill_ready = self.is_resonance_skill_ready(img)
         is_echo_skill_ready = self.is_echo_skill_ready(img)
         is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
