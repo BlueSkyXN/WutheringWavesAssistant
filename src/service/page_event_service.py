@@ -821,8 +821,8 @@ class PageEventAbstractService(PageEventService, ABC):
                     self._info.fightTime = datetime.now()
                 if self._context.param_config.autoCombatBeta is True:
                     if self._info.waitBoss:
+                        logger.info("智能连招beta开启")  # 放这里不会频繁打印
                         self.boss_wait(self._info.lastBossName)
-                    logger.info("智能连招beta开启")
                     is_nightmare = self._boss_info_service.is_nightmare(self._info.lastBossName)
                     self.combat_system.is_nightmare = is_nightmare
                     self.combat_system.start(3.5)

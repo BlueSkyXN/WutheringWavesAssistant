@@ -1,4 +1,5 @@
 import logging
+import random
 import time
 
 import numpy as np
@@ -182,9 +183,10 @@ class Jinhsi(BaseJinhsi, BaseCombo):
             ["a", 0.05, 0.35],
         ]
 
-    def E2_full_combo(self):
+    def E2_full_combo_E4(self):
         """ E2起手的一整套 """
-        logger.debug("E2_full_combo")
+        # 这套容易触发闪避断招，伤害也偏低，但打的快
+        logger.debug("E2_full_combo_E4")
         return [
             ["E", 0.05, 0.05],
             ["d", 0.05, 0.20],
@@ -199,8 +201,6 @@ class Jinhsi(BaseJinhsi, BaseCombo):
             ["d", 0.05, 0.20],
 
             # 直接喷 E4
-            ["a", 0.05, 0.05],
-            ["E", 0.05, 0.05],  # 冗余，多打一个aE
             ["a", 0.05, 0.05],
             ["E", 0.05, 2.50],
 
@@ -221,6 +221,48 @@ class Jinhsi(BaseJinhsi, BaseCombo):
             # ["E", 0.05, 0.00],  # 冗余多打一个E
             #
             # ["w", 0.00, 2.50],
+        ]
+
+    def E2_full_combo_E3E4(self):
+        """ E2起手的一整套 """
+        # 这套不容易触发闪避，伤害高一些，但打的慢一些
+        logger.debug("E2_full_combo_E3E4")
+        return [
+            ["E", 0.05, 0.05],
+            ["d", 0.05, 0.20],
+            ["a", 0.05, 0.05],
+            ["j", 0.05, 0.01],
+
+            # ["W", 0.00, 0.00, "down"],
+            ["a", 0.05, 0.05],
+            ["d", 0.05, 0.20],
+            # ["W", 0.00, 0.00, "up"],
+            ["a", 0.05, 0.05],
+            ["d", 0.05, 0.20],
+
+            # # 直接喷 E4
+            # ["a", 0.05, 0.05],
+            # ["E", 0.05, 0.05],  # 冗余，多打一个aE
+            # ["a", 0.05, 0.05],
+            # ["E", 0.05, 2.50],
+
+            # 升龙再喷 E3E4
+            # ["E", 0.05, 1.00],  # 实战若被打断普攻次数不够会原地发呆，E后接普攻保证有事可做
+            ["E", 0.05, 0.10],
+            ["a", 0.05, 0.30],
+            # ["a", 0.05, 0.30],  # 提高a的点击频率，保证实战普攻次数覆盖
+            ["a", 0.05, 0.15],
+            ["a", 0.05, 0.15],
+            ["a", 0.05, 0.10],
+            ["E", 0.05, 0.10],
+
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.10],  # 冗余多打一个普攻
+            ["E", 0.05, 0.10],
+            ["E", 0.05, 0.00],  # 冗余多打一个E
+
+            ["w", 0.00, 2.50],
         ]
 
     def E2(self):
@@ -321,7 +363,9 @@ class Jinhsi(BaseJinhsi, BaseCombo):
             img = self.img_service.screenshot()
             is_resonance_skill_2_ready = self.is_resonance_skill_2_ready(img)
             if is_resonance_skill_2_ready:
-                self.combo_action(self.E2_full_combo(), False)
+                random_E2_full_combo = self.E2_full_combo_E4() if random.random() < 0.5 else self.E2_full_combo_E3E4()
+                self.combo_action(random_E2_full_combo, False)
+                time.sleep(0.05)
             else:
                 self.combo_action(self.E(), False)
                 time.sleep(0.05)
