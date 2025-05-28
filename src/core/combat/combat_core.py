@@ -109,6 +109,7 @@ class BaseCombo:
     def __init__(self, control_service: ControlService):
         self.control_service = control_service
         self.event: threading.Event | None = None
+        self.is_nightmare: bool = False
 
     def combo_action(self, sequence: Sequence, end_wait: bool):
         """
@@ -121,7 +122,7 @@ class BaseCombo:
         for i, keys in enumerate(sequence):
             if self.event is not None and not self.event.is_set():
                 raise StopError()
-            if i % 2 == 0:
+            if self.is_nightmare is True and i % 2 == 0:
                 self.control_service.fight_tap("F", 0.001)
             key, press_time, wait_time = keys[:3]
             if key == "a":

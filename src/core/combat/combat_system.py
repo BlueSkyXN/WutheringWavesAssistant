@@ -45,6 +45,8 @@ class CombatSystem:
             self.verina.name_en: self.verina,
         }
 
+        self.is_nightmare: bool = False
+
     def run(self, event: threading.Event):
         resonators = []
         member_names = self.team_member_selector.get_team_members()
