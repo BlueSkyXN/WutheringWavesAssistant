@@ -80,6 +80,10 @@ class ImgServiceImpl(ImgService):
         else:
             cropped_img = img
         confidence, position = img_util.match_template(cropped_img, template_img)
+
+        # draw_img = img_util.draw_match_template_result(cropped_img.copy(), img_util.match_template(cropped_img, template_img))
+        # img_util.save_img_in_temp(draw_img)
+
         if confidence < threshold:
             return None
         return Position.build(position[0], position[1], position[2], position[3], confidence=confidence)

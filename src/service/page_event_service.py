@@ -770,7 +770,7 @@ class PageEventAbstractService(PageEventService, ABC):
                 self._check_heal()
                 if self._info.needHeal:
                     logger.info("有角色阵亡，开始治疗")
-                    time.sleep(1)
+                    # time.sleep(1)
                     self._info.lastBossName = "治疗"
                     self.transfer()
                     time.sleep(0.5)

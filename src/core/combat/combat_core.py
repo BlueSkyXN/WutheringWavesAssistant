@@ -210,6 +210,84 @@ class TeamMemberSelector:
             3: self._team_member_3_checker,
         }
 
+        self._team_members = None
+
+    def get_avatars(self) -> dict[str, np.ndarray]:
+        """ 获取所有角色的头像 """
+        from src.util import file_util, img_util
+        # 所有头像都放在一张透明图里1280x720，按网格摆放
+        img_path = file_util.get_assets_template("Avatars.png")
+        img = img_util.read_img(img_path, alpha=False)
+        # logger.debug("img shape: %s", img.shape)
+        # 头像摆放顺序
+        avatar_names = ["jinhsi", "changli", "shorekeeper", "verina", "encore"]
+        # 头像网格，40像素放一个，1280宽度，一行放32个
+        avatar_grid = (40, 40)
+        # 头像在网格内的位置，左上角0,0 到 右下角这个位置的正方形。有四个像素的空白间隙
+        avatar_wh = (36, 36)
+        x = 0
+        y = 0
+        avatar_map = {}
+        for name in avatar_names:
+            avatar_grid_img = img[y:y + avatar_grid[1], x:x + avatar_grid[0]]
+            avatar_img = avatar_grid_img[0:avatar_wh[1], 0:avatar_wh[0]]
+            avatar_map[name] = avatar_img
+            # img_util.save_img_in_temp(avatar_img)
+            x = x + avatar_grid[0]
+            if x >= 1280:
+                x = 0
+                y = y + avatar_grid[1]
+        return avatar_map
+
+    def get_team_members(self, img: np.ndarray | None = None) -> list[str]:
+        """
+        识别画面中的角色，从上到下
+        :param img: 16:9 BGR
+        :return:
+        """
+        if img is None:
+            img = self.img_service.screenshot()
+        img = self.img_service.resize(img)
+        logger.debug("img shape: %s", img.shape)
+        # start_col = int(img.shape[1] * 0.85)
+        # img = img[:, start_col:]
+        # img = img[135:372, 1168:1225]
+        # 123号位角色头像在图中的区域
+        member_regions = [(1167, 135, 1230, 198), (1167, 224, 1230, 285), (1167, 314, 1230, 373)]
+        avatars = self.get_avatars()
+        members = []
+        for i, region in enumerate(member_regions):
+            # 每个位置都匹配一般头像，找出相似度最高的那个
+            region_img = img[region[1]:region[3], region[0]:region[2]]
+            # from src.util import img_util
+            # img_util.save_img_in_temp(region_img)
+            match_results = []
+            for avatar_name, avatar_img in avatars.items():
+                position = self.img_service.match_template(region_img, avatar_img, threshold=0.3)
+                logger.debug(f"{i} avatar: {avatar_name}, position: {position}")
+                if not position:
+                    continue
+                match_results.append((avatar_name, position.confidence))
+            logger.debug(f"{i} match_results: {match_results}")
+            if len(match_results) == 0:
+                members.append(None)
+                continue
+            if len(match_results) > 1:
+                match_results.sort(key=lambda x: x[1], reverse=True)  # 从大到小
+            logger.debug(f"{i} match_results: {match_results}")
+            members.append(match_results[0])
+
+        logger.debug(f"members: {members}")
+        member_names = []
+        for i, member in enumerate(members):
+            if member is None:
+                logger.warning(f"无法识别{i + 1}号位角色")
+                member_names.append(None)
+                continue
+            member_names.append(member[0])
+        logger.info(f"member_names: {member_names}")
+        return member_names
+
     def toggle(self, member: int, timeout_seconds: float = 1.0, event: threading.Event | None = None) -> bool:
         team_member_checker = self._team_member_map.get(member)
         start_time = time.monotonic()

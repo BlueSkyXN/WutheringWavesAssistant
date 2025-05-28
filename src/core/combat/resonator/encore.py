@@ -17,6 +17,7 @@ class BaseEncore(BaseResonator):
         self.img_service = img_service
 
         self.name = "安可"
+        self.name_en = "encore"
 
         # 协奏 左下血条旁红圈
         self._concerto_energy_checker = ColorChecker.concerto_fusion()

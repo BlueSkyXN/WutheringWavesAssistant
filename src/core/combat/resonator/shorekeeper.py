@@ -16,6 +16,7 @@ class BaseShorekeeper(BaseResonator):
         self.img_service = img_service
 
         self.name = "守岸人"
+        self.name_en = "shorekeeper"
 
         # 协奏 左下血条旁黄圈
         self._concerto_energy_checker = ColorChecker.concerto_spectro()

@@ -1021,7 +1021,7 @@ class ParamInterface(ScrollArea):
 
         self.autoCombatCard = AutoCombatSwitchSettingCard(
             FIF.LABEL,
-            self.tr('智能连招 测试V0.1 编队顺序必须是：1守岸人 2长离 3今汐，替代无效，暂时只适配了这三个'),
+            self.tr('智能连招 测试V0.2 支持：守岸人、长离、今汐、安可、维里奈，替代无效'),
             self.tr('默认关闭，关闭则是config.yaml里的连招，此开关仅在测试阶段可见'),
             configItem=paramConfig.autoCombat,
             parent=self.bossGroup

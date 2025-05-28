@@ -16,6 +16,7 @@ class BaseVerina(BaseResonator):
         self.img_service = img_service
 
         self.name = "维里奈"
+        self.name_en = "verina"
 
         # 协奏 左下血条旁红圈
         self._concerto_energy_checker = ColorChecker.concerto_spectro()
@@ -199,7 +200,7 @@ class Verina(BaseVerina, BaseCombo):
         # is_echo_skill_ready = self.is_echo_skill_ready(img)
         is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
 
-        # 不管条件，切人就打aaEQ
+        # 不管条件，入场就打aaEQ
         self.combo_action(self.a2EQ(), False)
 
         # 有大开大
@@ -214,6 +215,6 @@ class Verina(BaseVerina, BaseCombo):
             time.sleep(0.05)
             return
 
-        # 兜底，打完剩下的普攻段数
-        self.combo_action(self.a3(), False)
-        self.combo_action(self.EQR(), False)
+        # # 兜底，打完剩下的普攻段数
+        # self.combo_action(self.a3(), False)
+        # self.combo_action(self.EQR(), False)

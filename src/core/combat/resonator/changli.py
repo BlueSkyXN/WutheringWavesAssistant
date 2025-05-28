@@ -17,6 +17,7 @@ class BaseChangli(BaseResonator):
         self.img_service = img_service
 
         self.name = "长离"
+        self.name_en = "changli"
 
         # 协奏 左下血条旁红圈
         self._concerto_energy_checker = ColorChecker.concerto_fusion()
@@ -192,7 +193,7 @@ class Changli(BaseChangli, BaseCombo):
     #     ]
 
     def a3(self):
-        logger.debug("a5")
+        logger.debug("a3")
         return [
             # 普攻 5a 一离火
             # ["a", 0.05, 0.31],
@@ -207,6 +208,12 @@ class Changli(BaseChangli, BaseCombo):
 
             ["a", 0.05, 0.00],
             ["w", 0.05, 0.75],
+        ]
+
+    def a(self):
+        logger.debug("a")
+        return [
+            ["a", 0.05, 0.00],
         ]
 
     # def zRz(self):
@@ -306,6 +313,7 @@ class Changli(BaseChangli, BaseCombo):
                 time.sleep(0.1)
             elif is_resonance_liberation_ready:
                 self.combo_action(self.R(), False)
+                self.combo_action(self.E(), False)
             return
 
         # 低离火有大直接开
@@ -324,8 +332,10 @@ class Changli(BaseChangli, BaseCombo):
             energy_count = self.energy_count(img)
             if energy_count == 4:
                 self.combo_action(self.z(), False)
-                time.sleep(0.1)
                 return
+            else:
+                # 有时会撑伞，再a一下
+                self.combo_action(self.a(), False)
         # 摩托最后放合轴
         if is_echo_skill_ready:
             # 随机放梦魇摩托或普通摩托

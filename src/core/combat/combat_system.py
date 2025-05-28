@@ -37,16 +37,19 @@ class CombatSystem:
         self.encore = Encore(self.control_service, self.img_service)
         self.verina = Verina(self.control_service, self.img_service)
 
-    def run(self, event: threading.Event):
-        resonators = [
-            self.shorekeeper, self.jinhsi, self.changli, self.jinhsi, self.shorekeeper, self.changli, self.jinhsi,
-            self.changli
-        ]
-        member_number_map = {
-            self.jinhsi.name: 3,
-            self.changli.name: 2,
-            self.shorekeeper.name: 1,
+        self.resonator_map = {
+            self.jinhsi.name_en: self.jinhsi,
+            self.changli.name_en: self.changli,
+            self.shorekeeper.name_en: self.shorekeeper,
+            self.encore.name_en: self.encore,
+            self.verina.name_en: self.verina,
         }
+
+    def run(self, event: threading.Event):
+        resonators = []
+        member_names = self.team_member_selector.get_team_members()
+        for member_name in member_names:
+            resonators.append(self.resonator_map.get(member_name))
         index = 0
         seq_length = len(resonators)
         while True:
@@ -59,14 +62,16 @@ class CombatSystem:
                 time.sleep(0.3)
                 continue
             # logger.info("index：%s", index)
-            resonator = resonators[index]
-            index = self._next_index(index, seq_length)
             self.control_service.fight_tap("F", 0.001)
-            if index % 4 == 0:
+            if index % 3 == 0:
                 self.control_service.activate()
             if index % 2 == 0:
                 self.control_service.camera_reset()
-            is_toggled = self.team_member_selector.toggle(member_number_map.get(resonator.name), event=event)
+            resonator = resonators[index]
+            if resonator is None:
+                time.sleep(0.3)
+                continue
+            is_toggled = self.team_member_selector.toggle(index + 1, event=event)
             if not is_toggled:
                 continue
             resonator.event = event
@@ -74,7 +79,7 @@ class CombatSystem:
                 resonator.combo()
             except StopError:  # 主动抛出异常快速跳出连招序列
                 self.control_service.fight_tap("a", 0.001)  # 打一下普攻，打断守岸人变身蝴蝶
-                continue
+            index = self._next_index(index, seq_length)
 
     def _next_index(self, index, seq_length) -> int:
         next_index = index + 1

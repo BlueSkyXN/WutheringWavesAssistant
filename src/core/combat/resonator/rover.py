@@ -17,6 +17,7 @@ class BaseRover(BaseResonator):
         self.img_service = img_service
 
         self.name = "漂泊者-湮灭"
+        self.name_en = "rover"
 
         # 协奏 左下血条旁红圈
         self._concerto_energy_point = [(513, 669), (514, 669), (514, 670), (514, 671)]
