@@ -64,7 +64,8 @@ class CombatSystem:
                 time.sleep(0.3)
                 continue
             # logger.info("index：%s", index)
-            self.control_service.fight_tap("F", 0.001)
+            if self.is_nightmare:
+                self.control_service.fight_tap("F", 0.001)
             if index % 3 == 0:
                 self.control_service.activate()
             if index % 2 == 0:
