@@ -1215,6 +1215,28 @@ class PageEventAbstractService(PageEventService, ABC):
             action=action if action else Page.error_action
         )
 
+    def build_Fight_Click_alternately_to_break_free(self, action: Callable = None) -> Page:
+
+        if action is None:
+            def default_action(positions: dict[str, Position]) -> bool:
+                for _ in range(4):
+                    self._control_service.left()
+                    self._control_service.right()
+                return True
+
+            action = default_action
+
+        return Page(
+            name="交替点击进行挣脱|Click alternately to break free",
+            targetTexts=[
+                TextMatch(
+                    name="交替点击进行挣脱|Click alternately to break free",
+                    text=r"^(交替点击进行挣脱|Click\s*alternately\s*to\s*break\s*free)$",
+                ),
+            ],
+            action=action if action else Page.error_action
+        )
+
     def release_skills(self):
         # adapts()
         if self._info.waitBoss:

@@ -308,6 +308,9 @@ class AutoBossServiceImpl(PageEventAbstractService):
 
         self._general_pages.append(terminal_page)
 
+        click_alternately_to_break_free = self.build_Fight_Click_alternately_to_break_free()
+        self._dreamless_pages.append(click_alternately_to_break_free)
+
         # # 击败 战斗状态
         # def fight_action(positions: dict[str, Position]) -> bool:
         #     """

@@ -284,19 +284,18 @@ class Changli(BaseChangli, BaseCombo):
 
     def combo(self):
 
+        self.combo_action(self.a2(), True)  # 入场先打两个普攻，触发心眼冲
+
         img = self.img_service.screenshot()
         energy_count = self.energy_count(img)
 
         # 4离火 z
         if energy_count == 4:
             self.combo_action(self.az(), False)
-            time.sleep(0.1)
+            self.combo_action(self.E(), False)
+            time.sleep(0.05)
             return
 
-        self.combo_action(self.a2(), True)  # 入场先打两个普攻，触发心眼冲
-
-        img = self.img_service.screenshot()
-        energy_count = self.energy_count(img)
         # is_concerto_energy_ready = self.is_concerto_energy_ready(img)
         is_resonance_skill_ready = self.is_resonance_skill_ready(img)
         is_echo_skill_ready = self.is_echo_skill_ready(img)
@@ -310,7 +309,7 @@ class Changli(BaseChangli, BaseCombo):
             is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
             if energy_count == 4:
                 self.combo_action(self.z(), False)
-                time.sleep(0.1)
+                time.sleep(0.05)
             elif is_resonance_liberation_ready:
                 self.combo_action(self.R(), False)
                 self.combo_action(self.E(), False)
@@ -319,7 +318,7 @@ class Changli(BaseChangli, BaseCombo):
         # 低离火有大直接开
         if energy_count < 3 and is_resonance_liberation_ready:
             self.combo_action(self.R(), False)
-            self.combo_action(self.Ea(), False)  # 冗余，万一没有R出来还能触发Ea
+            self.combo_action(self.E(), False)  # 冗余，万一没有R出来还能触发Ea
             return
 
         # 兜底，打E合轴或普攻

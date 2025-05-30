@@ -100,7 +100,7 @@ def test_combo_Jinhsi(control_service):
 
 
 def test_combo_Jinhsi_AdvancedCombo(control_service):
-    # 汐汐 瞬喷 BV1sUfHYdEPG
+    # 汐汐 速喷 BV1sUfHYdEPG
     # 4a E闪a跳 a闪a闪 aE
     seq = [
         ["a", 0.05, 0.45],
@@ -137,18 +137,27 @@ def test_combo_Jinhsi_AdvancedCombo(control_service):
 
 
 def test_combo_Jinhsi_AdvancedCombo2(control_service):
-    # 汐汐 瞬喷2 BV1rS5Vz4Egy
-    # 下落攻击 落地瞬间跳 E闪a跳 a闪a闪 aE
+    # 汐汐 变奏（E2下劈）速喷 BV1rS5Vz4Egy BV1dtEgzUEAF
+    # E2状态 下落攻击 落地瞬间跳（翻滚） E跳 a跳a跳a跳a跳 E
+    # JAJ EJ AJAJAJAJ
     seq = [
+        # 进入E2
+        ["a", 0.05, 0.45],
+        ["a", 0.05, 0.45],
+        ["a", 0.05, 0.90],
+        ["a", 0.05, 0.40],
+        # 模拟下劈
         ["j", 0.05, 0.27],
-        ["a", 0.05, 0.27],
-        ["a", 0.05, 0.05],
-        ["j", 0.05, 0.05],
-        ["j", 0.05, 0.05],
-        ["E", 0.05, 0.05],
-        ["E", 0.05, 0.05],
+        ["a", 0.05, 0.00],
     ]
-    combo_action(control_service, seq, 10.0)
+    combo_action(control_service, seq, 0.0, cycle=1)
+    seq = [
+        ["j", 0.002, 0.005],
+        ["a", 0.002, 0.005],
+        ["j", 0.002, 0.005],
+        ["E", 0.002, 0.005],
+    ]
+    combo_action(control_service, seq, 0.0, cycle=50)
 
 
 def test_combo_Changli(control_service):
@@ -344,6 +353,8 @@ def test_combat(container, control_service):
     resonator.is_resonance_skill_ready(img)
     resonator.is_echo_skill_ready(img)
     resonator.is_resonance_liberation_ready(img)
+
+    resonator.boss_hp(img)
 
     # for _ in range(50):
     #     shorekeeper.full_combo()

@@ -128,9 +128,9 @@ class HomeInterface(ScrollArea):
         )
         basicInputView.addSampleCard(
             icon=":/gallery/images/controls/Checkbox.png",
-            title="沉浸式剧情（推荐）",
+            title="沉浸式剧情",
             content=self.tr(
-                "自动选择对话，解放双手，体验完整人生\n任意分辨率，建议全屏最高画质"),
+                "剧情党使用，需开启自动播放，后续自动选择对话\n解放双手，体验完整人生，任意分辨率，建议全屏最高画质"),
             routeKey="basicInputInterface",
             index=9,
             task_name="AutoStoryEnjoyProcessTask",

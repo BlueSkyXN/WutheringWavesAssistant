@@ -55,6 +55,7 @@ class CombatSystem:
         index = 0
         seq_length = len(resonators)
         while True:
+            # logger.debug("member: %s", index + 1)
             if not event.is_set():
                 # logger.info("暂停中，event.is_set()")
                 time.sleep(0.3)
@@ -74,15 +75,18 @@ class CombatSystem:
             if resonator is None:
                 time.sleep(0.3)
                 continue
-            is_toggled = self.team_member_selector.toggle(index + 1, event=event)
+            is_toggled = self.team_member_selector.toggle(index, event=event, resonators=resonators)
+            index = self._next_index(index, seq_length)
+            # if is_toggled is None:
+            #     time.sleep(0.3)
+            #     continue
             if not is_toggled:
                 continue
             resonator.event = event
             try:
                 resonator.combo()
             except StopError:  # 主动抛出异常快速跳出连招序列
-                self.control_service.fight_tap("a", 0.001)  # 打一下普攻，打断守岸人变身蝴蝶
-            index = self._next_index(index, seq_length)
+                pass
 
     def _next_index(self, index, seq_length) -> int:
         next_index = index + 1

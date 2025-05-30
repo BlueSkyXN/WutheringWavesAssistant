@@ -42,7 +42,7 @@ class TaskMonitor:
         self.game_restart_time: float | None = None  # time.monotonic()
 
         # 任务重启冷却时间，防止异常时一直重启
-        self.task_restart_cooldown = 20  # seconds
+        self.task_restart_cooldown = 20.0  # seconds
         self.task_restart_time: float | None = None  # time.monotonic()
 
         self._monitor_event = threading.Event()

@@ -490,6 +490,9 @@ class DailyActivityServiceImpl(PageEventAbstractService, ABC):
         # terminal_page = self.build_UI_ESC_Terminal()
         # self._general_pages.append(terminal_page)
 
+        click_alternately_to_break_free = self.build_Fight_Click_alternately_to_break_free()
+        self._dreamless_pages.append(click_alternately_to_break_free)
+
         def fight_action(positions: dict[str, Position]):
             if self._ctx.fight_status == Status.idle:  # 空闲进入战斗，即为新一轮战斗
                 self._ctx.fight_start_time = datetime.now()

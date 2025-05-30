@@ -4,6 +4,7 @@ import time
 import numpy as np
 
 from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo
+from src.core.exceptions import StopError
 from src.core.interface import ControlService, ImgService
 
 logger = logging.getLogger(__name__)
@@ -155,6 +156,15 @@ class Shorekeeper(BaseShorekeeper, BaseCombo):
             ["a", 0.05, 0.05],  # 多一个普攻打断z防止一直飞
         ]
 
+    def Eja(self):
+        logger.debug("Eja")
+        return [
+            ["E", 0.01, 0.10],
+            # 清空能量
+            ["j", 0.05, 0.17],
+            ["a", 0.05, 0.10],
+        ]
+
     def zaEja(self):
         logger.debug("zaEja")
         return [
@@ -206,6 +216,23 @@ class Shorekeeper(BaseShorekeeper, BaseCombo):
             ["a", 0.05, 0.35],
         ]
 
+    def a2(self):
+        logger.debug("a2")
+        return [
+            # 2a
+            ["a", 0.05, 0.31],
+            ["a", 0.05, 0.43],
+        ]
+
+    def a3(self):
+        logger.debug("a3")
+        return [
+            # 3a
+            ["a", 0.05, 0.31],
+            ["a", 0.05, 0.43],
+            ["a", 0.05, 0.40],
+        ]
+
     def za(self):
         logger.debug("za")
         return [
@@ -235,28 +262,44 @@ class Shorekeeper(BaseShorekeeper, BaseCombo):
         return self.COMBO_SEQ
 
     def combo(self):
-        img = self.img_service.screenshot()
-        energy_count = self.energy_count(img)
-        # is_concerto_energy_ready = self.is_concerto_energy_ready(img)
-        # is_resonance_skill_ready = self.is_resonance_skill_ready(img)
-        # is_echo_skill_ready = self.is_echo_skill_ready(img)
-        is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
-
-        # 打满能量，释放重击和E
-        if energy_count >= 4:
-            self.combo_action(self.zE(), is_resonance_liberation_ready)
-        elif energy_count == 3:
-            self.combo_action(self.zaEja(), is_resonance_liberation_ready)
-            time.sleep(0.05)
-        elif energy_count < 3:
-            self.combo_action(self.a3Ea(), True)
+        try:
             img = self.img_service.screenshot()
             energy_count = self.energy_count(img)
-            if energy_count == 5:
-                self.combo_action(self.za(), False)
+            # is_concerto_energy_ready = self.is_concerto_energy_ready(img)
+            # is_resonance_skill_ready = self.is_resonance_skill_ready(img)
+            # is_echo_skill_ready = self.is_echo_skill_ready(img)
+            is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
+            boss_hp = self.boss_hp(img)
 
-        # 最后开声骸和大招
-        self.combo_action(self.Q(), False)
-        self.combo_action(self.R(), False)
-        if is_resonance_liberation_ready:
-            time.sleep(0.1)
+            # 防止击败boss时时停卡掉按键，导致变成蝴蝶一直飞，低血量时不打z，改成ja
+            if boss_hp <= 0.20:
+                # 打满能量，释放重击和E
+                if energy_count >= 4:
+                    self.combo_action(self.a2(), is_resonance_liberation_ready)
+                elif energy_count <= 3:
+                    self.combo_action(self.a3(), is_resonance_liberation_ready)
+                self.combo_action(self.Eja(), False)
+                time.sleep(0.05)
+            else:
+                # 打满能量，释放重击和E
+                if energy_count >= 4:
+                    self.combo_action(self.zE(), is_resonance_liberation_ready)
+                elif energy_count == 3:
+                    self.combo_action(self.zaEja(), is_resonance_liberation_ready)
+                    time.sleep(0.05)
+                elif energy_count < 3:
+                    self.combo_action(self.a3Ea(), True)
+                    img = self.img_service.screenshot()
+                    energy_count = self.energy_count(img)
+                    if energy_count == 5:
+                        self.combo_action(self.za(), False)
+
+            # 最后开声骸和大招
+            self.combo_action(self.Q(), False)
+            if boss_hp > 0.20:
+                self.combo_action(self.R(), False)
+                if is_resonance_liberation_ready:
+                    time.sleep(0.1)
+        except StopError as e:
+            self.control_service.fight_tap("a", 0.001)  # 打一下普攻，打断守岸人变身蝴蝶
+            raise e

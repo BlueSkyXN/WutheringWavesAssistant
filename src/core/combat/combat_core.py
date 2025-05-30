@@ -119,8 +119,12 @@ class BaseCombo:
         :return:
         """
         max_size = len(sequence)
+        key_down_caches = set()
         for i, keys in enumerate(sequence):
             if self.event is not None and not self.event.is_set():
+                # 退出前释放按压的按键
+                for key_down_cache in key_down_caches:
+                    self.control_service.key_up(key_down_cache, 0.001)
                 raise StopError()
             if self.is_nightmare is True and i % 2 == 0:
                 self.control_service.fight_tap("F", 0.001)
@@ -143,8 +147,10 @@ class BaseCombo:
                 key_action = keys[3] if len(keys) >= 4 else None
                 if key_action == "down":
                     self.control_service.key_down(key, press_time)
+                    key_down_caches.add(key)
                 elif key_action == "up":
                     self.control_service.key_up(key, press_time)
+                    key_down_caches.discard(key)
                 else:
                     self.control_service.fight_tap(key, press_time)
             if wait_time <= 0:
@@ -174,6 +180,77 @@ class BaseResonator:
 
     def is_resonance_liberation_ready(self, img: np.ndarray) -> bool:
         raise NotImplementedError()
+
+    def is_avatar_grey(self, img: np.ndarray, member: int) -> bool:
+        # 角色头像检查点，一般是中心点
+        point = [1195, 168, 1]  # 坐标x,y，第三个是采样点在几号角色位
+        # 右侧123号位角色血条起始点，用于定位，计算相对位置
+        team_member_health_points = [(1170, 192), (1170, 280), (1170, 368)]
+        if member > 1:
+            member_1_point = team_member_health_points[0]
+            member_n_point = team_member_health_points[member - 1]
+            point = [
+                point[0],
+                point[1] + member_n_point[1] - member_1_point[1]
+            ]
+        b, g, r = img[point[1], point[0]]
+        tolerance = 1  # 容差
+        # uint8转为int
+        is_avatar_grey = abs(int(b) - int(g)) <= tolerance and abs(int(g) - int(r)) <= tolerance
+        logger.debug("is_avatar_grey: %s", is_avatar_grey)
+        return is_avatar_grey
+
+    def boss_hp(self, img: np.ndarray) -> float:
+        """ boss剩余血条比例，归一 """
+        # 血条为黄到红的渐变色
+        # health_00_point = [(452, 41)]
+        # health_00_color = [(68, 179, 255)]  # BGR
+
+        health_20_point = [(528, 41)]
+        health_20_color = [(62, 164, 255)]  # BGR
+
+        health_30_point = [(565, 41)]
+        health_30_color = [(55, 148, 255)]  # BGR
+
+        health_50_point = [(641, 41)]
+        health_50_color = [(38, 109, 255)]  # BGR
+
+        health_100_point = [(830, 41)]
+        health_100_color = [(8, 37, 255)]  # BGR
+
+        health = 0.0
+        # if ColorChecker(health_00_point, health_00_color).check(img):
+        #     health = 0.00
+        if ColorChecker(health_20_point, health_20_color).check(img):
+            health = 0.20
+            # logger.debug("boss_hp: %s", health)
+        if ColorChecker(health_30_point, health_30_color).check(img):
+            health = 0.30
+            # logger.debug("boss_hp: %s", health)
+        if ColorChecker(health_50_point, health_50_color).check(img):
+            health = 0.50
+            # logger.debug("boss_hp: %s", health)
+        if ColorChecker(health_100_point, health_100_color).check(img):
+            health = 1.00
+
+        logger.debug("boss_hp: %s", health)
+        return health
+
+    def boss_is_immobilized(self, img: np.ndarray) -> bool:
+        """ boss是否已瘫痪 """
+        # # 共振度，比血条略短一点点
+        vibration_strength_00_point = [(453, 54)]
+        # vibration_strength_20_point = [(528, 54)]
+        # vibration_strength_50_point = [(641, 54)]
+        # vibration_strength_100_point = [(826, 54)]
+        # vibration_strength_color = [(255, 255, 255)]  # BGR
+
+        # 瘫痪后，共振条由白色变为黄色
+        immobilize_color = [(28, 235, 255)]  # BGR
+        checker = ColorChecker(vibration_strength_00_point, immobilize_color)
+        if checker.check(img):
+            return True
+        return False
 
 
 class TeamMemberSelector:
@@ -210,8 +287,6 @@ class TeamMemberSelector:
             2: self._team_member_2_checker,
             3: self._team_member_3_checker,
         }
-
-        self._team_members = None
 
     def get_avatars(self) -> dict[str, np.ndarray]:
         """ 获取所有角色的头像 """
@@ -258,7 +333,7 @@ class TeamMemberSelector:
         avatars = self.get_avatars()
         members = []
         for i, region in enumerate(member_regions):
-            # 每个位置都匹配一般头像，找出相似度最高的那个
+            # 每个位置都匹配一遍头像，找出相似度最高的那个
             region_img = img[region[1]:region[3], region[0]:region[2]]
             # from src.util import img_util
             # img_util.save_img_in_temp(region_img)
@@ -289,16 +364,34 @@ class TeamMemberSelector:
         logger.info(f"member_names: {member_names}")
         return member_names
 
-    def toggle(self, member: int, timeout_seconds: float = 1.0, event: threading.Event | None = None) -> bool:
+    def toggle(self, index: int, event: threading.Event | None,
+               resonators: list[BaseResonator] | None, timeout_seconds: float = 1.0) -> bool | None:
+        member = index + 1
+
+        resonator = resonators[index]
+        img = self.img_service.screenshot()
+        is_avatar_grey = resonator.is_avatar_grey(img, member)
+        if is_avatar_grey:
+            logger.debug(f"角色{member}已阵亡，跳过")
+            return None
+        else:
+            logger.debug(f"角色{member}存活")
+
         team_member_checker = self._team_member_map.get(member)
         start_time = time.monotonic()
+
         while time.monotonic() - start_time < timeout_seconds:
             if event is not None and not event.is_set():
-                return False
+                return None
+            logger.debug("切换角色: %s", member)
             self.control_service.toggle_team_member(member)
             time.sleep(0.15)
             img = self.img_service.screenshot()
             is_toggled = team_member_checker.check(img)
+
+            # from src.util import img_util
+            # img_util.save_img_in_temp(img)
+
             if is_toggled:
                 return True
             time.sleep(0.1)
