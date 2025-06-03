@@ -506,10 +506,10 @@ class Camellya(BaseCamellya, BaseCombo):
             if is_whimpering_wastes:
                 # self.combo_action(self.Eaazja(), False)
                 # self.combo_action(self.Ezja(), False)
-                self.combo_action(self.EQdzjE(), False)
+                self.combo_action(self.QdEj(), False)
             else:
                 if self.random_float() < 0.5:
-                    self.combo_action(self.QdEj(), False)
+                    self.combo_action(self.waz(), False)
                 else:
                     # self.combo_action(self.a3z(), False)  # 普攻次数不稳定，接不上派生转圈
                     # self.combo_action(self.z(), False)  # 被肘容易发呆
@@ -525,7 +525,7 @@ class Camellya(BaseCamellya, BaseCombo):
                 time.sleep(0.6)
             else:
                 # 转白椿
-                self.combo_action(self.QdEj(), False)
+                self.combo_action(self.EQdzjE(), False)
                 return
         else:
             # 兜底，打一套普攻
