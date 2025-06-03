@@ -348,6 +348,14 @@ class ExtendedControlService(ABC):
         pass
 
     @abstractmethod
+    def mouse_right_down(self, x: int | float = 0, y: int | float = 0, seconds: float = 0.0):
+        pass
+
+    @abstractmethod
+    def mouse_right_up(self, x: int | float = 0, y: int | float = 0, seconds: float = 0.0):
+        pass
+
+    @abstractmethod
     def scroll_mouse(self, count: int, x: int | float = 0, y: int | float = 0, seconds: float = 0.0):
         pass
 

@@ -152,7 +152,8 @@ class AutoStoryServiceImpl(PageEventAbstractService):
                 self.page_action(self._auto_play_page, src_img, img, ocr_results)
                 time.sleep(0.005)
                 if self.page_action(self._auto_play_open_page, src_img, img, ocr_results):
-                    self._is_auto_play_enabled = True
+                    # self._is_auto_play_enabled = True
+                    pass
                 time.sleep(0.005)
 
             # 剧情对话框，不跳过，一句一句自动过剧情

@@ -563,7 +563,7 @@ class AutoBossServiceImpl(PageEventAbstractService):
                             if child_wh[0] == 0 or child_wh[1] == 0:
                                 continue
                             child_img = self._img_service.screenshot_window(child_hwnd)
-                            img_util.save_img_in_temp(child_img)
+                            # img_util.save_img_in_temp(child_img)
                             child_ocr_result = self._ocr_service.ocr(child_img)
                             logger.debug("child_ocr_result: %s", child_ocr_result)
                             search_result = self._ocr_service.search_text(child_ocr_result, "^登录$")

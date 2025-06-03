@@ -1,5 +1,4 @@
 import logging
-import random
 import time
 
 import numpy as np
@@ -274,7 +273,7 @@ class Encore(BaseEncore, BaseCombo):
 
         # 呼呼啦开
         if is_resonance_skill_ready:
-            if random.random() < 0.66:
+            if self.random_float() < 0.66:
                 self.combo_action(self.Ea(), False)
             else:
                 self.combo_action(self.a4(), False)
@@ -307,5 +306,5 @@ class Encore(BaseEncore, BaseCombo):
 
     def _random_echo_skill(self):
         # 随机放梦魇摩托或普通摩托
-        random_q = self.Qa3() if random.random() < 0.5 else self.Q()
+        random_q = self.Qa3() if self.random_float() < 0.5 else self.Q()
         self.combo_action(random_q, False)

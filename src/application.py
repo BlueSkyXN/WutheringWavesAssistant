@@ -1,6 +1,7 @@
 import logging
 import sys
 
+from src import __version__
 from src.config import logging_config, gui_config
 from src.controller.main_controller import MainController
 from src.core import environs
@@ -24,6 +25,8 @@ def gui_is_exist():
 
 
 def run():
+    logger.info(f"WWA v{__version__}, free and open-source")
+
     before()
 
     # 启动后台

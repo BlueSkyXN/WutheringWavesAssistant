@@ -2,7 +2,8 @@ import logging
 import threading
 import time
 
-from src.core.combat.combat_core import TeamMemberSelector
+from src.core.combat.combat_core import TeamMemberSelector, BaseCombo, BaseResonator
+from src.core.combat.resonator.camellya import Camellya
 from src.core.combat.resonator.changli import Changli
 from src.core.combat.resonator.encore import Encore
 from src.core.combat.resonator.jinhsi import Jinhsi
@@ -36,6 +37,7 @@ class CombatSystem:
         self.shorekeeper = Shorekeeper(self.control_service, self.img_service)
         self.encore = Encore(self.control_service, self.img_service)
         self.verina = Verina(self.control_service, self.img_service)
+        self.camellya = Camellya(self.control_service, self.img_service)
 
         self.resonator_map = {
             self.jinhsi.name_en: self.jinhsi,
@@ -43,17 +45,30 @@ class CombatSystem:
             self.shorekeeper.name_en: self.shorekeeper,
             self.encore.name_en: self.encore,
             self.verina.name_en: self.verina,
+            self.camellya.name_en: self.camellya,
         }
+        self.resonators = None
 
         self.is_nightmare: bool = False
 
-    def run(self, event: threading.Event):
+    def get_resonators(self):
         resonators = []
         member_names = self.team_member_selector.get_team_members()
+        member_names_log = []
         for member_name in member_names:
-            resonators.append(self.resonator_map.get(member_name))
+            resonator = self.resonator_map.get(member_name)
+            resonators.append(resonator)
+            member_names_log.append(resonator.name)
+        logger.info(f"编队: {member_names_log}")
+        return resonators
+
+    def run(self, event: threading.Event):
+        if self.resonators is None:
+            self.resonators = self.get_resonators()
         index = 0
-        seq_length = len(resonators)
+        seq_length = len(self.resonators)
+        last_index = index
+        last_index_toggle = True
         while True:
             # logger.debug("member: %s", index + 1)
             if not event.is_set():
@@ -71,22 +86,34 @@ class CombatSystem:
                 self.control_service.activate()
             if index % 2 == 0:
                 self.control_service.camera_reset()
-            resonator = resonators[index]
+            resonator = self.resonators[index]
             if resonator is None:
                 time.sleep(0.3)
                 continue
-            is_toggled = self.team_member_selector.toggle(index, event=event, resonators=resonators)
-            index = self._next_index(index, seq_length)
-            # if is_toggled is None:
-            #     time.sleep(0.3)
-            #     continue
+            is_toggled = self.team_member_selector.toggle(index, event=event, resonators=self.resonators)
             if not is_toggled:
+                index = self._next_index(index, seq_length)
                 continue
+            # 大招期间无法切人，若又切到同一个角色，尝试切下一个人
+            # 避免单角色连续站场两次
+            if last_index == index and last_index_toggle:
+                logger.debug(f"又轮到同一个角色，跳过, member: {index + 1}")
+                index = self._next_index(index, seq_length)
+                last_index_toggle = False
+                continue
+            last_index_toggle = True
+            last_index = index
+            index = self._next_index(index, seq_length)
             resonator.event = event
+            if isinstance(resonator, BaseCombo):
+                resonator.is_nightmare = self.is_nightmare
             try:
                 resonator.combo()
             except StopError:  # 主动抛出异常快速跳出连招序列
-                pass
+                if self.is_nightmare:
+                    self.control_service.pick_up()
+            finally:
+                self.control_service.mouse_left_up()
 
     def _next_index(self, index, seq_length) -> int:
         next_index = index + 1
@@ -121,6 +148,29 @@ class CombatSystem:
         with self._lock:
             self.event.clear()
 
+    # def _auto_pause_after(self):
+    #     self.control_service.mouse_left_up()
+    #     self.control_service.mouse_right_up()
+    #     self.control_service.jump()  # 退出蝴蝶/红椿
+
     # def is_running(self):
     #     with self._lock:
     #         return self.event.is_set()
+
+    def is_boss_health_bar_exist(self):
+        return BaseResonator.is_boss_health_bar_exist(self.img_service.screenshot())
+
+    def move_prepare(self):
+        if self.resonators is None:
+            self.resonators = self.get_resonators()
+        try:
+            cur_member_number = self.team_member_selector.get_cur_member_number()
+            if cur_member_number is None:
+                return
+            resonator = self.resonators[cur_member_number - 1]
+            if isinstance(resonator, Camellya):
+                resonator.quit_blossom()
+            # elif isinstance(resonator, Shorekeeper):
+            #     self.control_service.jump()
+        except IndexError as e:
+            logger.exception(e)

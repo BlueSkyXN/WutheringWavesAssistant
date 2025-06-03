@@ -1,5 +1,4 @@
 import logging
-import random
 import time
 
 import numpy as np
@@ -251,7 +250,7 @@ class Rover(BaseRover, BaseCombo):
 
         # 呼呼啦开
         if is_resonance_skill_ready:
-            if random.random() < 0.66:
+            if self.random_float() < 0.66:
                 self.combo_action(self.Ea(), False)
             self.combo_action(self.E(), False)
             time.sleep(0.05)
@@ -261,7 +260,7 @@ class Rover(BaseRover, BaseCombo):
                 self.combo_action(self.R(), False)
             elif is_echo_skill_ready:
                 # 随机放梦魇摩托或普通摩托
-                random_q = self.Qa3() if random.random() < 0.5 else self.Q()
+                random_q = self.Qa3() if self.random_float() < 0.5 else self.Q()
                 self.combo_action(random_q, False)
             return
 
@@ -278,5 +277,5 @@ class Rover(BaseRover, BaseCombo):
         # 摩托最后放合轴
         if is_echo_skill_ready:
             # 随机放梦魇摩托或普通摩托
-            random_q = self.Qa3() if random.random() < 0.5 else self.Q()
+            random_q = self.Qa3() if self.random_float() < 0.5 else self.Q()
             self.combo_action(random_q, False)

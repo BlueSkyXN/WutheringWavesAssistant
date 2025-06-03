@@ -756,13 +756,16 @@ class PageEventAbstractService(PageEventService, ABC):
             def default_action(positions: dict[str, Position]) -> bool:
                 if self._context.param_config.autoCombatBeta is True:
                     self.combat_system.pause()
+                else:
+                    time.sleep(1)
+                    return True
 
                 is_nightmare = self._boss_info_service.is_nightmare(self._info.lastBossName)
                 if not is_nightmare:
-                    time.sleep(0.2)
+                    time.sleep(1)
                     return True
 
-                time.sleep(1.5)
+                self.combat_system.move_prepare()
                 self.search_echo()
 
                 if self._config.CharacterHeal is not True:
@@ -823,10 +826,13 @@ class PageEventAbstractService(PageEventService, ABC):
                     if self._info.waitBoss:
                         logger.info("智能连招beta开启")  # 放这里不会频繁打印
                         self.boss_wait(self._info.lastBossName)
-                    is_nightmare = self._boss_info_service.is_nightmare(self._info.lastBossName)
-                    self.combat_system.is_nightmare = is_nightmare
-                    self.combat_system.start(3.5)
-                    time.sleep(1)
+                    if self.combat_system.is_boss_health_bar_exist():
+                        is_nightmare = self._boss_info_service.is_nightmare(self._info.lastBossName)
+                        self.combat_system.is_nightmare = is_nightmare
+                        self.combat_system.start(3.5)
+                        time.sleep(1.5)
+                    else:
+                        time.sleep(0.75)
                 else:
                     self.release_skills()
                 self._info.status = Status.fight
@@ -847,6 +853,10 @@ class PageEventAbstractService(PageEventService, ABC):
                 TextMatch(
                     name="活跃度",
                     text="^活跃度$",
+                ),
+                TextMatch(
+                    name="挑战成功",
+                    text="^挑战成功$",
                 ),
             ],
             action=action if action else Page.error_action
@@ -1376,6 +1386,10 @@ class PageEventAbstractService(PageEventService, ABC):
     def absorption_action(self, search_type: str = "echo"):
         self._info.needAbsorption = False
         time.sleep(2)
+
+        if self._context.param_config.autoCombatBeta is True:
+            self.combat_system.move_prepare()
+
         # 是否在副本中
         if self.absorption_and_receive_rewards({}):
             # if self._info.in_dungeon:
@@ -1866,6 +1880,9 @@ class PageEventAbstractService(PageEventService, ABC):
             forward_walk_times = forward_walk_times_mapping.get(bossName, 0)
             forward_run_seconds = forward_run_seconds_mapping.get(bossName, 0)
             time.sleep(1.2)  # 等站稳了再动
+
+            self.combat_system.move_prepare()  # 移动前检查，如 椿退出红椿状态
+
             if forward_walk_times > 0:
                 if bossName == "赫卡忒" and self._ocr_service.find_text("进入声之领域"):
                     pass
@@ -2023,6 +2040,7 @@ class PageEventAbstractService(PageEventService, ABC):
             # if is_ok:
             #     return is_ok
             time.sleep(0.3)
+        return True
 
     def _od_search(self, img, search_type: str):
         if search_type == "boss":
@@ -2048,14 +2066,18 @@ class PageEventAbstractService(PageEventService, ABC):
         #     return
 
         start_time = time.monotonic()
-        max_search_seconds = 3.5
+        max_search_seconds = 4.0
+        min_search_seconds = 2.0
         while time.monotonic() - start_time < max_search_seconds:
             self._control_service.pick_up()
             img = self._img_service.screenshot()
             echo_box = self._od_service.search_echo(img)
             if echo_box is None:
-                logger.info("未发现声骸")
-                return
+                if time.monotonic() - start_time > min_search_seconds:
+                    logger.info("未发现声骸")
+                    return
+                time.sleep(0.3)
+                continue
 
             # 前往声骸
             window_width = self._window_service.get_client_wh()[0]

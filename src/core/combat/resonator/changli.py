@@ -1,5 +1,4 @@
 import logging
-import random
 import time
 
 import numpy as np
@@ -171,7 +170,8 @@ class Changli(BaseChangli, BaseCombo):
         return [
             # 普攻 2a
             ["a", 0.05, 0.31],
-            ["a", 0.05, 0.50],
+            # ["a", 0.05, 0.50],
+            ["a", 0.05, 0.30],
         ]
 
     # def a5(self):
@@ -213,7 +213,7 @@ class Changli(BaseChangli, BaseCombo):
     def a(self):
         logger.debug("a")
         return [
-            ["a", 0.05, 0.00],
+            ["a", 0.05, 0.31],
         ]
 
     # def zRz(self):
@@ -291,9 +291,16 @@ class Changli(BaseChangli, BaseCombo):
 
         # 4离火 z
         if energy_count == 4:
-            self.combo_action(self.az(), False)
-            self.combo_action(self.E(), False)
-            time.sleep(0.05)
+            self.combo_action(self.z(), False)
+            time.sleep(0.4)
+            self.combo_action(self.a2(), True)
+            # 空中重击会变成下落攻击，再次确认
+            img = self.img_service.screenshot()
+            energy_count = self.energy_count(img)
+            if energy_count == 4:
+                self.combo_action(self.z(), False)
+            else:
+                self.combo_action(self.E(), False)
             return
 
         # is_concerto_energy_ready = self.is_concerto_energy_ready(img)
@@ -332,11 +339,9 @@ class Changli(BaseChangli, BaseCombo):
             if energy_count == 4:
                 self.combo_action(self.z(), False)
                 return
-            else:
-                # 有时会撑伞，再a一下
-                self.combo_action(self.a(), False)
+            self.combo_action(self.a(), False)
         # 摩托最后放合轴
         if is_echo_skill_ready:
             # 随机放梦魇摩托或普通摩托
-            random_q = self.Qa3() if random.random() < 0.5 else self.Q()
+            random_q = self.Qa3() if self.random_float() < 0.5 else self.Q()
             self.combo_action(random_q, False)

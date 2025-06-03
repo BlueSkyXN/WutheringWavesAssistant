@@ -246,6 +246,12 @@ class Win32ExtendedControlServiceImpl(ExtendedControlService, BaseControlService
     def mouse_left_up(self, x: int | float = 0, y: int | float = 0, seconds: float = 0.0):
         keymouse_util.mouse_left_up(self._window_service.window, x, y, seconds)
 
+    def mouse_right_down(self, x: int | float = 0, y: int | float = 0, seconds: float = 0.0):
+        keymouse_util.mouse_right_down(self._window_service.window, x, y, seconds)
+
+    def mouse_right_up(self, x: int | float = 0, y: int | float = 0, seconds: float = 0.0):
+        keymouse_util.mouse_right_up(self._window_service.window, x, y, seconds)
+
     def scroll_mouse(self, count: int, x: int | float = 0, y: int | float = 0, seconds: float = 0.0):
         keymouse_util.scroll_mouse(self._window_service.window, count, x, y, seconds)
 
