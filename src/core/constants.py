@@ -31,3 +31,5 @@ class BossNameEnum(Enum):
     NightmareMourningAix = "梦魇哀声鸷"
     NightmareLampylumenMyriad = "梦魇辉萤军势"
     Fleurdelys = "芙露德莉斯"
+    NightmareKelpie = "梦魇凯尔匹"
+    LionessOfGlory = "荣耀狮像"

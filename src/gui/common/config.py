@@ -119,6 +119,8 @@ class BossNameEnum(Enum):
     NightmareMourningAix = "梦魇哀声鸷"
     NightmareLampylumenMyriad = "梦魇辉萤军势"
     Fleurdelys = "芙露德莉斯"
+    NightmareKelpie = "梦魇凯尔匹"
+    LionessOfGlory = "荣耀狮像"
 
     # Dreamless = ("无妄者", "Dreamless")
     # FallacyOfNoReturn = ("无归的谬误", "Fallacy of No Return")

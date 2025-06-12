@@ -846,7 +846,7 @@ class PageEventAbstractService(PageEventService, ABC):
             targetTexts=[
                 TextMatch(
                     name="战斗",
-                    text=r"(击败|对战|泰缇斯系统|凶戾之齿|倦怠之翼|妒恨之眼|(无餍?之舌)|(僭?越之矛)|(谵?妄之爪)|爱欲之容|盖希诺姆|(愚执之瞳?))",
+                    text=r"(击败|对战|泰缇斯系统|凶戾之齿|倦怠之翼|妒恨之眼|(无餍?之舌)|(僭?越之矛)|(谵?妄之爪)|爱欲之容|盖希诺姆|(愚执之瞳?)|背誓之脊)",
                 ),
             ],
             excludeTexts=[
@@ -1807,7 +1807,7 @@ class PageEventAbstractService(PageEventService, ABC):
             "异构武装": 4, "罗蕾莱": 4.5, "叹息古龙": 5.6, "梦魇无常凶鹭": 5.3, "梦魇云闪之鳞": 4.8,
             "梦魇朔雷之鳞": 3.2,
             "梦魇无冠者": 2.4, "梦魇燎照之骑": 4.5, "梦魇哀声鸷": 3.6, "梦魇飞廉之猩": 1,
-            "梦魇辉萤军势": 2.6,
+            "梦魇辉萤军势": 2.6, "梦魇凯尔匹": 4.3, "荣耀狮像": 2.6,
         }
         # position = self.find_pic(template_img_name="UI_F2_Guidebook_EchoHunting.png", threshold=0.5)
         position = self._img_service.match_template(img=None, template_img="UI_F2_Guidebook_EchoHunting.png",
@@ -1834,6 +1834,7 @@ class PageEventAbstractService(PageEventService, ABC):
             "梦魇燎照之骑": "梦.*燎照之骑",
             "梦魇哀声鸷": "梦.*哀声鸷?",
             "梦魇辉萤军势": "梦.*辉萤军势",
+            "梦魇凯尔匹": "梦.*凯尔匹",
         }
         find_boss_name_reg = boss_name_reg_mapping.get(bossName, bossName)
         findBoss = None
@@ -1854,8 +1855,12 @@ class PageEventAbstractService(PageEventService, ABC):
             self._control_service.esc()
             logger.warning("未找到目标boss")
             return False
+
+        # self.click_position(findBoss)
+        self._control_service.click(findBoss.x1, findBoss.y1)
+        time.sleep(0.2)
         self.click_position(findBoss)
-        self.click_position(findBoss)
+
         time.sleep(1)
         detection_text = self._ocr_service.wait_text("^探测$", timeout=5)
         if not detection_text:
