@@ -1886,7 +1886,8 @@ class PageEventAbstractService(PageEventService, ABC):
             forward_run_seconds = forward_run_seconds_mapping.get(bossName, 0)
             time.sleep(1.2)  # 等站稳了再动
 
-            self.combat_system.move_prepare()  # 移动前检查，如 椿退出红椿状态
+            if self._context.param_config.autoCombatBeta is True:
+                self.combat_system.move_prepare()  # 移动前检查，如 椿退出红椿状态
 
             if forward_walk_times > 0:
                 if bossName == "赫卡忒" and self._ocr_service.find_text("进入声之领域"):
