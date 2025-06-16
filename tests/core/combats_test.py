@@ -109,18 +109,18 @@ def test_combo_Jinhsi_AdvancedCombo(control_service):
         ["a", 0.05, 0.40],
 
         ["E", 0.05, 0.05],
-        ["d", 0.05, 0.20],
+        ["d", 0.05, 0.30],
         ["a", 0.05, 0.05],
         ["j", 0.05, 0.01],
 
         ["W", 0.00, 0.00, "down"],
         ["a", 0.05, 0.05],
-        ["d", 0.05, 0.20],
+        ["d", 0.05, 0.30],
         ["W", 0.00, 0.00, "up"],
         ["a", 0.05, 0.05],
-        ["d", 0.05, 0.20],
+        ["d", 0.05, 0.30],
 
-        ## 直接喷 E4
+        # # 直接喷 E4
         # ["a", 0.05, 0.05],
         # ["E", 0.05, 0.00],
 
@@ -133,7 +133,7 @@ def test_combo_Jinhsi_AdvancedCombo(control_service):
         ["w", 0.05, 2.50],
         ["j", 0.05, 0.15],
     ]
-    combo_action(control_service, seq, 10.0)
+    combo_action(control_service, seq, 10.0, cycle=2000)
 
 
 def test_combo_Jinhsi_AdvancedCombo2(control_service):
@@ -291,6 +291,11 @@ def test_combo_Shorekeeper_AdvancedCombo(control_service):
 def test_combo_Encore(control_service):
     # 安可 BnB combo
     seq = [
+        # ja
+        ["j", 0.05, 0.33],
+        ["a", 0.05, 0.72],
+        ["j", 0.05, 1.20],
+
         # Ea
         ["E", 0.05, 1.90],
         ["a", 0.05, 0.90],
@@ -425,6 +430,61 @@ def test_combo_camellya_AdvancedCombo(control_service):
         ["j", 0.05, 1.05],
         ["E", 0.05, 1.25],
         ["j", 0.05, 1.20],
+    ]
+    combo_action(control_service, seq, 2)
+
+
+def test_combo_sanhua(control_service):
+    # 散华 BnB combo
+    seq = [
+        # 普攻4a
+        ["a", 0.05, 0.36],
+        ["a", 0.05, 0.33],
+        ["a", 0.05, 0.60],
+        ["a", 0.05, 0.67],
+        ["a", 0.05, 0.89],
+        ["j", 0.05, 1.20],
+
+        # # 重击爆裂
+        # ["z", 0.915, 1.30],
+        # ["j", 0.05, 1.20],
+
+        ["w", 0.00, 1.00],
+
+        # Ez
+        ["E", 0.05, 0.20],
+        ["z", 0.85, 1.56],
+        ["j", 0.05, 1.20],
+
+        # 辉萤军势
+        ["Q", 0.05, 0.66],
+        ["a", 0.05, 0.93],
+        ["a", 0.05, 1.23],
+        ["j", 0.05, 1.20],
+
+        # # 无常凶鹭
+        # ["Q", 0.05, 1.45],
+        # ["j", 0.05, 1.20],
+
+        # 普攻4a
+        ["a", 0.05, 0.36],
+        ["a", 0.05, 0.33],
+        ["a", 0.05, 0.60],
+        ["a", 0.05, 0.67],
+        ["a", 0.05, 0.89],
+        ["j", 0.05, 1.20],
+
+        # ERz
+        ["E", 0.05, 0.39],
+        ["R", 0.05, 0.05],
+        ["z", 1.85, 1.43],
+        ["j", 0.05, 1.20],
+
+        # 下落攻击
+        ["j", 0.05, 0.28],
+        ["a", 0.05, 0.75],
+        ["j", 0.05, 1.20],
+
     ]
     combo_action(control_service, seq, 2)
 

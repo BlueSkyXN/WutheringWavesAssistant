@@ -102,6 +102,13 @@ class ColorChecker(BaseChecker):
         concerto_energy_color = [(153, 77, 201)]  # BGR
         return ColorChecker(concerto_energy_point, concerto_energy_color)
 
+    @staticmethod
+    def concerto_glacio():
+        """ 冷凝 协奏能量校验器，左下血条旁蓝圈 """
+        concerto_energy_point = [(513, 669), (514, 669), (514, 670), (514, 671)]
+        concerto_energy_color = [(222, 159, 68)]  # BGR
+        return ColorChecker(concerto_energy_point, concerto_energy_color)
+
 
 class BaseCombo:
     """ 连招 """
@@ -169,8 +176,19 @@ class BaseCombo:
             time.sleep(wait_time)
 
 
+class CharClassEnum(Enum):
+    MainDPS = "MainDPS"
+    SubDPS = "SubDPS"
+    Support = "Support"
+    Healer = "Healer"
+
+
 class BaseResonator:
     """ 共鸣者 """
+
+    def char_class(self) -> list[CharClassEnum]:
+        """ 角色分类 """
+        raise NotImplementedError()
 
     def energy_count(self, img: np.ndarray) -> int:
         raise NotImplementedError()
@@ -354,8 +372,9 @@ class TeamMemberSelector:
         # logger.debug("img shape: %s", img.shape)
         # 头像摆放顺序
         avatar_names = [
-            "jinhsi", "changli", "shorekeeper", "verina", "encore",
-            "camellya", "rover", "sanhua",
+            "jinhsi", "changli", "changli-桂枝宁芙", "shorekeeper", "verina", "encore",
+            "camellya", "rover", "sanhua", "sanhua-叱妖诰", "cantarella",
+            "zani", "baizhi", "xiangliyao", "calcharo", "jianxin",
         ]
         # 头像网格，40像素放一个，1280宽度，一行放32个
         avatar_grid = (40, 40)
@@ -383,6 +402,8 @@ class TeamMemberSelector:
         """
         if img is None:
             img = self.img_service.screenshot()
+            # from src.util import img_util
+            # img_util.save_img_in_temp(img)
         img = self.img_service.resize(img)
         logger.debug("img shape: %s", img.shape)
         # start_col = int(img.shape[1] * 0.85)

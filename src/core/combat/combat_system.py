@@ -2,11 +2,12 @@ import logging
 import threading
 import time
 
-from src.core.combat.combat_core import TeamMemberSelector, BaseCombo, BaseResonator
+from src.core.combat.combat_core import TeamMemberSelector, BaseCombo, BaseResonator, CharClassEnum
 from src.core.combat.resonator.camellya import Camellya
 from src.core.combat.resonator.changli import Changli
 from src.core.combat.resonator.encore import Encore
 from src.core.combat.resonator.jinhsi import Jinhsi
+from src.core.combat.resonator.sanhua import Sanhua
 from src.core.combat.resonator.shorekeeper import Shorekeeper
 from src.core.combat.resonator.verina import Verina
 from src.core.exceptions import StopError
@@ -38,20 +39,25 @@ class CombatSystem:
         self.encore = Encore(self.control_service, self.img_service)
         self.verina = Verina(self.control_service, self.img_service)
         self.camellya = Camellya(self.control_service, self.img_service)
+        self.sanhua = Sanhua(self.control_service, self.img_service)
 
         self.resonator_map = {
             self.jinhsi.name_en: self.jinhsi,
             self.changli.name_en: self.changli,
+            "changli-桂枝宁芙": self.changli,
             self.shorekeeper.name_en: self.shorekeeper,
             self.encore.name_en: self.encore,
             self.verina.name_en: self.verina,
             self.camellya.name_en: self.camellya,
+            self.sanhua.name_en: self.sanhua,
+            "sanhua-叱妖诰": self.sanhua,
         }
         self.resonators = None
+        self._sorted_resonators = None
 
         self.is_nightmare: bool = False
 
-    def get_resonators(self):
+    def get_resonators(self) -> list[BaseResonator]:
         resonators = []
         member_names = self.team_member_selector.get_team_members()
         member_names_log = []
@@ -62,9 +68,30 @@ class CombatSystem:
         logger.info(f"编队: {member_names_log}")
         return resonators
 
+    def _sort_resonators(self, resonators: list):
+        dps = []
+        support = []
+        healer = []
+        for index, resonator in enumerate(resonators):
+            char_class = resonator.char_class()
+            if CharClassEnum.MainDPS in char_class or CharClassEnum.SubDPS in char_class:
+                dps.append((resonator, index))
+            elif CharClassEnum.Support in char_class:
+                support.append((resonator, index))
+            elif CharClassEnum.Healer in char_class:
+                healer.append((resonator, index))
+            else:
+                raise NotImplementedError()
+        # 辅助先于输出
+        sorted_resonators = support + dps + healer
+        logger.debug(f"sorted_resonators: {sorted_resonators}")
+        return sorted_resonators
+
     def run(self, event: threading.Event):
         if self.resonators is None:
             self.resonators = self.get_resonators()
+        if self.resonators and self._sorted_resonators is None:
+            self._sorted_resonators = self._sort_resonators(self.resonators)
         index = 0
         seq_length = len(self.resonators)
         last_index = index
@@ -86,11 +113,11 @@ class CombatSystem:
                 self.control_service.activate()
             if index % 2 == 0:
                 self.control_service.camera_reset()
-            resonator = self.resonators[index]
+            resonator, src_index = self._sorted_resonators[index]
             if resonator is None:
                 time.sleep(0.3)
                 continue
-            is_toggled = self.team_member_selector.toggle(index, event=event, resonators=self.resonators)
+            is_toggled = self.team_member_selector.toggle(src_index, event=event, resonators=self.resonators)
             if not is_toggled:
                 index = self._next_index(index, seq_length)
                 continue
@@ -160,7 +187,7 @@ class CombatSystem:
     def is_boss_health_bar_exist(self):
         return BaseResonator.is_boss_health_bar_exist(self.img_service.screenshot())
 
-    def move_prepare(self):
+    def move_prepare(self, camellya_reset: bool = False):
         if self.resonators is None:
             self.resonators = self.get_resonators()
         try:
@@ -170,6 +197,10 @@ class CombatSystem:
             resonator = self.resonators[cur_member_number - 1]
             if isinstance(resonator, Camellya):
                 resonator.quit_blossom()
+                # 椿落地会前移，后闪复位
+                if camellya_reset:
+                    self.control_service.dash_dodge()
+                    time.sleep(0.3)
             # elif isinstance(resonator, Shorekeeper):
             #     self.control_service.jump()
         except IndexError as e:

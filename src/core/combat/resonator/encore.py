@@ -3,7 +3,7 @@ import time
 
 import numpy as np
 
-from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo
+from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo, CharClassEnum
 from src.core.interface import ControlService, ImgService
 
 logger = logging.getLogger(__name__)
@@ -48,6 +48,12 @@ class BaseEncore(BaseResonator):
         self._cosmos_rave_checker = ColorChecker(
             self._cosmos_rave_point, self._cosmos_rave_color, logic=ColorChecker.LogicEnum.AND)
 
+    def __str__(self):
+        return self.name_en
+
+    def char_class(self) -> list[CharClassEnum]:
+        return [CharClassEnum.MainDPS]
+
     def energy_count(self, img: np.ndarray) -> int:
         # 安可只看能量是否满，满为1，未满为0
         energy_count = 0
@@ -89,6 +95,11 @@ class Encore(BaseEncore, BaseCombo):
 
     # 常规轴
     COMBO_SEQ = [
+        # ja
+        ["j", 0.05, 0.33],
+        ["a", 0.05, 0.72],
+        ["j", 0.05, 1.20],
+
         # Ea
         ["E", 0.05, 1.90],
         ["a", 0.05, 0.90],
@@ -178,13 +189,34 @@ class Encore(BaseEncore, BaseCombo):
             ["a", 0.05, 1.22],
         ]
 
-    def a4(self):
+    def a3(self):
         logger.debug("a3")
         return [
             # 3a，固定频率连点数下，用于脱离空中状态，非普攻连段
             ["a", 0.05, 0.30],
             ["a", 0.05, 0.30],
             ["a", 0.05, 0.30],
+        ]
+
+    # def a2(self):
+    #     logger.debug("a2")
+    #     return [
+    #         # ja的时间轴，用于打变奏下落攻击
+    #         ["a", 0.05, 0.32],
+    #         ["a", 0.05, 0.40],
+    #     ]
+
+    def a2(self):
+        logger.debug("a2")
+        return [
+            # 普攻5a的后两下
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.22],
+
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.27],
+
+            ["a", 0.05, 1.22],
         ]
 
     def R(self):
@@ -217,7 +249,7 @@ class Encore(BaseEncore, BaseCombo):
         logger.debug("z")
         return [
             # 重击
-            ["z", 0.60, 3.00],
+            ["z", 0.70, 3.00],
         ]
 
     def Qa3(self):
@@ -243,6 +275,10 @@ class Encore(BaseEncore, BaseCombo):
         return self.COMBO_SEQ
 
     def combo(self):
+
+        time.sleep(0.1)
+        self.combo_action(self.a3(), True)  # 入场先打几个普攻，触发下落攻击
+
         img = self.img_service.screenshot()
         energy_count = self.energy_count(img)
         # is_concerto_energy_ready = self.is_concerto_energy_ready(img)
@@ -258,17 +294,23 @@ class Encore(BaseEncore, BaseCombo):
 
         # 别靠近安可
         if energy_count == 1:
-            # 空中无法打出重击，先打普攻
-            self.combo_action(self.a4(), True)
             self.combo_action(self.z(), False)
             return
 
-        # 开大，放到E后面检测，因为下落攻击放不出R，导致什么也没干就切人
+        # 开大，空中放不出R
         if is_resonance_liberation_ready:
-            self.combo_action(self.a4(), True)
-            self.combo_action(self.R(), False)
-            self.combo_action(self.E(), False)
-            time.sleep(0.05)
+            # self.combo_action(self.a3(), True)
+            # time.sleep(0.2)
+            self.combo_action(self.R(), True)
+            time.sleep(0.2)
+            img = self.img_service.screenshot()
+            is_cosmos_rave_ready = self.is_cosmos_rave_ready(img)
+            if is_cosmos_rave_ready:
+                self.combo_action(self.Ea11E(), True)
+                img = self.img_service.screenshot()
+                energy_count = self.energy_count(img)
+                if energy_count == 1:
+                    self.combo_action(self.z(), False)
             return
 
         # 呼呼啦开
@@ -276,11 +318,9 @@ class Encore(BaseEncore, BaseCombo):
             if self.random_float() < 0.66:
                 self.combo_action(self.Ea(), False)
             else:
-                self.combo_action(self.a4(), False)
+                # self.combo_action(self.a3(), False)
                 self.combo_action(self.E(), False)
             time.sleep(0.05)
-            # E被检测频率太高，在空中又放不出来，导致经常想打E合轴切人，实战时啥也没干就切走了
-            # E后放其他技能总能有一个生效
             return
 
         if is_echo_skill_ready:
@@ -289,13 +329,22 @@ class Encore(BaseEncore, BaseCombo):
             return
 
         # 兜底，打一套普攻
-        self.combo_action(self.a5(), is_echo_skill_ready)
+        self.combo_action(self.a2(), is_echo_skill_ready)
 
         # 大招图标在切人时会先红一下，导致颜色无法匹配，最后再匹配一次
         img = self.img_service.screenshot()
         is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
         if is_resonance_liberation_ready:
-            self.combo_action(self.R(), False)
+            self.combo_action(self.R(), True)
+            time.sleep(0.2)
+            img = self.img_service.screenshot()
+            is_cosmos_rave_ready = self.is_cosmos_rave_ready(img)
+            if is_cosmos_rave_ready:
+                self.combo_action(self.Ea11E(), True)
+                img = self.img_service.screenshot()
+                energy_count = self.energy_count(img)
+                if energy_count == 1:
+                    self.combo_action(self.z(), False)
             return
 
         # 摩托最后放合轴

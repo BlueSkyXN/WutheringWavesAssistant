@@ -766,7 +766,8 @@ class PageEventAbstractService(PageEventService, ABC):
                     return True
 
                 self.combat_system.move_prepare()
-                self.search_echo()
+                if self._info.needAbsorption:
+                    self.search_echo()
 
                 if self._config.CharacterHeal is not True:
                     return True
@@ -1388,7 +1389,7 @@ class PageEventAbstractService(PageEventService, ABC):
         time.sleep(2)
 
         if self._context.param_config.autoCombatBeta is True:
-            self.combat_system.move_prepare()
+            self.combat_system.move_prepare(camellya_reset=True)
 
         # 是否在副本中
         if self.absorption_and_receive_rewards({}):
@@ -1515,14 +1516,15 @@ class PageEventAbstractService(PageEventService, ABC):
         #     time.sleep(1)
 
     def absorption_action_fleurdelys(self):
-        run_param = [("w", 0.5), ("a", 0.4), ("s", 1.0), ("d", 0.8), ("w", 0.6)]
+        # run_param = [("w", 0.5), ("a", 0.4), ("s", 1.0), ("d", 0.8), ("w", 0.6)]
+        run_param = [("w", 0.22), ("w", 0.23), ("a", 0.25), ("s", 0.3), ("s", 0.3), ("d", 0.25), ("w", 0.3), ("d", 0.25), ("w", 0.25), ("s", 0.55)]
         for i in range(len(run_param)):
             key, sleep_time = run_param[i]
             if i > 0:
                 self._control_service.player().fight_tap(key, 0.05)
                 self._control_service.player().fight_tap(key, 0.05)
             self._control_service.forward_run(sleep_time, key)
-            time.sleep(0.5)
+            time.sleep(0.70)
             if self._ocr_service.find_text("吸收"):
                 self.absorption_and_receive_rewards({})
                 return
@@ -1761,21 +1763,37 @@ class PageEventAbstractService(PageEventService, ABC):
         :return:
         """
         self._control_service.activate()
+        w, h = self._window_service.get_client_wh()
         count = 0
-        absorb_try_more = 0
-        while True:
-            if not self._ocr_service.find_text("吸收"):
-                if absorb_try_more > 0:
-                    break
-                else:
-                    # 多搜一次，有时吸收前突然蹦出个蓝羽蝶，导致误判误吸
-                    absorb_try_more += 1
-                    time.sleep(0.1)
-                    continue
-            if count % 2:
-                logger.info("向下滚动后尝试吸收")
-                keymouse_util.scroll_mouse(self._window_service.window, -1)
-                time.sleep(1)
+        for i in range(3):
+        # while True:
+            img = self._img_service.screenshot()
+            results = self._ocr_service.ocr(img)
+            absorption = self._ocr_service.search_text(results, "吸收")
+            receive_rewards = self._ocr_service.search_texts(results, "领取奖励")
+            if not receive_rewards:
+                receive_reward = None
+            elif len(receive_rewards) == 1:
+                receive_reward = receive_rewards[0]
+            else:
+                receive_reward = None
+                for ele in receive_rewards:
+                    if receive_reward is None:
+                        receive_reward = ele
+                        continue
+                    # 左侧的领取不要
+                    if ele.x1 < w // 3:
+                        continue
+                    receive_reward = ele
+
+            logger.debug(f"absorption: {absorption}, receive_rewards: {receive_rewards}")
+            if absorption:
+                if receive_reward and absorption.y1 > receive_reward.y1:
+                    logger.info("向下滚动")
+                    keymouse_util.scroll_mouse(self._window_service.window, -1)
+                    time.sleep(1)
+            else:
+                return False
             count += 1
             self._control_service.pick_up()
             time.sleep(2)
@@ -1783,8 +1801,6 @@ class PageEventAbstractService(PageEventService, ABC):
                 logger.info("点击到领取奖励，关闭页面")
                 self._control_service.esc()
                 time.sleep(2)
-        if count == 0:
-            return False
         logger.info("吸收声骸")
         if self._info.fightCount is None or self._info.fightCount == 0:
             self._info.fightCount = 1
@@ -1887,7 +1903,8 @@ class PageEventAbstractService(PageEventService, ABC):
             time.sleep(1.2)  # 等站稳了再动
 
             if self._context.param_config.autoCombatBeta is True:
-                self.combat_system.move_prepare()  # 移动前检查，如 椿退出红椿状态
+                # 移动前检查，如 椿退出红椿状态
+                self.combat_system.move_prepare()
 
             if forward_walk_times > 0:
                 if bossName == "赫卡忒" and self._ocr_service.find_text("进入声之领域"):
@@ -2074,10 +2091,20 @@ class PageEventAbstractService(PageEventService, ABC):
         start_time = time.monotonic()
         max_search_seconds = 4.0
         min_search_seconds = 2.0
+        last_echo_box = None
+        max_tolerance = 1
+        tolerance = max_tolerance
         while time.monotonic() - start_time < max_search_seconds:
             self._control_service.pick_up()
             img = self._img_service.screenshot()
             echo_box = self._od_service.search_echo(img)
+            if echo_box:
+                last_echo_box = echo_box
+                tolerance = min(max_tolerance, tolerance + 1)
+            elif last_echo_box is not None and tolerance > 0:
+                echo_box = last_echo_box
+                tolerance -= 1
+
             if echo_box is None:
                 if time.monotonic() - start_time > min_search_seconds:
                     logger.info("未发现声骸")
@@ -2096,11 +2123,11 @@ class PageEventAbstractService(PageEventService, ABC):
 
             # echo_search_config_mapping = {"角": (8, 4, 4, 7)}
 
-            if echo_x1 > half_window_width:  # 声骸中在角色右侧
+            if echo_x1 * 0.9 > half_window_width:  # 声骸中在角色右侧
                 logger.info("发现声骸 向右移动")
                 self._control_service.right(0.1)
                 time.sleep(0.05)
-            elif echo_x2 < half_window_width:  # 声骸中在角色左侧
+            elif echo_x2 * 1.1 < half_window_width:  # 声骸中在角色左侧
                 logger.info("发现声骸 向左移动")
                 self._control_service.left(0.1)
                 time.sleep(0.05)
@@ -2110,6 +2137,7 @@ class PageEventAbstractService(PageEventService, ABC):
                 # time.sleep(0.01)
                 for _ in range(5):
                     self._control_service.up(0.1)
+                    self._control_service.pick_up(0.001)
                     time.sleep(0.05)
                 time.sleep(0.5)
             self._control_service.pick_up()

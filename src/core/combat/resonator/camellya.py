@@ -3,7 +3,7 @@ import time
 
 import numpy as np
 
-from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo
+from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo, CharClassEnum
 from src.core.interface import ControlService, ImgService
 
 logger = logging.getLogger(__name__)
@@ -72,6 +72,12 @@ class BaseCamellya(BaseResonator):
         self._resonance_liberation_color = [(255, 255, 255), (153, 66, 212)]  # BGR
         self._resonance_liberation_checker = ColorChecker(
             self._resonance_liberation_point, self._resonance_liberation_color)
+
+    def __str__(self):
+        return self.name_en
+
+    def char_class(self) -> list[CharClassEnum]:
+        return [CharClassEnum.MainDPS]
 
     def energy_count(self, img: np.ndarray) -> int:
         energy_count = 0
@@ -266,7 +272,6 @@ class Camellya(BaseCamellya, BaseCombo):
             ["j", 0.05, 1.05],
 
             # ["E", 0.05, 1.25],
-            ["R", 0.05, 0.10],
             ["E", 0.05, 0.20],
             ["E", 0.05, 0.20],
             ["w", 0.05, 1.20],
@@ -463,7 +468,8 @@ class Camellya(BaseCamellya, BaseCombo):
             ["a", 0.05, 0.20],
             ["a", 0.05, 0.20],
             ["a", 0.05, 0.20],
-            ["a", 0.05, 0.20],
+            # ["a", 0.05, 0.26],
+            ["a", 0.05, 0.50],
         ]
 
     def full_combo(self):
@@ -539,10 +545,12 @@ class Camellya(BaseCamellya, BaseCombo):
         img = self.img_service.screenshot()
         is_resonance_skill_ephemeral_ready = self.is_resonance_skill_ephemeral_ready(img)
         is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
+        boss_hp = self.boss_hp(img)
 
         if is_resonance_skill_ephemeral_ready and is_resonance_liberation_ready:
             # 一日花会清除【红椿·蕾】，先大
-            self.combo_action(self.RaRa(), True)
+            if boss_hp >= 0.3:
+                self.combo_action(self.RaRa(), True)
             self.combo_action(self.ephemeral_a(), False)
             return
 

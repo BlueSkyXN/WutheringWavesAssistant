@@ -3,7 +3,7 @@ import time
 
 import numpy as np
 
-from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo
+from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo, CharClassEnum
 from src.core.interface import ControlService, ImgService
 
 logger = logging.getLogger(__name__)
@@ -70,6 +70,12 @@ class BaseJinhsi(BaseResonator):
         self._resonance_liberation_color = [(255, 255, 255), (173, 238, 249)]  # BGR
         self._resonance_liberation_checker = ColorChecker(
             self._resonance_liberation_point, self._resonance_liberation_color)
+
+    def __str__(self):
+        return self.name_en
+
+    def char_class(self) -> list[CharClassEnum]:
+        return [CharClassEnum.MainDPS]
 
     def is_concerto_energy_ready(self, img: np.ndarray) -> bool:
         is_ready = self._concerto_energy_checker.check(img)
@@ -148,18 +154,18 @@ class Jinhsi(BaseJinhsi, BaseCombo):
         ["a", 0.05, 0.40],
 
         ["E", 0.05, 0.05],
-        ["d", 0.05, 0.20],
+        ["d", 0.05, 0.30],
         ["a", 0.05, 0.05],
         ["j", 0.05, 0.01],
 
         ["W", 0.00, 0.00, "down"],
         ["a", 0.05, 0.05],
-        ["d", 0.05, 0.20],
+        ["d", 0.05, 0.30],
         ["W", 0.00, 0.00, "up"],
         ["a", 0.05, 0.05],
-        ["d", 0.05, 0.20],
+        ["d", 0.05, 0.30],
 
-        ## 直接喷 E4
+        # # 直接喷 E4
         # ["a", 0.05, 0.05],
         # ["E", 0.05, 0.00],
 
@@ -169,7 +175,7 @@ class Jinhsi(BaseJinhsi, BaseCombo):
         ["a", 0.05, 0.20],
         ["E", 0.05, 0.00],
 
-        ["w", 0.00, 2.50],
+        ["w", 0.05, 2.50],
         # ["j", 0.05, 0.15],
     ]
 
@@ -216,24 +222,24 @@ class Jinhsi(BaseJinhsi, BaseCombo):
         logger.debug("E2_full_combo_E4")
         return [
             ["E", 0.05, 0.05],
-            ["d", 0.05, 0.20],
+            ["d", 0.05, 0.30],
             ["a", 0.05, 0.05],
             ["j", 0.05, 0.01],
 
             ["W", 0.00, 0.00, "down"],
             ["a", 0.05, 0.05],
-            ["d", 0.05, 0.20],
+            ["d", 0.05, 0.30],
             ["W", 0.00, 0.00, "up"],
             ["a", 0.05, 0.05],
-            ["d", 0.05, 0.25],
+            ["d", 0.05, 0.30],
 
             # 直接喷 E4
             # ["a", 0.05, 0.05],
             # ["E", 0.05, 2.50],
             ["a", 0.05, 0.05],  # 多打一个aE，防止低帧率打不出喷
-            ["E", 0.05, 0.05],
+            ["E", 0.05, 0.30],
             ["a", 0.05, 0.05],
-            ["E", 0.05, 2.50],
+            ["E", 0.05, 2.05],
 
             # # 升龙再喷 E3E4
             # # ["E", 0.05, 1.00],  # 实战若被打断普攻次数不够会原地发呆，E后接普攻保证有事可做
@@ -260,16 +266,16 @@ class Jinhsi(BaseJinhsi, BaseCombo):
         logger.debug("E2_full_combo_E3E4")
         return [
             ["E", 0.05, 0.05],
-            ["d", 0.05, 0.20],
+            ["d", 0.05, 0.30],
             ["a", 0.05, 0.05],
             ["j", 0.05, 0.01],
 
             # ["W", 0.00, 0.00, "down"],
             ["a", 0.05, 0.05],
-            ["d", 0.05, 0.20],
+            ["d", 0.05, 0.30],
             # ["W", 0.00, 0.00, "up"],
             ["a", 0.05, 0.05],
-            ["d", 0.05, 0.20],
+            ["d", 0.05, 0.30],
 
             # # 直接喷 E4
             # ["a", 0.05, 0.05],
@@ -292,7 +298,7 @@ class Jinhsi(BaseJinhsi, BaseCombo):
         ]
 
     def E2_intro_full_combo(self):
-        """ E2 变奏速喷 """
+        """ E2 变奏速喷 120帧限定技 """
         logger.debug("E2_intro_full_combo")
         return [
             ["j", 0.002, 0.005],
@@ -323,7 +329,7 @@ class Jinhsi(BaseJinhsi, BaseCombo):
 
             ["a", 0.05, 0.35],
             ["a", 0.05, 0.35],
-            ["a", 0.05, 0.10],  # 冗余多打一个普攻
+            ["a", 0.05, 0.20],  # 冗余多打一个普攻
             ["E", 0.05, 0.00],
             ["E", 0.05, 0.00],
 
@@ -368,14 +374,20 @@ class Jinhsi(BaseJinhsi, BaseCombo):
         is_resonance_skill_4_incoming_ready = self.is_resonance_skill_4_incoming_ready(img)
         # is_echo_skill_ready = self.is_echo_skill_ready(img)
         is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
+        boss_hp = self.boss_hp(img)
 
         self.combo_action(self.Q(), False)
 
         if is_resonance_skill_2_ready or is_resonance_skill_2_incoming_ready:
-            self.combo_action(self.a2(), True)
-            _E2_intro_full_combo = self.E2_intro_full_combo()
-            for i in range(50):
-                self.combo_action(_E2_intro_full_combo, True)
+            # self.combo_action(self.a2(), True)
+            # _E2_intro_full_combo = self.E2_intro_full_combo()
+            # for i in range(50):
+            #     self.combo_action(_E2_intro_full_combo, True)
+
+            time.sleep(0.5)
+            self.combo_action(self.E(), False)
+            time.sleep(0.5)
+            self.combo_action(self.E(), False)
             return
 
         if is_resonance_skill_4_ready or is_resonance_skill_4_incoming_ready:
@@ -398,7 +410,10 @@ class Jinhsi(BaseJinhsi, BaseCombo):
             img = self.img_service.screenshot()
             is_resonance_skill_2_ready = self.is_resonance_skill_2_ready(img)
             if is_resonance_skill_2_ready:
-                _E2_full_combo = self.E2_full_combo_E4() if self.random_float() < 0.5 else self.E2_full_combo_E3E4()
+                if boss_hp <= 0.2:
+                    _E2_full_combo = self.E2_full_combo_E4()
+                else:
+                    _E2_full_combo = self.E2_full_combo_E4() if self.random_float() < 0.5 else self.E2_full_combo_E3E4()
                 self.combo_action(_E2_full_combo, False)
                 time.sleep(0.05)
             else:

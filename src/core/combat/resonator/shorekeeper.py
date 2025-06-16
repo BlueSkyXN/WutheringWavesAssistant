@@ -3,7 +3,7 @@ import time
 
 import numpy as np
 
-from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo
+from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo, CharClassEnum
 from src.core.exceptions import StopError
 from src.core.interface import ControlService, ImgService
 
@@ -62,6 +62,12 @@ class BaseShorekeeper(BaseResonator):
         self._resonance_liberation_color = [(255, 255, 255)]  # BGR
         self._resonance_liberation_checker = ColorChecker(
             self._resonance_liberation_point, self._resonance_liberation_color)
+
+    def __str__(self):
+        return self.name_en
+
+    def char_class(self) -> list[CharClassEnum]:
+        return [CharClassEnum.Healer]
 
     def energy_count(self, img: np.ndarray) -> int:
         energy_count = 0
@@ -135,10 +141,10 @@ class Shorekeeper(BaseShorekeeper, BaseCombo):
         ["E", 0.01, 0.10],
         # 清空能量
         ["j", 0.05, 0.15],
-        ["a", 0.05, 0.00],
-        ["Q", 0.05, 0.00],
+        ["a", 0.05, 0.10],
+        ["Q", 0.05, 0.10],
         # 间隔
-        ["w", 0.00, 0.55],
+        ["w", 0.00, 0.35],
         # ["j", 0.05, 1.20],
         # 开大
         ["R", 0.05, 1.20],
@@ -247,7 +253,7 @@ class Shorekeeper(BaseShorekeeper, BaseCombo):
     def Q(self):
         logger.debug("Q")
         return [
-            ["Q", 0.05, 0.00],
+            ["Q", 0.05, 0.10],
         ]
 
     def R(self):
@@ -267,7 +273,7 @@ class Shorekeeper(BaseShorekeeper, BaseCombo):
             energy_count = self.energy_count(img)
             # is_concerto_energy_ready = self.is_concerto_energy_ready(img)
             # is_resonance_skill_ready = self.is_resonance_skill_ready(img)
-            # is_echo_skill_ready = self.is_echo_skill_ready(img)
+            is_echo_skill_ready = self.is_echo_skill_ready(img)
             is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
             boss_hp = self.boss_hp(img)
 
@@ -295,11 +301,11 @@ class Shorekeeper(BaseShorekeeper, BaseCombo):
                         self.combo_action(self.za(), False)
 
             # 最后开声骸和大招
-            self.combo_action(self.Q(), False)
+            self.combo_action(self.Q(), is_echo_skill_ready)
             if boss_hp > 0.20:
                 self.combo_action(self.R(), False)
                 if is_resonance_liberation_ready:
                     time.sleep(0.1)
         except StopError as e:
-            self.control_service.fight_tap("a", 0.001)  # 打一下普攻，打断守岸人变身蝴蝶
+            self.control_service.jump()  # 打断守岸人变身蝴蝶
             raise e

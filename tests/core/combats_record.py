@@ -2,6 +2,7 @@ import threading
 import time
 
 from pynput import mouse, keyboard
+from pynput.keyboard import Key
 
 # 按键录制
 
@@ -40,6 +41,8 @@ def on_click(x, y, button, pressed):
 
 def on_press(key):
     global is_recording
+    # print(key)
+    # print(key == Key.f5)
     try:
         if hasattr(key, 'char') and key.char == 'z':
             # 切换录制状态

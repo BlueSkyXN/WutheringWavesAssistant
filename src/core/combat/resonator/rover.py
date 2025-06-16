@@ -3,7 +3,7 @@ import time
 
 import numpy as np
 
-from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo
+from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo, CharClassEnum
 from src.core.interface import ControlService, ImgService
 
 logger = logging.getLogger(__name__)
@@ -49,6 +49,12 @@ class BaseRover(BaseResonator):
         self._cosmos_rave_color = [(73, 81, 181)]  # BGR
         self._cosmos_rave_checker = ColorChecker(
             self._cosmos_rave_point, self._cosmos_rave_color, logic=ColorChecker.LogicEnum.AND)
+
+    def __str__(self):
+        return self.name_en
+
+    def char_class(self) -> list[CharClassEnum]:
+        return [CharClassEnum.SubDPS]
 
     def energy_count(self, img: np.ndarray) -> int:
         # 安可只看能量是否满，满为1，未满为0

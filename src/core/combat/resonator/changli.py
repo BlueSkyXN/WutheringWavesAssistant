@@ -3,7 +3,7 @@ import time
 
 import numpy as np
 
-from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo
+from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo, CharClassEnum
 from src.core.interface import ControlService, ImgService
 
 logger = logging.getLogger(__name__)
@@ -56,6 +56,12 @@ class BaseChangli(BaseResonator):
         self._resonance_liberation_color = [(255, 255, 255)]  # BGR
         self._resonance_liberation_checker = ColorChecker(
             self._resonance_liberation_point, self._resonance_liberation_color)
+
+    def __str__(self):
+        return self.name_en
+
+    def char_class(self) -> list[CharClassEnum]:
+        return [CharClassEnum.SubDPS]
 
     def energy_count(self, img: np.ndarray) -> int:
         energy_count = 0
@@ -154,7 +160,7 @@ class Changli(BaseChangli, BaseCombo):
 
             ["a", 0.05, 0.30],
             ["a", 0.05, 0.30],
-            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.40],
             ["a", 0.05, 0.30],
         ]
 
@@ -198,7 +204,8 @@ class Changli(BaseChangli, BaseCombo):
             # 普攻 5a 一离火
             # ["a", 0.05, 0.31],
             # ["a", 0.05, 0.50],
-            ["a", 0.05, 0.50],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.20],
 
             # ["a", 0.05, 1.05],
             ["a", 0.05, 0.35],
@@ -224,6 +231,14 @@ class Changli(BaseChangli, BaseCombo):
     #         ["z", 1.90, 1.00],
     #     ]
 
+    def Rz(self):
+        logger.debug("Rz")
+        return [
+            # Rz
+            ["R", 0.05, 1.65],
+            ["z", 2.00, 1.00],
+        ]
+
     def zR(self):
         logger.debug("zR")
         return [
@@ -244,7 +259,7 @@ class Changli(BaseChangli, BaseCombo):
         logger.debug("z")
         return [
             # z
-            ["z", 0.60, 1.10],
+            ["z", 0.70, 1.10],
         ]
 
     def az(self):
@@ -252,7 +267,7 @@ class Changli(BaseChangli, BaseCombo):
         return [
             # az
             ["a", 0.05, 0.31],
-            ["z", 0.60, 1.10],
+            ["z", 0.70, 1.10],
         ]
 
     def Qa3(self):
@@ -284,7 +299,9 @@ class Changli(BaseChangli, BaseCombo):
 
     def combo(self):
 
-        self.combo_action(self.a2(), True)  # 入场先打两个普攻，触发心眼冲
+        time.sleep(0.1)
+        self.combo_action(self.a2(), False)  # 入场先打两个普攻，触发心眼冲
+        time.sleep(0.2)
 
         img = self.img_service.screenshot()
         energy_count = self.energy_count(img)
@@ -292,13 +309,20 @@ class Changli(BaseChangli, BaseCombo):
         # 4离火 z
         if energy_count == 4:
             self.combo_action(self.z(), False)
-            time.sleep(0.4)
-            self.combo_action(self.a2(), True)
+            time.sleep(0.3)
+            self.combo_action(self.a2(), False)  # 凑够0.9秒后摇时间
+            time.sleep(0.3)
             # 空中重击会变成下落攻击，再次确认
             img = self.img_service.screenshot()
             energy_count = self.energy_count(img)
             if energy_count == 4:
                 self.combo_action(self.z(), False)
+                time.sleep(0.4)
+                img = self.img_service.screenshot()
+                energy_count = self.energy_count(img)
+                if energy_count != 4:
+                    time.sleep(0.6)
+                    self.combo_action(self.Rz(), False)
             else:
                 self.combo_action(self.E(), False)
             return
@@ -316,16 +340,18 @@ class Changli(BaseChangli, BaseCombo):
             is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
             if energy_count == 4:
                 self.combo_action(self.z(), False)
-                time.sleep(0.05)
+                img = self.img_service.screenshot()
+                is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
+                if is_resonance_liberation_ready:
+                    time.sleep(0.9)
+                    self.combo_action(self.Rz(), False)
             elif is_resonance_liberation_ready:
-                self.combo_action(self.R(), False)
-                self.combo_action(self.E(), False)
+                self.combo_action(self.Rz(), False)
             return
 
         # 低离火有大直接开
         if energy_count < 3 and is_resonance_liberation_ready:
-            self.combo_action(self.R(), False)
-            self.combo_action(self.E(), False)  # 冗余，万一没有R出来还能触发Ea
+            self.combo_action(self.Rz(), False)
             return
 
         # 兜底，打E合轴或普攻
@@ -333,7 +359,7 @@ class Changli(BaseChangli, BaseCombo):
             self.combo_action(self.E(), is_echo_skill_ready)
         else:
             self.combo_action(self.a3(), False)
-            time.sleep(0.5)
+            time.sleep(0.3)
             img = self.img_service.screenshot()
             energy_count = self.energy_count(img)
             if energy_count == 4:
@@ -343,5 +369,6 @@ class Changli(BaseChangli, BaseCombo):
         # 摩托最后放合轴
         if is_echo_skill_ready:
             # 随机放梦魇摩托或普通摩托
-            random_q = self.Qa3() if self.random_float() < 0.5 else self.Q()
-            self.combo_action(random_q, False)
+            # random_q = self.Qa3() if self.random_float() < 0.33 else self.Q()
+            # self.combo_action(random_q, False)
+            self.combo_action(self.Q(), False)
