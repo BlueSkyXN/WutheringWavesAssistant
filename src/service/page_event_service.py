@@ -1771,7 +1771,6 @@ class PageEventAbstractService(PageEventService, ABC):
             img = self._img_service.screenshot()
             results = self._ocr_service.ocr(img)
             absorption = self._ocr_service.search_text(results, "^吸收$")
-            logger.info(f"absorption: {absorption}")
 
             # 没有吸收，再试一次
             if not absorption:
