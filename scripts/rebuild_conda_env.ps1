@@ -100,14 +100,14 @@ if ($envs -contains $condaEnvName) {
     Write-Host "Conda virtual environment '$condaEnvName' already exists."
 } else {
     Write-Host "Creating Conda virtual environment: '$condaEnvName'"
-    conda create --name $condaEnvName python=3.12 -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+    conda create --name $condaEnvName python=3.12 -y -c defaults -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
 }
 
 conda activate $condaEnvName
 
 $poetryVersion = "2.1.1"
 Write-Host "Conda is installing Poetry version $poetryVersion..."
-conda install poetry=$poetryVersion -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+conda install poetry=$poetryVersion -y -c conda-forge -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
 
 poetry config virtualenvs.create false
 Write-Host "Set poetry config virtualenvs.create to false."
@@ -127,13 +127,13 @@ if ($poetryExtra -eq "cuda") {
     $cudatoolkitVersion = "12.6.1"
     Write-Host "Conda is installing cuda-toolkit version $cudatoolkitVersion..."
 #    conda install cuda-toolkit=$cudatoolkitVersion -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
-    conda install cuda-toolkit=$cudatoolkitVersion -y -c https://mirrors.sustech.edu.cn/anaconda-extra/cloud/nvidia/ -c nvidia
+    conda install cuda-toolkit=$cudatoolkitVersion -y -c nvidia -c https://mirrors.sustech.edu.cn/anaconda-extra/cloud/nvidia/
 
     $cudnnVersion = "9.3.0.75"
     $cudnnBuild = "cuda12.6"
     Write-Host "Conda is installing cudnn version $cudnnVersion build $cudnnBuild..."
 #    conda install cudnn=$cudnnVersion=$cudnnBuild -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
-    conda install cudnn=$cudnnVersion=$cudnnBuild -y -c https://mirrors.sustech.edu.cn/anaconda-extra/cloud/nvidia/ -c nvidia
+    conda install cudnn=$cudnnVersion=$cudnnBuild -y -c nvidia -c https://mirrors.sustech.edu.cn/anaconda-extra/cloud/nvidia/
 
     #$zlibwapiVersion = "1.3.1"
     #Write-Host "Conda is installing zlib-wapi version $zlibwapiVersion..."
@@ -147,17 +147,17 @@ if ($poetryExtra -eq "cuda") {
     Write-Output "cuda11.8 + cudnn8.9"
     $cudatoolkitVersion = "11.8.0"
     Write-Host "Conda is installing cudatoolkit version $cudatoolkitVersion..."
-    conda install cudatoolkit=$cudatoolkitVersion -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+    conda install cudatoolkit=$cudatoolkitVersion -y -c defaults -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
 
     $cudnnVersion = "8.9.2.26"
     $cudnnBuild = "cuda11_0"
     Write-Host "Conda is installing cudnn version $cudnnVersion build $cudnnBuild..."
-    conda install cudnn=$cudnnVersion=$cudnnBuild -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+    conda install cudnn=$cudnnVersion=$cudnnBuild -y -c defaults -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
 
     $zlibwapiVersion = "1.3.1"
     Write-Host "Conda is installing zlib-wapi version $zlibwapiVersion..."
     #conda install zlib-wapi=$zlibwapiVersion -c conda-forge -y
-    conda install zlib-wapi=$zlibwapiVersion -y -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/ -c conda-forge
+    conda install zlib-wapi=$zlibwapiVersion -y -c conda-forge -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
 
     Write-Host "`nListing installed versions of CUDA:"
     conda list | Select-String -Pattern "cudatoolkit|cudnn|poetry"
