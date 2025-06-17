@@ -1764,36 +1764,39 @@ class PageEventAbstractService(PageEventService, ABC):
         """
         self._control_service.activate()
         w, h = self._window_service.get_client_wh()
+        need_retry = False
+        max_ocr = 3
         count = 0
-        for i in range(3):
-        # while True:
+        while count < max_ocr or need_retry:
             img = self._img_service.screenshot()
             results = self._ocr_service.ocr(img)
-            absorption = self._ocr_service.search_text(results, "吸收")
+            absorption = self._ocr_service.search_text(results, "^吸收$")
+            logger.info(f"absorption: {absorption}")
+
+            # 没有吸收，再试一次
+            if not absorption:
+                if need_retry:
+                    break
+                need_retry = True
+                continue
+
             receive_rewards = self._ocr_service.search_texts(results, "领取奖励")
-            if not receive_rewards:
-                receive_reward = None
-            elif len(receive_rewards) == 1:
-                receive_reward = receive_rewards[0]
-            else:
-                receive_reward = None
+            receive_reward = None
+            if receive_rewards:
                 for ele in receive_rewards:
-                    if receive_reward is None:
-                        receive_reward = ele
-                        continue
                     # 左侧的领取不要
                     if ele.x1 < w // 3:
                         continue
                     receive_reward = ele
-
-            logger.debug(f"absorption: {absorption}, receive_rewards: {receive_rewards}")
-            if absorption:
+                    break
+            # 有吸收和领取奖励，吸收在下则滚动到下方
+            if receive_reward:
+                logger.debug(f"absorption: {absorption}, receive_rewards: {receive_rewards}")
                 if receive_reward and absorption.y1 > receive_reward.y1:
                     logger.info("向下滚动")
                     keymouse_util.scroll_mouse(self._window_service.window, -1)
                     time.sleep(1)
-            else:
-                return False
+
             count += 1
             self._control_service.pick_up()
             time.sleep(2)
@@ -1801,6 +1804,9 @@ class PageEventAbstractService(PageEventService, ABC):
                 logger.info("点击到领取奖励，关闭页面")
                 self._control_service.esc()
                 time.sleep(2)
+
+        if count == 0:
+            return False
         logger.info("吸收声骸")
         if self._info.fightCount is None or self._info.fightCount == 0:
             self._info.fightCount = 1
