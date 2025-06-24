@@ -1517,14 +1517,15 @@ class PageEventAbstractService(PageEventService, ABC):
 
     def absorption_action_fleurdelys(self):
         # run_param = [("w", 0.5), ("a", 0.4), ("s", 1.0), ("d", 0.8), ("w", 0.6)]
-        run_param = [("w", 0.22), ("w", 0.23), ("a", 0.25), ("s", 0.3), ("s", 0.3), ("d", 0.25), ("w", 0.3), ("d", 0.25), ("w", 0.25), ("s", 0.55)]
+        # run_param = [("w", 0.22), ("w", 0.23), ("a", 0.25), ("s", 0.3), ("s", 0.3), ("d", 0.25), ("w", 0.3), ("d", 0.25), ("w", 0.25), ("s", 0.55)]
+        run_param = [("w", 0.22), ("w", 0.23), ("a", 0.22), ("s", 0.27), ("s", 0.27), ("d", 0.22), ("w", 0.27), ("d", 0.22), ("w", 0.23), ("s", 0.53)]
         for i in range(len(run_param)):
             key, sleep_time = run_param[i]
             if i > 0:
                 self._control_service.player().fight_tap(key, 0.05)
                 self._control_service.player().fight_tap(key, 0.05)
             self._control_service.forward_run(sleep_time, key)
-            time.sleep(0.70)
+            time.sleep(0.75)
             if self._ocr_service.find_text("吸收"):
                 self.absorption_and_receive_rewards({})
                 return

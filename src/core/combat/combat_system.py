@@ -4,6 +4,7 @@ import time
 
 from src.core.combat.combat_core import TeamMemberSelector, BaseCombo, BaseResonator, CharClassEnum
 from src.core.combat.resonator.camellya import Camellya
+from src.core.combat.resonator.cartethyia import Cartethyia
 from src.core.combat.resonator.changli import Changli
 from src.core.combat.resonator.encore import Encore
 from src.core.combat.resonator.jinhsi import Jinhsi
@@ -40,17 +41,17 @@ class CombatSystem:
         self.verina = Verina(self.control_service, self.img_service)
         self.camellya = Camellya(self.control_service, self.img_service)
         self.sanhua = Sanhua(self.control_service, self.img_service)
+        self.cartethyia = Cartethyia(self.control_service, self.img_service)
 
         self.resonator_map = {
             self.jinhsi.name_en: self.jinhsi,
             self.changli.name_en: self.changli,
-            "changli-桂枝宁芙": self.changli,
             self.shorekeeper.name_en: self.shorekeeper,
             self.encore.name_en: self.encore,
             self.verina.name_en: self.verina,
             self.camellya.name_en: self.camellya,
             self.sanhua.name_en: self.sanhua,
-            "sanhua-叱妖诰": self.sanhua,
+            self.cartethyia.name_en: self.cartethyia,
         }
         self.resonators = None
         self._sorted_resonators = None

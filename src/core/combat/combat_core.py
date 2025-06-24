@@ -109,6 +109,13 @@ class ColorChecker(BaseChecker):
         concerto_energy_color = [(222, 159, 68)]  # BGR
         return ColorChecker(concerto_energy_point, concerto_energy_color)
 
+    @staticmethod
+    def concerto_aero():
+        """ 气动 协奏能量校验器，左下血条旁绿圈 """
+        concerto_energy_point = [(513, 669), (514, 669), (514, 670), (514, 671)]
+        concerto_energy_color = [(168, 226, 87), (171, 216, 121)]  # BGR
+        return ColorChecker(concerto_energy_point, concerto_energy_color)
+
 
 class BaseCombo:
     """ 连招 """
@@ -371,10 +378,12 @@ class TeamMemberSelector:
         img = img_util.read_img(img_path, alpha=False)
         # logger.debug("img shape: %s", img.shape)
         # 头像摆放顺序
-        avatar_names = [
-            "jinhsi", "changli", "changli-桂枝宁芙", "shorekeeper", "verina", "encore",
-            "camellya", "rover", "sanhua", "sanhua-叱妖诰", "cantarella",
+        avatar_names = [ # 重复的为皮肤或亮暗背景下的头像
+            "jinhsi", "jinhsi", "changli", "changli", "changli", "shorekeeper",
+            "verina", "verina", "verina", "encore", "encore", "encore",
+            "camellya", "rover", "sanhua", "sanhua", "sanhua", "cantarella",
             "zani", "baizhi", "xiangliyao", "calcharo", "jianxin",
+            "cartethyia"
         ]
         # 头像网格，40像素放一个，1280宽度，一行放32个
         avatar_grid = (40, 40)

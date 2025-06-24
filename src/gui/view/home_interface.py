@@ -121,7 +121,7 @@ class HomeInterface(ScrollArea):
         basicInputView.addSampleCard(
             icon=":/gallery/images/controls/Checkbox.png",
             title="自动拾取",
-            content=self.tr("自动拾取路过的声骸、草药、食材、宝箱\n任意分辨率，建议最低画质（窗口化），60fps，开DLSS"),
+            content=self.tr("自动拾取路过的声骸、草药、食材、宝箱\n任意分辨率，建议低画质（窗口化），60fps，开DLSS"),
             routeKey="basicInputInterface",
             index=8,
             task_name="AutoPickupProcessTask",

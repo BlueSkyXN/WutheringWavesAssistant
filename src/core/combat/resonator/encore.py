@@ -159,10 +159,12 @@ class Encore(BaseEncore, BaseCombo):
             ["a", 0.05, 0.15],
             ["a", 0.05, 0.05],
 
-            # ["a", 0.05, 0.90],
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.20],
+            # ["a", 0.05, 0.90],  # 拆分，增加频率保证打出派生
+            ["a", 0.05, 0.15],
+            ["a", 0.05, 0.15],
+            ["a", 0.05, 0.15],
+            ["a", 0.05, 0.15],
+            ["a", 0.05, 0.15],
         ]
 
     def a5(self):
@@ -193,9 +195,14 @@ class Encore(BaseEncore, BaseCombo):
         logger.debug("a3")
         return [
             # 3a，固定频率连点数下，用于脱离空中状态，非普攻连段
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.30],
+            # ["a", 0.05, 0.30],  # 拆分
+            ["a", 0.05, 0.15],
+            ["a", 0.05, 0.15],
+            # ["a", 0.05, 0.30],  # 拆分
+            ["a", 0.05, 0.15],
+            ["a", 0.05, 0.15],
+
+            ["a", 0.05, 0.30]
         ]
 
     # def a2(self):
@@ -242,7 +249,10 @@ class Encore(BaseEncore, BaseCombo):
             ["a", 0.05, 0.30],
             ["a", 0.05, 0.30],
             ["a", 0.05, 0.30],
-            ["E", 0.05, 0.28],
+            # ["E", 0.05, 0.28],  # 拆分多打几下E
+            ["E", 0.05, 0.10],
+            ["E", 0.05, 0.10],
+            ["w", 0.00, 0.08],
         ]
 
     def z(self):
@@ -302,15 +312,15 @@ class Encore(BaseEncore, BaseCombo):
             # self.combo_action(self.a3(), True)
             # time.sleep(0.2)
             self.combo_action(self.R(), True)
-            time.sleep(0.2)
+            # time.sleep(0.2)
+            # img = self.img_service.screenshot()
+            # is_cosmos_rave_ready = self.is_cosmos_rave_ready(img)
+            # if is_cosmos_rave_ready:
+            self.combo_action(self.Ea11E(), True)
             img = self.img_service.screenshot()
-            is_cosmos_rave_ready = self.is_cosmos_rave_ready(img)
-            if is_cosmos_rave_ready:
-                self.combo_action(self.Ea11E(), True)
-                img = self.img_service.screenshot()
-                energy_count = self.energy_count(img)
-                if energy_count == 1:
-                    self.combo_action(self.z(), False)
+            energy_count = self.energy_count(img)
+            if energy_count == 1:
+                self.combo_action(self.z(), False)
             return
 
         # 呼呼啦开

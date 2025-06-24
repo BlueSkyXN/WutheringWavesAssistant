@@ -88,5 +88,5 @@ def test_dump_screenshot():
         img = img.copy()
         img = img_util.hide_uid(img)
         img_util.save_img_in_temp(img)
-        time.sleep(0.5)
+        time.sleep(0.1)
 
