@@ -1829,7 +1829,7 @@ class PageEventAbstractService(PageEventService, ABC):
             "异构武装": 4, "罗蕾莱": 4.5, "叹息古龙": 5.6, "梦魇无常凶鹭": 5.3, "梦魇云闪之鳞": 4.8,
             "梦魇朔雷之鳞": 3.2,
             "梦魇无冠者": 2.4, "梦魇燎照之骑": 4.5, "梦魇哀声鸷": 3.6, "梦魇飞廉之猩": 1,
-            "梦魇辉萤军势": 2.6, "梦魇凯尔匹": 4.3, "荣耀狮像": 2.6,
+            "梦魇辉萤军势": 2.6, "梦魇凯尔匹": 5.2, "荣耀狮像": 2.6,
         }
         # position = self.find_pic(template_img_name="UI_F2_Guidebook_EchoHunting.png", threshold=0.5)
         position = self._img_service.match_template(img=None, template_img="UI_F2_Guidebook_EchoHunting.png",

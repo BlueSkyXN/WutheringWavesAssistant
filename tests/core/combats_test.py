@@ -501,7 +501,13 @@ def test_combo_cartethyia(control_service):
         ["j", 0.05, 1.20],
 
         # 重击 召唤异权剑
-        ["z", 0.92, 0.48],
+        ["z", 0.90, 0.60],
+        ["j", 0.05, 1.20],
+
+        # Eza
+        ["E", 0.05, 0.60],
+        ["z", 0.90, 0.20],
+        ["a", 0.05, 1.00],
         ["j", 0.05, 1.20],
 
         # Ea 召唤人权剑 收剑
@@ -545,6 +551,11 @@ def test_combo_cartethyia(control_service):
         ["R", 0.05, 9.40],
         ["w", 0.05, 1.20],
 
+        ["j", 0.05, 0.80],
+        ["a", 0.05, 0.61],
+        ["a", 0.05, 1.20],
+        ["a", 0.05, 0.61],
+        ["j", 0.05, 1.20],
     ]
     combo_action(control_service, seq, 2)
 
@@ -594,7 +605,7 @@ def test_combo_cartethyia_AdvancedCombo(control_service):
 
         # 再打一套三剑下劈
 
-        # 普攻4a 显化切小卡从第二段普攻开始打
+        # 普攻4a 大卡切化身小卡从第二段普攻开始打
         # ["a", 0.05, 0.33],
         ["a", 0.05, 0.67],
         ["a", 0.05, 0.84],
@@ -639,7 +650,7 @@ def test_combo_cartethyia_AdvancedCombo2(control_service):
 
         # 再打一套三剑下劈
 
-        # 普攻4a 显化切小卡从第二段普攻开始打
+        # 普攻4a 大卡切化身小卡从第二段普攻开始打
         # ["a", 0.05, 0.33],
         ["a", 0.05, 0.67],
         ["a", 0.05, 0.84],
@@ -684,8 +695,6 @@ def test_combo_cartethyia_AdvancedCombo2(control_service):
 
         ["E", 0.05, 1.00],
         ["a", 0.05, 1.10],
-
-
 
         # 普攻4a
         ["a", 0.05, 0.33],

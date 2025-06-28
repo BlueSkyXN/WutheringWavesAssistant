@@ -379,7 +379,7 @@ class TeamMemberSelector:
         # logger.debug("img shape: %s", img.shape)
         # 头像摆放顺序
         avatar_names = [ # 重复的为皮肤或亮暗背景下的头像
-            "jinhsi", "jinhsi", "changli", "changli", "changli", "shorekeeper",
+            "jinhsi", "jinhsi", "jinhsi", "jinhsi", "jinhsi", "changli", "changli", "changli", "shorekeeper",
             "verina", "verina", "verina", "encore", "encore", "encore",
             "camellya", "rover", "sanhua", "sanhua", "sanhua", "cantarella",
             "zani", "baizhi", "xiangliyao", "calcharo", "jianxin",

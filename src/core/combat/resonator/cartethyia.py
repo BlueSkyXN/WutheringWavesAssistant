@@ -115,9 +115,10 @@ class BaseCartethyia(BaseResonator):
         ]  # BGR
         self._conviction_checker = ColorChecker(self._conviction_point, self._conviction_color)
 
-        # self._cartethyia_point = [(567, 663), (575, 663)]
-        # self._cartethyia_color = [(225, 237, 83)]  # BGR
-        # self._cartethyia_checker = ColorChecker(self._cartethyia_point, self._cartethyia_color)
+        ### 运行时动态变量
+
+        # 化身·卡提希娅是否打过一套攻击，没打过就打一套，打过则变身
+        self.is_avatar_cartethyia_attack_done = False
 
     def __str__(self):
         return self.name_en
@@ -132,7 +133,7 @@ class BaseCartethyia(BaseResonator):
 
     def is_resonance_skill_cartethyia_ready(self, img: np.ndarray) -> bool:
         is_ready = self._resonance_skill_cartethyia_checker.check(img)
-        logger.debug(f"{self.name}-共鸣技能-卡提希娅: {is_ready}")
+        logger.debug(f"{self.name}-共鸣技能: {is_ready}")
         return is_ready
 
     def is_echo_skill_ready(self, img: np.ndarray) -> bool:
@@ -147,27 +148,27 @@ class BaseCartethyia(BaseResonator):
 
     def is_resonance_skill_fleurdelys_ready(self, img: np.ndarray) -> bool:
         is_ready = self._resonance_skill_fleurdelys_checker.check(img)
-        logger.debug(f"{self.name}-共鸣技能 E1 芙露德莉斯: {is_ready}")
+        logger.debug(f"芙露德莉斯-共鸣技能 E1: {is_ready}")
         return is_ready
 
     def is_resonance_skill_fleurdelys_2_ready(self, img: np.ndarray) -> bool:
         is_ready = self._resonance_skill_fleurdelys_checker.check(img)
-        logger.debug(f"{self.name}-共鸣技能 E2 芙露德莉斯: {is_ready}")
+        logger.debug(f"芙露德莉斯-共鸣技能 E2: {is_ready}")
         return is_ready
 
     def is_resonance_liberation_avatar_fleurdelys_ready(self, img: np.ndarray) -> bool:
         is_ready = self._resonance_liberation_avatar_fleurdelys_checker.check(img)
-        logger.debug(f"{self.name}-共鸣解放 R 化身·芙露德莉斯: {is_ready}")
+        logger.debug(f"芙露德莉斯-共鸣解放 R: {is_ready}")
         return is_ready
 
     def is_resonance_liberation_avatar_cartethyia_ready(self, img: np.ndarray) -> bool:
         is_ready = self._resonance_liberation_avatar_cartethyia_checker.check(img)
-        logger.debug(f"{self.name}-共鸣解放 R 化身·卡提希娅: {is_ready}")
+        logger.debug(f"化身·{self.name}-共鸣解放 R: {is_ready}")
         return is_ready
 
     def is_resonance_liberation_blade_of_howling_squall_ready(self, img: np.ndarray) -> bool:
         is_ready = self._resonance_liberation_blade_of_howling_squall_checker.check(img)
-        logger.debug(f"{self.name}-共鸣解放 R 看潮怒风哮之刃: {is_ready}")
+        logger.debug(f"芙露德莉斯-共鸣解放 R 看潮怒风哮之刃: {is_ready}")
         return is_ready
 
     def is_sword_of_discord_existing(self, img: np.ndarray) -> bool:
@@ -187,12 +188,12 @@ class BaseCartethyia(BaseResonator):
 
     def is_manifest_existing(self, img: np.ndarray) -> bool:
         is_existing = self._manifest_checker.check(img)
-        logger.debug(f"{self.name}-显化: {is_existing}")
+        logger.debug(f"芙露德莉斯-显化: {is_existing}")
         return is_existing
 
     def is_conviction_existing(self, img: np.ndarray) -> bool:
         is_existing = self._conviction_checker.check(img)
-        logger.debug(f"{self.name}-决意条: {is_existing}")
+        logger.debug(f"芙露德莉斯-决意条: {is_existing}")
         return is_existing
 
 
@@ -210,7 +211,13 @@ class Cartethyia(BaseCartethyia, BaseCombo):
         ["j", 0.05, 1.20],
 
         # 重击 召唤异权剑
-        ["z", 0.92, 0.48],
+        ["z", 0.90, 0.60],
+        ["j", 0.05, 1.20],
+
+        # Eza
+        ["E", 0.05, 0.60],
+        ["z", 0.90, 0.20],
+        ["a", 0.05, 1.00],
         ["j", 0.05, 1.20],
 
         # Ea 召唤人权剑 收剑
@@ -254,6 +261,11 @@ class Cartethyia(BaseCartethyia, BaseCombo):
         ["R", 0.05, 9.40],
         ["w", 0.05, 1.20],
 
+        ["j", 0.05, 0.80],
+        ["a", 0.05, 0.61],
+        ["a", 0.05, 1.20],
+        ["a", 0.05, 0.61],
+        ["j", 0.05, 1.20],
     ]
 
     # 进阶轴1
@@ -300,7 +312,7 @@ class Cartethyia(BaseCartethyia, BaseCombo):
 
         # 再打一套三剑下劈
 
-        # 普攻4a 显化切小卡从第二段普攻开始打
+        # 普攻4a 大卡切化身小卡从第二段普攻开始打
         # ["a", 0.05, 0.33],
         ["a", 0.05, 0.67],
         ["a", 0.05, 0.84],
@@ -340,7 +352,7 @@ class Cartethyia(BaseCartethyia, BaseCombo):
 
         # 再打一套三剑下劈
 
-        # 普攻4a 显化切小卡从第二段普攻开始打
+        # 普攻4a 大卡切化身小卡从第二段普攻开始打
         # ["a", 0.05, 0.33],
         ["a", 0.05, 0.67],
         ["a", 0.05, 0.84],
@@ -412,9 +424,19 @@ class Cartethyia(BaseCartethyia, BaseCombo):
         return [
             # 小卡
             # 普攻4a 召唤神权剑
-            ["a", 0.05, 0.36],
-            ["a", 0.05, 0.67],
-            ["a", 0.05, 0.84],
+            # ["a", 0.05, 0.36],
+            ["a", 0.05, 0.10],
+            ["a", 0.05, 0.16],
+
+            # ["a", 0.05, 0.67],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.27],
+
+            # ["a", 0.05, 0.84],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.25],
+
             # ["a", 0.05, 1.20],  # 拆分
             ["a", 0.05, 0.20],
             ["a", 0.05, 0.20],
@@ -425,17 +447,20 @@ class Cartethyia(BaseCartethyia, BaseCombo):
         logger.debug("cartethyia_a2_start")
         return [
             # 普攻前两下
-            ["a", 0.05, 0.36],
+            # ["a", 0.05, 0.36],
+            ["a", 0.05, 0.10],
+            ["a", 0.05, 0.16],
+
             # ["a", 0.05, 0.67],
-            ["a", 0.05, 0.37],
-            ["w", 0.00, 0.30],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.27],
         ]
 
     def cartethyia_a2_end(self):
         logger.debug("cartethyia_a2_end")
         return [
             # 普攻后两下
-            # ["a", 0.05, 0.84],  # 拆分
+            # ["a", 0.05, 0.84],
             ["a", 0.05, 0.25],
             ["a", 0.05, 0.25],
             ["a", 0.05, 0.25],
@@ -446,48 +471,106 @@ class Cartethyia(BaseCartethyia, BaseCombo):
             ["w", 0.00, 0.75],
         ]
 
-    def cartethyia_a2_end_z(self):
-        logger.debug("cartethyia_a2_end_z")
-        return [
-            # 普攻后两下
-            # ["a", 0.05, 0.84],  # 拆分
-            ["a", 0.05, 0.25],
-            ["a", 0.05, 0.25],
-            ["a", 0.05, 0.25],
+    # def cartethyia_a4zEa(self):
+    #     logger.debug("cartethyia_a4zEa")
+    #     return [
+    #         # 小卡
+    #         # 普攻4a
+    #         ["a", 0.05, 0.33],
+    #         ["a", 0.05, 0.67],
+    #         ["a", 0.05, 0.84],
+    #         # ["a", 0.05, 1.20],
+    #         ["a", 0.05, 0.70],
+    #
+    #         ["z", 0.70, 0.50],
+    #
+    #         ["E", 0.05, 1.00],
+    #         # ["a", 0.05, 1.10],
+    #         ["a", 0.05, 0.20],
+    #         ["w", 0.00, 0.90],
+    #     ]
 
-            # ["a", 0.05, 1.20],
-            # ["a", 0.05, 0.70],
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.35],
-
-            ["z", 0.70, 0.50],
-        ]
-
-    def cartethyia_a4zEa(self):
-        logger.debug("cartethyia_a4zEa")
+    def cartethyia_a4Eza(self):
+        logger.debug("cartethyia_a4Eza")
         return [
             # 小卡
             # 普攻4a
-            ["a", 0.05, 0.33],
-            ["a", 0.05, 0.67],
-            ["a", 0.05, 0.84],
-            # ["a", 0.05, 1.20],
-            ["a", 0.05, 0.70],
+            # 小卡
+            # 普攻4a 召唤神权剑
+            # ["a", 0.05, 0.36],
+            ["a", 0.05, 0.10],
+            ["a", 0.05, 0.16],
 
-            ["z", 0.70, 0.50],
+            # ["a", 0.05, 0.67],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.27],
 
-            ["E", 0.05, 1.00],
-            # ["a", 0.05, 1.10],
+            # ["a", 0.05, 0.84],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.25],
+
+            ## ["a", 0.05, 1.20],
+            # ["a", 0.05, 0.90],  # 拆分
             ["a", 0.05, 0.20],
-            ["w", 0.00, 0.90],
+            ["a", 0.05, 0.20],
+            ["w", 0.00, 0.45],
+
+            # Eza
+            # ["E", 0.05, 0.60],
+            ["E", 0.05, 0.20],
+            ["E", 0.05, 0.45],
+
+            ["z", 0.90, 0.20],
+            # ["a", 0.05, 1.00],
+            ["a", 0.05, 0.15],
+            ["a", 0.05, 0.15],
+            ["w", 0.00, 0.65],
+        ]
+
+    def cartethyia_E(self):
+        logger.debug("cartethyia_E")
+        return [
+            # E 召唤人权剑
+            ["E", 0.05, 1.00],
         ]
 
     def cartethyia_Ea(self):
         logger.debug("cartethyia_Ea")
         return [
             # Ea 召唤人权剑 收剑
-            ["E", 0.05, 1.00],
-            ["a", 0.05, 1.10],
+            # ["E", 0.05, 1.00],
+            ["E", 0.05, 0.20],
+            ["E", 0.05, 0.75],
+
+            # ["a", 0.05, 1.10],
+            ["a", 0.05, 0.15],
+            ["a", 0.05, 0.15],
+            ["w", 0.00, 0.75],
+        ]
+
+    def cartethyia_Eza(self):
+        logger.debug("cartethyia_Eza")
+        return [
+            # Eza
+            # ["E", 0.05, 0.60],
+            ["E", 0.05, 0.20],
+            ["E", 0.05, 0.45],
+
+            ["z", 0.90, 0.20],
+            # ["a", 0.05, 1.00],
+            ["a", 0.05, 0.15],
+            ["a", 0.05, 0.15],
+            ["w", 0.00, 0.65],
+        ]
+
+    def cartethyia_z(self):
+        logger.debug("cartethyia_z")
+        return [
+            # 重击 召唤异权剑
+            # ["z", 0.90, 0.60],
+            ["z", 0.90, 0.20],
+            ["w", 0.00, 0.40],
         ]
 
     def cartethyia_ja(self):
@@ -495,68 +578,14 @@ class Cartethyia(BaseCartethyia, BaseCombo):
         return [
             # 下落攻击 收剑
             ["j", 0.05, 0.20],
-            ["a", 0.05, 0.80],
+            ["a", 0.05, 0.10],
+            ["w", 0.00, 0.70],
         ]
 
     def cartethyia_R(self):
         logger.debug("cartethyia_R")
         return [
-            ["R", 0.05, 3.60],
-        ]
-
-    def cartethyia_R_full_combo(self):
-        logger.debug("cartethyia_R_full_combo")
-        return [
-            # R
-            ["R", 0.05, 3.60],
-
-            # 变大卡
-            # 普攻5a
-            # ["a", 0.05, 0.32],
-            ["a", 0.05, 0.10],
-            ["a", 0.05, 0.20],
-            ["a", 0.05, 0.65],
-            ["a", 0.05, 0.82],
-            ["a", 0.05, 1.02],
-            ["a", 0.05, 0.90],
-
-            # EaaEaaa
-            ["E", 0.05, 0.93],
-            ["a", 0.05, 0.68],
-            ["a", 0.05, 1.20],
-            # ["E", 0.05, 1.65],
-            ["E", 0.05, 1.10],
-
-            # 切小卡
-
-            ["R", 0.05, 1.10],
-
-            # 再打一套三剑下劈
-
-            # 普攻4a 显化切小卡从第二段普攻开始打
-            # ["a", 0.05, 0.33],
-            ["a", 0.05, 0.67],
-            ["a", 0.05, 0.84],
-            # ["a", 0.05, 1.20],
-            ["a", 0.05, 0.70],
-
-            ["z", 0.70, 0.50],
-
-            ["E", 0.05, 1.00],
-            ["a", 0.05, 1.10],
-
-            # 切大卡
-            ["R", 0.05, 0.65],
-
-            # 普攻5a 化身卡提希娅切回芙露德莉斯从普攻第三段开始打
-            # ["a", 0.05, 0.32],
-            # ["a", 0.05, 0.65],
-            ["a", 0.05, 0.82],
-            ["a", 0.05, 1.02],
-            ["a", 0.05, 0.90],
-
-            # R
-            ["R", 0.05, 5.20],
+            ["R", 0.05, 3.70],
         ]
 
     def fleurdelys_a5(self):
@@ -567,36 +596,126 @@ class Cartethyia(BaseCartethyia, BaseCombo):
             # ["a", 0.05, 0.32],
             ["a", 0.05, 0.10],
             ["a", 0.05, 0.20],
-            ["a", 0.05, 0.65],
-            ["a", 0.05, 0.82],
-            ["a", 0.05, 1.02],
-            ["a", 0.05, 0.90],
+
+            # ["a", 0.05, 0.65],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.15],
+
+            # ["a", 0.05, 0.82],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.27],
+            ["a", 0.05, 0.30],
+
+            # ["a", 0.05, 1.02],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.22],
+            ["a", 0.05, 0.25],
+
+            # ["a", 0.05, 0.90],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.30],
         ]
 
-    def fleurdelys_Ra3(self):
-        logger.debug("fleurdelys_a5")
+    def avatar_cartethyia_to_fleurdelys_Ra3(self):
+        logger.debug("avatar_cartethyia_to_fleurdelys_Ra3")
         return [
-            # 切大卡
-            ["R", 0.05, 0.65],
+            # 化身小卡切大卡
+            # ["R", 0.05, 0.65],
+            ["R", 0.05, 0.10],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.20],
 
             # 普攻5a 化身卡提希娅切回芙露德莉斯从普攻第三段开始打
             # ["a", 0.05, 0.32],
             # ["a", 0.05, 0.65],
-            ["a", 0.05, 0.82],
-            ["a", 0.05, 1.02],
-            ["a", 0.05, 0.90],
+
+            # ["a", 0.05, 0.82],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.27],
+            ["a", 0.05, 0.30],
+
+            # ["a", 0.05, 1.02],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.22],
+            ["a", 0.05, 0.25],
+
+            # ["a", 0.05, 0.90],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.30],
         ]
 
-    def fleurdelys_zaa3(self):
-        logger.debug("fleurdelys_zaa3")
+    def fleurdelys_to_avatar_cartethyia_Ra3(self):
+        logger.debug("avatar_cartethyia_to_fleurdelys_Ra3")
         return [
-            # 大卡
-            # 普攻5a
+            # 大卡切化身小卡
+            # ["R", 0.05, 1.10],
+            ["R", 0.05, 0.20],
+
+            # 普攻4a 大卡切化身小卡从第二段普攻开始打
+            # ["a", 0.05, 0.36],
+
+            # ["a", 0.05, 0.67],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.27],
+
+            # ["a", 0.05, 0.84],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.25],
+
+            # ["a", 0.05, 1.20],  # 拆分
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            ["w", 0.00, 0.75],
+        ]
+
+    def fleurdelys_za_a3(self):
+        logger.debug("fleurdelys_za_a3")
+        return [
+            # 大卡 重击派生
+            # za 射箭
             ["z", 0.90, 0.31],
-            ["a", 0.05, 0.93],
-            ["a", 0.05, 0.50],
-            ["a", 0.05, 0.68],
-            ["a", 0.05, 1.20],
+            # ["a", 0.05, 0.93],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.28],
+            ["a", 0.05, 0.30],
+
+            # 普攻起飞
+            # ["a", 0.05, 0.50],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.20],
+
+            # 空中2a
+            # ["a", 0.05, 0.68],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.33],
+            # ["a", 0.05, 1.20],
+            ["a", 0.05, 0.15],
+            ["a", 0.05, 0.15],
+            ["w", 0.00, 0.85],
+        ]
+
+    def fleurdelys_ja2(self):
+        logger.debug("fleurdelys_ja2")
+        return [
+            # 大卡 空中2a
+            # ["j", 0.05, 0.80],
+            ["j", 0.05, 0.20],
+            ["j", 0.05, 0.55],
+
+            # ["a", 0.05, 0.68],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.33],
+
+            # ["a", 0.05, 1.20],
+            ["a", 0.05, 0.15],
+            ["a", 0.05, 0.15],
+            ["w", 0.00, 0.85],
         ]
 
     def fleurdelys_EaaEaaa(self):
@@ -604,26 +723,59 @@ class Cartethyia(BaseCartethyia, BaseCombo):
         return [
             # 大卡
             # EaaEaaa
-            ["E", 0.05, 0.93],
-            ["a", 0.05, 0.68],
-            ["a", 0.05, 1.20],
-            ["E", 0.05, 1.65],
-            ["a", 0.05, 0.82],
-            ["a", 0.05, 1.02],
-            ["a", 0.05, 0.90],
+            # ["E", 0.05, 0.93],
+            ["E", 0.05, 0.13],
+            ["a", 0.05, 0.15],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.25],
+
+            # ["a", 0.05, 0.68],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.33],
+
+            # ["a", 0.05, 1.20],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.30],
+            ["E", 0.05, 0.30],
+
+            # ["E", 0.05, 1.65],
+            ["E", 0.05, 0.30],
+            ["E", 0.05, 0.30],
+            ["E", 0.05, 0.30],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.25],
+
+            # ["a", 0.05, 0.82],
+            ["a", 0.05, 0.22],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.25],
+
+            # ["a", 0.05, 1.02],
+            ["a", 0.05, 0.17],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.20],
+
+            # ["a", 0.05, 0.90],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.25],
+            ["a", 0.05, 0.30],
         ]
 
     def fleurdelys_R_blade_of_howling_squall(self):
         logger.debug("R")
         return [
-            ["R", 0.05, 3.60],
+            # ["R", 0.05, 3.60],
+            ["R", 0.05, 0.20],
+            ["R", 0.05, 3.35],
         ]
 
     def Q(self):
         logger.debug("Q")
         return [
             # 声骸技能
-            ["Q", 0.05, 0.00],
+            ["Q", 0.01, 0.00],
         ]
 
     def full_combo(self):
@@ -635,9 +787,10 @@ class Cartethyia(BaseCartethyia, BaseCombo):
         # 空中切人，附近有怪，自动打下落攻击，后摇0.8s，没人则在地面
         # 地面切人，附近有怪，自动打普攻第二段
 
-        # 风蚀效应持续15s
+        # 风蚀效应持续16s，超时清空
         # 普攻第四段叠一层
         # E技能叠两层
+        # 变奏叠两层
 
         self.combo_action(self.cartethyia_a2_start(), False)
 
@@ -651,7 +804,7 @@ class Cartethyia(BaseCartethyia, BaseCombo):
         is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
         # 大卡技能
         is_resonance_skill_fleurdelys_ready = self.is_resonance_skill_fleurdelys_ready(img)
-        is_resonance_skill_fleurdelys_2_ready = self.is_resonance_skill_fleurdelys_2_ready(img)
+        # is_resonance_skill_fleurdelys_2_ready = self.is_resonance_skill_fleurdelys_2_ready(img)
         is_resonance_liberation_avatar_fleurdelys_ready = self.is_resonance_liberation_avatar_fleurdelys_ready(img)
         is_resonance_liberation_avatar_cartethyia_ready = self.is_resonance_liberation_avatar_cartethyia_ready(img)
         is_resonance_liberation_blade_of_howling_squall_ready = self.is_resonance_liberation_blade_of_howling_squall_ready(img)
@@ -659,46 +812,59 @@ class Cartethyia(BaseCartethyia, BaseCombo):
         is_sword_of_discord_existing = self.is_sword_of_discord_existing(img)
         is_sword_of_divinity_existing = self.is_sword_of_divinity_existing(img)
         is_sword_of_virtue_existing = self.is_sword_of_virtue_existing(img)
-        is_manifest_existing = self.is_manifest_existing(img)
-        is_conviction_existing = self.is_conviction_existing(img)
+        # is_manifest_existing = self.is_manifest_existing(img)
+        # is_conviction_existing = self.is_conviction_existing(img)
 
-        boss_hp = self.boss_hp(img)
+        # boss_hp = self.boss_hp(img)
 
         self.combo_action(self.Q(), False)
 
         use_seconds = time.monotonic() - start_time
         time.sleep(max(0.0, 0.30 - use_seconds))
 
-        # 化身·芙露德莉斯 有大开大
+        # 化身·芙露德莉斯 狂澜，分割天地
         if is_resonance_liberation_blade_of_howling_squall_ready:
+            # 有大开大
             self.combo_action(self.fleurdelys_R_blade_of_howling_squall(), True)
-            # 若小卡E转好了再打一个三剑下劈
+            # 小卡E合轴
             img = self.img_service.screenshot()
             is_resonance_skill_cartethyia_ready = self.is_resonance_skill_cartethyia_ready(img)
             if is_resonance_skill_cartethyia_ready:
-                self.combo_action(self.cartethyia_a4zEa(), False)
+                self.combo_action(self.cartethyia_E(), False)
+                time.sleep(0.2)
             return
         
-        # 化身·卡提希娅 打一套三剑下劈
+        # 化身·卡提希娅
         avatar_cartethyia_to_fleurdelys = False
         if is_resonance_liberation_avatar_cartethyia_ready:
+            # 打一套三剑下劈
             if is_resonance_skill_cartethyia_ready:
-                self.combo_action(self.cartethyia_a4zEa(), True)
-                avatar_cartethyia_to_fleurdelys = True
-            else:
+                # self.combo_action(self.cartethyia_a4Eza(), self.is_avatar_cartethyia_attack_done)
                 self.combo_action(self.cartethyia_a4(), False)
-                return 
+                time.sleep(0.2)
+                self.combo_action(self.cartethyia_Eza(), self.is_avatar_cartethyia_attack_done)
+            else:
+                self.combo_action(self.cartethyia_a4(), self.is_avatar_cartethyia_attack_done)
+            # 合轴
+            if not self.is_avatar_cartethyia_attack_done:
+                self.is_avatar_cartethyia_attack_done = True
+                time.sleep(0.2)
+                return
+            # 再来就标记需改变状态切换化身
+            avatar_cartethyia_to_fleurdelys = True
 
-        # 化身·芙露德莉斯 决意未满
+        # 化身·芙露德莉斯 决意未满 或 需切换成 化身·芙露德莉斯
         if is_resonance_liberation_avatar_fleurdelys_ready or avatar_cartethyia_to_fleurdelys:
             if avatar_cartethyia_to_fleurdelys:
-                self.combo_action(self.fleurdelys_Ra3(), True)
+                self.is_avatar_cartethyia_attack_done = False
+                self.combo_action(self.avatar_cartethyia_to_fleurdelys_Ra3(), True)
+                self.combo_action(self.fleurdelys_EaaEaaa(), True)
             elif is_resonance_skill_fleurdelys_ready:
                 self.combo_action(self.fleurdelys_EaaEaaa(), True)
             else:
                 self.combo_action(self.fleurdelys_a5(), True)
 
-            # 有E打空中，没有打普攻，补决意
+            # 检查E、R状态，有E打空中连，没有打普攻，补决意
             img = self.img_service.screenshot()
             is_resonance_skill_fleurdelys_ready = self.is_resonance_skill_fleurdelys_ready(img)
             is_resonance_liberation_blade_of_howling_squall_ready = self.is_resonance_liberation_blade_of_howling_squall_ready(img)
@@ -708,53 +874,95 @@ class Cartethyia(BaseCartethyia, BaseCombo):
                 else:
                     self.combo_action(self.fleurdelys_a5(), True)
 
-            # 决意还没满，补一个重击派生
-            img = self.img_service.screenshot()
-            is_resonance_liberation_blade_of_howling_squall_ready = self.is_resonance_liberation_blade_of_howling_squall_ready(img)
-            if not is_resonance_liberation_blade_of_howling_squall_ready:
-                self.combo_action(self.fleurdelys_zaa3(), True)
+                # 决意还没满，补一个重击派生
+                img = self.img_service.screenshot()
+                is_resonance_liberation_blade_of_howling_squall_ready = self.is_resonance_liberation_blade_of_howling_squall_ready(img)
+                if not is_resonance_liberation_blade_of_howling_squall_ready:
+                    self.combo_action(self.fleurdelys_za_a3(), True)
+                    img = self.img_service.screenshot()
+                    is_resonance_liberation_blade_of_howling_squall_ready = self.is_resonance_liberation_blade_of_howling_squall_ready(img)
 
-            # 开大
-            img = self.img_service.screenshot()
-            is_resonance_liberation_blade_of_howling_squall_ready = self.is_resonance_liberation_blade_of_howling_squall_ready(img)
+            # 此剑，斩灭诸恶
             if is_resonance_liberation_blade_of_howling_squall_ready:
                 self.combo_action(self.fleurdelys_R_blade_of_howling_squall(), True)
-                # 若小卡E转好了再打一个三剑下劈
+                # 若小卡E转好了再打一个 E合轴 或 三剑下劈
                 img = self.img_service.screenshot()
                 is_resonance_skill_cartethyia_ready = self.is_resonance_skill_cartethyia_ready(img)
                 if is_resonance_skill_cartethyia_ready:
-                    self.combo_action(self.cartethyia_a4zEa(), False)
+                    if self.random_float() < 0.5:
+                        self.combo_action(self.cartethyia_E(), False)
+                        time.sleep(0.2)
+                    else:
+                        # self.combo_action(self.cartethyia_a4Eza(), False)
+                        self.combo_action(self.cartethyia_a4(), False)
+                        time.sleep(0.2)
+                        self.combo_action(self.cartethyia_Eza(), True)
+                        time.sleep(0.2)
+            else:
+                self.combo_action(self.fleurdelys_to_avatar_cartethyia_Ra3(), False)
+                time.sleep(0.2)
             return
 
-        # 常态 卡提希娅 有E或R TODO 根据状态栏剑一剑二剑三，动态攒剑
+        # 常态 卡提希娅
         if is_resonance_skill_cartethyia_ready or is_resonance_liberation_ready:
-            # 先打剑二剑一
-            self.combo_action(self.cartethyia_a2_end_z(), True)
-            # 有E打剑三，接三剑下劈
-            if is_resonance_skill_cartethyia_ready:
-                self.combo_action(self.cartethyia_Ea(), True)
-            else:
-                # 再检查E是否转好
+            need_cartethyia_ja = False
+            # 有大，补满三剑
+            if is_resonance_liberation_ready:
+                if not is_sword_of_divinity_existing:
+                    self.combo_action(self.cartethyia_a4(), False)
+                if not is_sword_of_virtue_existing and is_resonance_skill_cartethyia_ready:
+                    self.combo_action(self.cartethyia_Eza(), True)
+                elif not is_sword_of_discord_existing:
+                    self.combo_action(self.cartethyia_z(), True)
+                    self.combo_action(self.cartethyia_ja(), True)
+            else: # 没大，打一套普攻连
+                self.combo_action(self.cartethyia_a4(), False)
+                # 检查E
                 img = self.img_service.screenshot()
                 is_resonance_skill_cartethyia_ready = self.is_resonance_skill_cartethyia_ready(img)
-                # 接着打三剑，没有也直接收剑
+                # 收剑
                 if is_resonance_skill_cartethyia_ready:
-                    self.combo_action(self.cartethyia_Ea(), True)
+                    self.combo_action(self.cartethyia_Eza(), True)
                 else:
-                    self.combo_action(self.cartethyia_ja(), True)
+                    if not is_sword_of_discord_existing:
+                        self.combo_action(self.cartethyia_z(), False)
+                    # self.combo_action(self.cartethyia_ja(), True)
+                    need_cartethyia_ja = True  # 先记录状态，有大才收剑
 
-            # 再看看大招好了没有
+            # 检查大招
             if not is_resonance_liberation_ready:
                 img = self.img_service.screenshot()
                 is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
+
+            self.combo_action(self.Q(), False)
+
             # 大招还没好，结束
             if not is_resonance_liberation_ready:
                 return
+            elif need_cartethyia_ja:
+                self.combo_action(self.cartethyia_ja(), True)
 
-            self.combo_action(self.Q(), False)
-            # 开大
-            self.combo_action(self.cartethyia_R_full_combo(), True)
+            # 真容，于此展露
+            self.combo_action(self.cartethyia_R(), True)
+
+            # 显化爆发
+            self.combo_action(self.fleurdelys_a5(), True)
+            img = self.img_service.screenshot()
+            is_resonance_skill_fleurdelys_ready = self.is_resonance_skill_fleurdelys_ready(img)
+            is_resonance_liberation_avatar_fleurdelys_ready = self.is_resonance_liberation_avatar_fleurdelys_ready(img)
+            if is_resonance_skill_fleurdelys_ready:
+                self.combo_action(self.fleurdelys_EaaEaaa(), True)
+            else:
+                self.combo_action(self.fleurdelys_za_a3(), True)
+
+            # 切小卡补风蚀
+            if is_resonance_liberation_avatar_fleurdelys_ready:
+                self.combo_action(self.fleurdelys_to_avatar_cartethyia_Ra3(), True)
+                img = self.img_service.screenshot()
+                is_resonance_skill_cartethyia_ready = self.is_resonance_skill_cartethyia_ready(img)
+                if is_resonance_skill_cartethyia_ready:
+                    self.combo_action(self.cartethyia_Eza(), True)
             return
 
+        # 兜底
         self.combo_action(self.cartethyia_a4(), False)
-
