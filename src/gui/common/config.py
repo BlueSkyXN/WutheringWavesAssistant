@@ -121,6 +121,8 @@ class BossNameEnum(Enum):
     Fleurdelys = "芙露德莉斯"
     NightmareKelpie = "梦魇凯尔匹"
     LionessOfGlory = "荣耀狮像"
+    NightmareHecate = "梦魇赫卡忒"
+    # Fenrico = "芬莱克"
 
     # Dreamless = ("无妄者", "Dreamless")
     # FallacyOfNoReturn = ("无归的谬误", "Fallacy of No Return")

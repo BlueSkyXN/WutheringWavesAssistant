@@ -46,6 +46,9 @@ class BossTaskContext(BaseModel):
     adaptsType: int = Field(None, title="适配类型")
     # adaptsResolution: str = Field(None, title="适配分辨率")
 
+    # challengeSuccess: bool = Field(False, title="是否挑战成功")
+    # lastChallengeSuccessTime: datetime = Field(default_factory=datetime.now, title="上次挑战成功的时间")
+
     echoIsLockQuantity: int = Field(0, title="检测到连续锁定的声骸数量")
     echoNumber: int = Field(0, title="当前进行的锁定声骸个数")
     inSpecEchoQuantity: int = Field(0, title="检测到的符合配置的声骸数量")
@@ -94,5 +97,37 @@ class Context(BaseModel):
         self.config.param = value
 
 
-if __name__ == '__main__':
-    print(Context())
+# class TaskCtx(BaseModel):
+#     model_config = {"arbitrary_types_allowed": True}
+#
+# class CombatContext(TaskCtx):
+#
+#     # boss
+#     bossIndex: int = Field(0)
+#     bossName: str | None = Field(None)
+#     lastBossName: str | None = Field(None)
+#     inInstance: bool = Field(False)
+#
+#     # role
+#     roleIndex: str | None = Field(None)
+#
+#     # Metrics
+#     reviveCount: int = Field(0)
+#     combatCount: int = Field(0)
+#     echoCount: int = Field(0)
+#     rewardCount: int = Field(0)
+#
+#     def toggle_boss(self):
+#         pass
+#
+#
+#
+# if __name__ == '__main__':
+#     print(Context())
+
+# CombatTracker
+# CombatStats
+# CombatSession
+# CombatMetrics
+# CombatContext
+# CombatSnapshot

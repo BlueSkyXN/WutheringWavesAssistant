@@ -37,8 +37,8 @@ class ColorChecker(BaseChecker):
         """
         多点匹配，逻辑或、与
         """
-        OR = "or"
-        AND = "and"
+        OR = "or"  # 默认使用或，一点匹配即可，适用于一个技能只有亮或灰两种状态
+        AND = "and"  # 当一个技能有多种变化，比如今汐E，则需要多点联合点位，使用与
 
     def __init__(self, points: Sequence[tuple[int, int]], colors: Sequence[tuple[int, int, int]], tolerance: int = 30,
                  logic=LogicEnum.OR):
@@ -152,17 +152,18 @@ class BaseCombo:
             if key == "a":
                 if press_time > 0.2:
                     raise ValueError("普攻按压时间不可大于0.2，默认统一填写0.05")
-                self.control_service.fight_click(0, 0, press_time)
+                self.control_service.fight_click(seconds=press_time)
             elif key == "z":
                 if press_time < 0.3:
                     raise ValueError("重击按压时间不可小于0.3，默认统一写0.5")
-                self.control_service.fight_click(0, 0, press_time)
-            # elif key == "w":
-            #     time.sleep(wait_time)
+                self.control_service.fight_click(seconds=press_time)
+            elif key == "w":
+                pass
             elif key == "j":
                 self.control_service.fight_tap("SPACE", press_time)
             elif key == "d":
-                self.control_service.fight_tap("LSHIFT", press_time)
+                # self.control_service.fight_tap("LSHIFT", press_time)
+                self.control_service.fight_right_click(seconds=press_time)
             else:
                 key_action = keys[3] if len(keys) >= 4 else None
                 if key_action == "down":
@@ -175,11 +176,12 @@ class BaseCombo:
                     self.control_service.fight_tap(key, press_time)
             if wait_time <= 0:
                 continue
-            # 最后一下可合轴，无需等待
+            # 最后一下可合轴，显示传入False表示无需等待后摇结束
             if i == max_size - 1 and end_wait is False:
                 break
             if not ignore_event and self.event is not None and not self.event.is_set():
                 raise StopError()
+            # 后摇等待
             time.sleep(wait_time)
 
 
@@ -383,7 +385,7 @@ class TeamMemberSelector:
             "verina", "verina", "verina", "encore", "encore", "encore",
             "camellya", "rover", "sanhua", "sanhua", "sanhua", "cantarella",
             "zani", "baizhi", "xiangliyao", "calcharo", "jianxin",
-            "cartethyia"
+            "cartethyia", #"ciaccona",
         ]
         # 头像网格，40像素放一个，1280宽度，一行放32个
         avatar_grid = (40, 40)

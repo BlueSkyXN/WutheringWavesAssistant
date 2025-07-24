@@ -2,6 +2,7 @@ import logging
 import time
 from datetime import datetime
 
+from src.core.constants import BossNameEnum
 from src.core.contexts import Status, Context
 from src.core.interface import ControlService, OCRService, ODService, ImgService, WindowService, BossInfoService
 from src.core.pages import Page, Position, TextMatch, ConditionalAction
@@ -973,6 +974,7 @@ class AutoBossServiceImpl(PageEventAbstractService):
         def judgment_leave() -> bool:
             time.sleep(0.1)
             return (
+                    self._info.lastBossName != BossNameEnum.NightmareHecate.value and
                     self._info.in_dungeon and
                     (datetime.now() - self._info.lastFightTime).seconds > self._config.MaxIdleTime
             )

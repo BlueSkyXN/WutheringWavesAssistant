@@ -33,3 +33,5 @@ class BossNameEnum(Enum):
     Fleurdelys = "芙露德莉斯"
     NightmareKelpie = "梦魇凯尔匹"
     LionessOfGlory = "荣耀狮像"
+    NightmareHecate = "梦魇赫卡忒"
+    Fenrico = "芬莱克"

@@ -300,6 +300,10 @@ class PlayerControlService(ABC):
         pass
 
     @abstractmethod
+    def fight_right_click(self, x: int | float = 0, y: int | float = 0, seconds: float | None = None):
+        pass
+
+    @abstractmethod
     def fight_tap(self, key: str, seconds: float | None = None):
         pass
 
@@ -321,6 +325,10 @@ class ExtendedControlService(ABC):
 
     @abstractmethod
     def forward_walk(self, forward_walk_times: int, sleep_seconds: float = None):
+        pass
+
+    @abstractmethod
+    def left_forward_walk(self, forward_walk_times: int, sleep_seconds: float = None):
         pass
 
     @abstractmethod

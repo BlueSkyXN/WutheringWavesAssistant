@@ -40,17 +40,18 @@ def combo_action(control_service, seq, after_time, cycle=50):
             if key == "a":
                 if press_time > 0.2:
                     raise ValueError("普攻按压时间不可大于0.2，默认统一填写0.05")
-                control_service.player().fight_click(0, 0, press_time)
+                control_service.player().fight_click(seconds=press_time)
             elif key == "z":
                 if press_time < 0.3:
                     raise ValueError("重击按压时间不可小于0.3，默认统一写0.5")
-                control_service.player().fight_click(0, 0, press_time)
+                control_service.player().fight_click(seconds=press_time)
             elif key == "w":
-                time.sleep(wait_time)
+                pass
             elif key == "j":
                 control_service.player().fight_tap("SPACE", press_time)
             elif key == "d":
-                control_service.player().fight_tap("LSHIFT", press_time)
+                # control_service.player().fight_tap("LSHIFT", press_time)
+                control_service.player().fight_right_click(seconds=press_time)
             else:
                 key_action = keys[3] if len(keys) >= 4 else None
                 if key_action == "down":
@@ -59,8 +60,9 @@ def combo_action(control_service, seq, after_time, cycle=50):
                     control_service.player().key_up(key, press_time)
                 else:
                     control_service.player().fight_tap(key, press_time)
-            if wait_time > 0:
-                time.sleep(wait_time)
+            if wait_time <= 0:
+                continue
+            time.sleep(wait_time)
         time.sleep(after_time)
 
 
@@ -716,6 +718,251 @@ def test_combo_cartethyia_AdvancedCombo2(control_service):
     combo_action(control_service, seq, 2)
 
 
+def test_combo_ciaccona(control_service):
+    # 夏空 BnB combo
+    seq = [
+        # 普攻4a
+        ["a", 0.05, 0.24],
+        ["a", 0.05, 0.88],
+        ["a", 0.05, 0.85],
+        ["a", 0.05, 1.30],
+        ["j", 0.05, 1.20],
+
+        # 普攻4a取消
+        ["a", 0.05, 0.24],
+        ["a", 0.05, 0.88],
+        ["a", 0.05, 0.85],
+        ["a", 0.05, 0.10],
+        ["d", 0.05, 0.30],
+        ["j", 0.05, 1.20],
+
+        # E3a E后从普攻第二段开始打 E加一层风蚀
+        ["E", 0.05, 0.50],
+        ["a", 0.05, 0.88],
+        ["a", 0.05, 0.85],
+        ["a", 0.05, 1.30],
+        ["j", 0.05, 1.20],
+
+        # jaaa
+        ["j", 0.05, 0.12],
+        ["a", 0.05, 0.65],
+        ["a", 0.05, 0.78],
+        ["a", 0.05, 1.20],
+        ["j", 0.05, 1.20],
+
+        # jaaa取消
+        ["j", 0.05, 0.12],
+        ["a", 0.05, 0.65],
+        ["a", 0.05, 0.78],
+        ["a", 0.05, 0.10],
+        ["d", 0.05, 1.00],
+        ["j", 0.05, 1.20],
+
+        # 3能量 重击 加一层风蚀
+        ["z", 1.54, 0.20],
+        ["j", 0.05, 1.20],
+
+        # 能量不满 重击上挑
+        ["z", 0.82, 0.05],
+        ["a", 0.05, 0.65],
+        ["a", 0.05, 0.78],
+        ["a", 0.05, 1.20],
+        ["j", 0.05, 1.20],
+
+        # 空中E 3音律重击
+        ["j", 0.05, 0.12],
+        ["E", 0.05, 0.15],
+        ["z", 1.30, 0.40],
+        ["j", 0.05, 1.20],
+
+        # R 风蚀
+        ["R", 0.05, 3.67],
+        # ["1", 0.05, 1.20],
+
+        # R 光噪
+        ["R", 0.05, 3.67],
+        ["A", 0.05, 0.30],
+        ["A", 0.05, 0.15],
+        # ["1", 0.05, 1.20],
+
+        # R 全程
+        ["R", 0.05, 3.67],  # 37950
+        ["w", 0.00, 34.28],
+        ["j", 0.05, 1.20],
+
+        # jaaaEaaa
+        ["j", 0.05, 0.12],
+        ["a", 0.05, 0.65],
+        ["a", 0.05, 0.78],
+        ["a", 0.05, 0.10],
+        ["E", 0.05, 0.50],
+        ["a", 0.05, 0.65],
+        ["a", 0.05, 0.78],
+        ["a", 0.05, 0.10],
+        ["j", 0.05, 1.20],
+
+        # jEaaajaaa BV1N8KyzAENt
+        ["j", 0.05, 0.12],
+        ["E", 0.05, 0.50],
+        ["a", 0.05, 0.65],
+        ["a", 0.05, 0.78],
+        ["a", 0.05, 0.10],
+        ["j", 0.05, 0.12],
+        ["a", 0.05, 0.65],
+        ["a", 0.05, 0.78],
+        ["a", 0.05, 0.10],
+        ["j", 0.05, 1.20],
+
+        # 枪系通用 瞄准加特林
+        ["G", 0.008, 0.008],
+
+        ["a", 0.008, 0.010],
+        ["G", 0.008, 0.008],
+        ["G", 0.008, 0.008],
+        ["a", 0.008, 0.010],
+        ["G", 0.008, 0.008],
+        ["G", 0.008, 0.008],
+        ["a", 0.008, 0.010],
+        ["G", 0.008, 0.008],
+        ["G", 0.008, 0.008],
+        ["a", 0.008, 0.010],
+        ["G", 0.008, 0.008],
+        ["G", 0.008, 0.008],
+        ["a", 0.008, 0.010],
+        ["G", 0.008, 0.008],
+        ["G", 0.008, 0.008],
+        ["a", 0.008, 0.010],
+        ["G", 0.008, 0.008],
+        ["G", 0.008, 0.008],
+        ["a", 0.008, 0.010],
+        ["G", 0.008, 0.008],
+        ["G", 0.008, 0.008],
+        ["a", 0.008, 0.010],
+        ["G", 0.008, 0.008],
+        ["G", 0.008, 0.008],
+        ["a", 0.008, 0.010],
+        ["G", 0.008, 0.008],
+        ["G", 0.008, 0.008],
+        ["a", 0.008, 0.010],
+        ["G", 0.008, 0.008],
+        ["G", 0.008, 0.008],
+        ["a", 0.008, 0.010],
+        ["G", 0.008, 0.008],
+        ["G", 0.008, 0.008],
+
+        ["G", 0.008, 0.008],
+
+        ["w", 0.00, 0.50],
+
+        # 普攻 瞄准无限戳
+        ["a", 0.008, 0.200],
+        ["G", 0.008, 0.008],
+        ["G", 0.008, 0.008],
+        ["a", 0.008, 0.200],
+        ["G", 0.008, 0.008],
+        ["G", 0.008, 0.008],
+        ["a", 0.008, 0.200],
+        ["G", 0.008, 0.008],
+        ["G", 0.008, 0.008],
+        ["a", 0.008, 0.200],
+        ["G", 0.008, 0.008],
+        ["G", 0.008, 0.008],
+        ["a", 0.008, 0.200],
+        ["G", 0.008, 0.008],
+        ["G", 0.008, 0.008],
+        ["a", 0.008, 0.200],
+        ["G", 0.008, 0.008],
+        ["G", 0.008, 0.008],
+        ["a", 0.008, 0.200],
+        ["G", 0.008, 0.008],
+        ["G", 0.008, 0.008],
+
+    ]
+    combo_action(control_service, seq, 2)
+
+
+def test_combo_phoebe(control_service):
+    # 菲比 BnB combo
+    seq = [
+        # 强化输出
+        ["z", 1.28, 0.28],
+        # # 强化辅助
+        # ["E", 1.28, 0.28],
+        ["j", 0.05, 1.20],
+
+        # E1
+        ["E", 0.05, 0.80],
+        ["j", 0.05, 1.20],
+
+        # E2
+        ["E", 0.05, 1.55],
+        ["j", 0.05, 1.20],
+
+        # 普攻3a
+        ["a", 0.05, 0.28],
+        ["a", 0.05, 0.51],
+        ["a", 0.05, 1.10],
+        ["j", 0.05, 1.20],
+
+        # 3az
+        ["a", 0.05, 0.28],
+        ["a", 0.05, 0.51],
+        ["a", 0.05, 0.66],
+        ["z", 0.92, 0.20],
+        ["j", 0.05, 1.20],
+
+        # # R
+        # ["R", 0.05, 3.63],
+        # ["j", 0.05, 1.20],
+
+    ]
+    combo_action(control_service, seq, 2)
+
+
+def test_combo_phoebe_AdvancedCombo(control_service):
+    # 菲比 BV1GWKKeVEnm
+    seq = [
+        # 满buff
+        ["E", 0.05, 0.05],
+        ["z", 0.80, 0.00],
+        ["Q", 0.05, 0.00],
+        ["E", 0.05, 0.05],
+        ["R", 0.05, 3.63],
+
+        # 3az
+        ["a", 0.05, 0.28],
+        ["a", 0.05, 0.51],
+        ["a", 0.05, 0.66],
+        ["z", 0.92, 0.20],
+        ["j", 0.05, 1.20],
+
+        # 3az
+        ["a", 0.05, 0.28],
+        ["a", 0.05, 0.51],
+        ["a", 0.05, 0.66],
+        ["z", 0.92, 0.20],
+        ["j", 0.05, 1.20],
+
+        # 3az
+        ["a", 0.05, 0.28],
+        ["a", 0.05, 0.51],
+        ["a", 0.05, 0.66],
+        ["z", 0.92, 0.20],
+        ["j", 0.05, 1.20],
+
+        # 3az
+        ["a", 0.05, 0.28],
+        ["a", 0.05, 0.51],
+        ["a", 0.05, 0.66],
+        ["z", 0.92, 0.20],
+        ["j", 0.05, 1.20],
+
+
+
+    ]
+    combo_action(control_service, seq, 6)
+
+
 def test_combat(container, control_service):
     window_service: WindowService = container.window_service()
     img_service: ImgService = container.img_service()
@@ -748,4 +995,5 @@ def test_combat(container, control_service):
 def test_CombatSystem(container, control_service):
     img_service: ImgService = container.img_service()
     combat_system = CombatSystem(control_service, img_service)
+    # combat_system.resonators = [combat_system.cartethyia]
     combat_system.start()

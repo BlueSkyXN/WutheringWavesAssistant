@@ -6,8 +6,10 @@ from src.core.combat.combat_core import TeamMemberSelector, BaseCombo, BaseReson
 from src.core.combat.resonator.camellya import Camellya
 from src.core.combat.resonator.cartethyia import Cartethyia
 from src.core.combat.resonator.changli import Changli
+from src.core.combat.resonator.ciaccona import Ciaccona
 from src.core.combat.resonator.encore import Encore
 from src.core.combat.resonator.jinhsi import Jinhsi
+from src.core.combat.resonator.phoebe import Phoebe
 from src.core.combat.resonator.sanhua import Sanhua
 from src.core.combat.resonator.shorekeeper import Shorekeeper
 from src.core.combat.resonator.verina import Verina
@@ -42,6 +44,8 @@ class CombatSystem:
         self.camellya = Camellya(self.control_service, self.img_service)
         self.sanhua = Sanhua(self.control_service, self.img_service)
         self.cartethyia = Cartethyia(self.control_service, self.img_service)
+        self.ciaccona = Ciaccona(self.control_service, self.img_service)
+        self.phoebe = Phoebe(self.control_service, self.img_service)
 
         self.resonator_map = {
             self.jinhsi.name_en: self.jinhsi,
@@ -52,6 +56,8 @@ class CombatSystem:
             self.camellya.name_en: self.camellya,
             self.sanhua.name_en: self.sanhua,
             self.cartethyia.name_en: self.cartethyia,
+            self.ciaccona.name_en: self.ciaccona,
+            self.phoebe.name_en: self.phoebe,
         }
         self.resonators = None
         self._sorted_resonators = None
