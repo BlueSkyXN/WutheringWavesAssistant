@@ -7,6 +7,7 @@ from typing import Callable
 import numpy as np
 
 from src.core.combat.combat_system import CombatSystem
+from src.core.constants import BossNameEnum
 from src.core.contexts import Context, Status
 from src.core.interface import ControlService, OCRService, PageEventService, ImgService, WindowService, ODService, \
     BossInfoService
@@ -775,7 +776,7 @@ class PageEventAbstractService(PageEventService, ABC):
                 if self._info.needHeal:
                     logger.info("有角色阵亡，开始治疗")
                     # time.sleep(1)
-                    self._info.lastBossName = "治疗"
+                    # self._info.lastBossName = "治疗"
                     self.transfer()
                     time.sleep(0.5)
                 return True
@@ -1676,6 +1677,33 @@ class PageEventAbstractService(PageEventService, ABC):
         if self._config.CharacterHeal and self._info.needHeal:  # 检查是否需要治疗
             logger.info("有角色阵亡，开始治疗")
             time.sleep(1)
+
+            # logger.info(f"self._info.lastBossName: {self._info.lastBossName}")
+            if self._info.lastBossName == BossNameEnum.NightmareHecate.value:
+                self._control_service.esc()
+                time.sleep(1)
+                position = self._ocr_service.find_text("^确认$")
+                if position:
+                    self.click_position(position)
+                    time.sleep(3)
+                    self.wait_home()
+                    logger.info(f"{self._info.lastBossName}副本结束")
+                    time.sleep(2)
+                    position = self._ocr_service.find_text("^进入梦.?领域$")
+                    if position:
+                        self._control_service.pick_up()
+                        logger.info("进入梦魇领域")
+                        time.sleep(1.5)
+                        self._control_service.pick_up()
+                        time.sleep(1.5)
+                        return True
+
+                    self._info.in_dungeon = False
+                    self._info.status = Status.idle
+                    now = datetime.now()
+                    self._info.lastFightTime = now + timedelta(seconds=self._config.MaxFightTime / 2)
+                    return True
+
             self._info.lastBossName = "治疗"
             self._transfer_to_heal()
 
