@@ -864,6 +864,9 @@ class AutoBossServiceImpl(PageEventAbstractService):
         confirm_leave_page = self.build_UI_ESC_LeaveInstance()
         self._dreamless_pages.append(confirm_leave_page)
 
+        # v2.5
+        self._dreamless_pages.append(self.build_UI_ESC_LeaveInstance_NightmareHecate())
+
         # # 结晶波片不足
         # def crystal_wave_action(positions: dict[str, Position]) -> bool:
         #     """

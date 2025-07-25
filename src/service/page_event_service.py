@@ -40,6 +40,7 @@ class PageEventAbstractService(PageEventService, ABC):
         self._UI_F2_Guidebook_Milestones = self.build_UI_F2_Guidebook_Milestones()
         self._UI_ESC_Terminal = self.build_UI_ESC_Terminal()
         self._UI_ESC_LeaveInstance = self.build_UI_ESC_LeaveInstance()
+        self._UI_ESC_LeaveInstance_NightmareHecate = self.build_UI_ESC_LeaveInstance_NightmareHecate()
         self._Reward_TapTheBlankAreaToClose = self.build_Reward_TapTheBlankAreaToClose()
         self._Reward_LuniteSubscriptionReward = self.build_Reward_LuniteSubscriptionReward()
         self._F_EnterForgeryChallenge = self.build_F_EnterForgeryChallenge()
@@ -345,7 +346,10 @@ class PageEventAbstractService(PageEventService, ABC):
 
         if action is None:
             def default_action(positions: dict[str, Position]) -> bool:
-                self._control_service.esc()
+                if self._context.param_config.autoCombatBeta is True and self.combat_system.resonators is None:
+                    self.team_members_ocr(positions.get("编队|Team"))
+                else:
+                    self._control_service.esc()
                 time.sleep(2)
                 return True
 
@@ -374,9 +378,13 @@ class PageEventAbstractService(PageEventService, ABC):
                         ),
                     ),
                 ),
+                # TextMatch(
+                #     name="生日|Birthday",
+                #     text=r"^(生日|Birthday)$",
+                # ),
                 TextMatch(
-                    name="生日|Birthday",
-                    text=r"^(生日|Birthday)$",
+                    name="编队|Team",
+                    text=r"^(编队|Team)$",
                 ),
                 TextMatch(
                     name="活动|Events",
@@ -478,6 +486,58 @@ class PageEventAbstractService(PageEventService, ABC):
                 TextMatch(
                     name="重新挑战|Restart",
                     text=r"^(重新挑战|Restart)$",
+                ),
+            ],
+            action=action if action else Page.error_action
+        )
+
+    def build_UI_ESC_LeaveInstance_NightmareHecate(self, action: Callable = None) -> Page:
+
+        if action is None:
+            def default_action(positions: dict[str, Position]) -> bool:
+                self._control_service.activate()
+                time.sleep(0.2)
+                pos = positions.get("确认|Confirm")
+                self.click_position(pos)
+                time.sleep(3)
+                self.wait_home()
+                logger.info(f"{self._info.lastBossName}副本结束")
+                time.sleep(2)
+                self._info.in_dungeon = False
+                self._info.status = Status.idle
+                now = datetime.now()
+                self._info.lastFightTime = now + timedelta(seconds=self._config.MaxFightTime / 2)
+                self._info.isCheckedHeal = False
+                return True
+
+            action = default_action
+
+        return Page(
+            name="UI-离开副本|LeaveInstance-NightmareHecate",
+            screenshot={
+                Languages.ZH: [
+                    # "UI_ESC_LeaveInstance_001.png",
+                ],
+                Languages.EN: [
+                    # "UI_ESC_LeaveInstance_001_EN.png",
+                ],
+            },
+            targetTexts=[
+                TextMatch(
+                    name="提示|Notice",
+                    text=r"^(提示|Notice)$",
+                ),
+                TextMatch(
+                    name="确认离开|Leave this domain",
+                    text=r"^(确认离开|Leave\s*this\s*domain)",
+                ),
+                TextMatch(
+                    name="确认|Confirm",
+                    text=r"^(确认|Confirm)$",
+                ),
+                TextMatch(
+                    name="取消|Cancel",
+                    text=r"^(取消|Cancel)$",
                 ),
             ],
             action=action if action else Page.error_action
@@ -828,6 +888,9 @@ class PageEventAbstractService(PageEventService, ABC):
                     if self._info.waitBoss:
                         logger.info("智能连招beta开启")  # 放这里不会频繁打印
                         self.boss_wait(self._info.lastBossName)
+                    if self.combat_system.resonators is None:
+                        self.team_members_ocr()
+                        return True
                     if self.combat_system.is_boss_health_bar_exist():
                         is_nightmare = self._boss_info_service.is_nightmare(self._info.lastBossName)
                         self.combat_system.is_nightmare = is_nightmare
@@ -968,6 +1031,9 @@ class PageEventAbstractService(PageEventService, ABC):
 
         if action is None:
             def default_action(positions: dict[str, Position]) -> bool:
+                if self._context.param_config.autoCombatBeta is True and self.combat_system.resonators is None:
+                    self.team_members_ocr()
+
                 self._control_service.pick_up()
                 self._info.in_dungeon = True
                 self._info.lastBossName = "无妄者"
@@ -1008,6 +1074,9 @@ class PageEventAbstractService(PageEventService, ABC):
 
         if action is None:
             def default_action(positions: dict[str, Position]) -> bool:
+                if self._context.param_config.autoCombatBeta is True and self.combat_system.resonators is None:
+                    self.team_members_ocr()
+
                 self._control_service.pick_up()
                 self._info.in_dungeon = True
                 self._info.lastBossName = "角"
@@ -1036,6 +1105,9 @@ class PageEventAbstractService(PageEventService, ABC):
 
         if action is None:
             def default_action(positions: dict[str, Position]) -> bool:
+                if self._context.param_config.autoCombatBeta is True and self.combat_system.resonators is None:
+                    self.team_members_ocr()
+
                 self._control_service.pick_up()
                 self._info.in_dungeon = True
                 # TODO 启动时就站在声之领域门口，无法区分是打哪个boss
@@ -1942,8 +2014,11 @@ class PageEventAbstractService(PageEventService, ABC):
             time.sleep(1.2)  # 等站稳了再动
 
             if self._context.param_config.autoCombatBeta is True:
+                if self.combat_system.resonators is None:
+                    self.team_members_ocr()
+
                 # 移动前检查，如 椿退出红椿状态
-                self.combat_system.move_prepare()
+                self.combat_system.move_prepare(camellya_reset=(bossName == BossNameEnum.NightmareHecate.value))
 
             if forward_walk_times > 0:
                 if bossName == "赫卡忒" and self._ocr_service.find_text("进入声之领域"):
@@ -2182,3 +2257,65 @@ class PageEventAbstractService(PageEventService, ABC):
                     time.sleep(0.05)
                 time.sleep(0.5)
             self._control_service.pick_up()
+
+    def team_members_ocr(self, team_pos=None):
+        if team_pos is None:
+            self._control_service.esc()
+            time.sleep(1.5)
+            self._ocr_service.wait_text(["确认离开", "^确认$", "编队", "终端", "活动"])
+            time.sleep(0.8)
+            img = self._img_service.screenshot()
+            ocr_results = self._ocr_service.ocr(img)
+            confirm_leave_pos = self._ocr_service.search_text(ocr_results, "^确认离开")
+            confirm_pos = self._ocr_service.search_text(ocr_results, "^确认$")
+            if confirm_leave_pos and confirm_pos:
+                self._control_service.click(*confirm_pos.center)
+                time.sleep(3)
+                self.wait_home()
+                time.sleep(2)
+                self._info.in_dungeon = False
+                self._info.status = Status.idle
+                now = datetime.now()
+                self._info.lastFightTime = now + timedelta(seconds=self._config.MaxFightTime / 2)
+
+                self._control_service.esc()
+                time.sleep(1.5)
+
+        team_pos = self._ocr_service.wait_text("^编队$")
+        if team_pos:
+            time.sleep(0.6)
+            self._control_service.click(*team_pos.center)
+            time.sleep(1)
+            quick_setup_pos = self._ocr_service.wait_text("^快速编队$")
+            if quick_setup_pos:
+                img = self._img_service.screenshot()
+                ocr_results = self._ocr_service.ocr(img)
+                avatar_names = [
+                    "今汐", "长离",
+                    "守岸人",
+                    "维里奈", "安可",
+                    "椿", "散华", "坎特蕾拉",
+                    # "zani", "baizhi", "xiangliyao", "calcharo", "jianxin",
+                    "卡提希娅",  # "ciaccona",
+                ]
+                avatar_pos_array = []
+                for avatar_name in avatar_names:
+                    avatar_pos = self._ocr_service.search_text(ocr_results, f"^{avatar_name}$")
+                    if avatar_pos:
+                        avatar_pos_array.append((avatar_name, avatar_pos))
+                avatar_pos_array_sorted = sorted(avatar_pos_array, key=lambda x: x[1].x1)
+                logger.debug(f"avatar_pos_array_sorted: {avatar_pos_array_sorted}")
+                team_members = [None, None, None]
+                w, h = self._window_service.get_client_wh()
+                for avatar_tuple in avatar_pos_array_sorted:
+                    if avatar_tuple[1].x2 < int(w * 500 / 1280):
+                        index = 0
+                    elif avatar_tuple[1].x2 > int(w * 850 / 1280):
+                        index = 2
+                    else:
+                        index = 1
+                    team_members[index] = avatar_tuple[0]
+
+                self.combat_system.set_resonators(team_members)
+                self._control_service.esc()
+                time.sleep(3)

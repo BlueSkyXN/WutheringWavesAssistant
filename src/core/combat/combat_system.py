@@ -191,6 +191,22 @@ class CombatSystem:
     #     with self._lock:
     #         return self.event.is_set()
 
+    def set_resonators(self, resonator_names_zh: list[str]):
+        resonators: list[BaseResonator] = []
+        resonators_names_en = []
+        for name_zh in resonator_names_zh:
+            if not name_zh:
+                resonators.append(None)
+                continue
+            for names_en, resonator in self.resonator_map.items():
+                if resonator.name == name_zh:
+                    resonators.append(resonator)
+                    resonators_names_en.append(resonator.name_en)
+                    break
+        logger.info(resonators_names_en)
+        logger.info(f"编队: {resonator_names_zh}")
+        self.resonators = resonators
+
     def is_boss_health_bar_exist(self):
         return BaseResonator.is_boss_health_bar_exist(self.img_service.screenshot())
 
