@@ -1759,6 +1759,8 @@ class PageEventAbstractService(PageEventService, ABC):
                     self.click_position(position)
                     time.sleep(3)
                     self.wait_home()
+                    self._info.needHeal = False
+                    self._info.healCount += 1
                     logger.info(f"{self._info.lastBossName}副本结束")
                     time.sleep(2)
                     position = self._ocr_service.find_text("^进入梦.?领域$")
