@@ -1785,6 +1785,10 @@ class PageEventAbstractService(PageEventService, ABC):
 
         self._control_service.activate()
         time.sleep(0.2)
+
+        if self._context.param_config.autoCombatBeta is True and self.combat_system.resonators is None:
+            self.team_members_ocr()
+
         self._control_service.guide_book()
         time.sleep(1)
         if not self._ocr_service.wait_text(["日志", "活跃", "挑战", "强者", "残象", "周期", "探寻", "漂泊"], timeout=7):
