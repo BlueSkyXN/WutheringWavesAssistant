@@ -2,7 +2,7 @@ import logging
 
 import numpy as np
 
-from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo, CharClassEnum
+from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo, CharClassEnum, LogicEnum
 from src.core.interface import ControlService, ImgService
 
 logger = logging.getLogger(__name__)
@@ -11,8 +11,7 @@ logger = logging.getLogger(__name__)
 class BasePhoebe(BaseResonator):
 
     def __init__(self, control_service: ControlService, img_service: ImgService):
-        super().__init__(control_service)
-        self.img_service = img_service
+        super().__init__(control_service, img_service)
 
         self.name = "菲比"
         self.name_en = "phoebe"
@@ -24,7 +23,7 @@ class BasePhoebe(BaseResonator):
         self._prayer_base_form_point = [(547, 668), (593, 668), (653, 668), (712, 668)]
         self._prayer_base_form_color = [(148, 213, 250), (144, 185, 217)]  # BGR
         self._prayer_base_form_checker = ColorChecker(
-            self._prayer_base_form_point, self._prayer_base_form_color, logic=ColorChecker.LogicEnum.AND)
+            self._prayer_base_form_point, self._prayer_base_form_color, logic=LogicEnum.AND)
 
         # 祈愿 选择形态后
         self._prayer_shifted_form_point = [(721, 675)]
@@ -51,25 +50,25 @@ class BasePhoebe(BaseResonator):
         self._absolution_enhancement_point = [(633, 672), (634, 672)]
         self._absolution_enhancement_color = [(175, 234, 248)]  # BGR
         self._absolution_enhancement_checker = ColorChecker(
-            self._absolution_enhancement_point, self._absolution_enhancement_color, logic=ColorChecker.LogicEnum.AND)
+            self._absolution_enhancement_point, self._absolution_enhancement_color, logic=LogicEnum.AND)
 
         # 告解 福音条中间 蓝白色为辅助形态
         self._confession_enhancement_point = [(633, 672), (634, 672)]
         self._confession_enhancement_color = [(255, 255, 253)]  # BGR
         self._confession_enhancement_checker = ColorChecker(
-            self._confession_enhancement_point, self._confession_enhancement_color, logic=ColorChecker.LogicEnum.AND)
+            self._confession_enhancement_point, self._confession_enhancement_color, logic=LogicEnum.AND)
 
         # 共鸣技能 E1
         self._resonance_skill_point = [(1057, 637), (1071, 637)]
         self._resonance_skill_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_checker = ColorChecker(
-            self._resonance_skill_point, self._resonance_skill_color, logic=ColorChecker.LogicEnum.AND)
+            self._resonance_skill_point, self._resonance_skill_color, logic=LogicEnum.AND)
 
         # 共鸣技能 E2
         self._resonance_skill_2_point = [(1063, 644), (1065, 644), (1064, 645), (1066, 645)]
         self._resonance_skill_2_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_2_checker = ColorChecker(
-            self._resonance_skill_2_point, self._resonance_skill_2_color, logic=ColorChecker.LogicEnum.AND)
+            self._resonance_skill_2_point, self._resonance_skill_2_color, logic=LogicEnum.AND)
 
         # 声骸技能
         self._echo_skill_point = [(1134, 653), (1137, 653)]

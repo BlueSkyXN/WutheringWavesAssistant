@@ -55,6 +55,16 @@ class SettingInterface(ScrollArea):
             ],
             parent=self.personalGroup
         )
+        self.windowSizeCard = OptionsSettingCard(
+            cfg.windowSize,
+            FIF.ZOOM,
+            self.tr("界面大小"),
+            self.tr("调整界面宽高"),
+            texts=[
+                "720x720", "Default"
+            ],
+            parent=self.personalGroup
+        )
         self.zoomCard = OptionsSettingCard(
             cfg.dpiScale,
             FIF.ZOOM,
@@ -142,6 +152,7 @@ class SettingInterface(ScrollArea):
         # add cards to group
         # self.personalGroup.addSettingCard(self.micaCard)
         self.personalGroup.addSettingCard(self.themeCard)
+        self.personalGroup.addSettingCard(self.windowSizeCard)
         self.personalGroup.addSettingCard(self.zoomCard)
         self.personalGroup.addSettingCard(self.languageCard)
 
@@ -174,6 +185,7 @@ class SettingInterface(ScrollArea):
         # personalization
         cfg.themeChanged.connect(setTheme)
         # self.micaCard.checkedChanged.connect(signalBus.micaEnableChanged)
+        self.windowSizeCard.optionChanged.connect(signalBus.windowSizeChanged.emit)
 
         # about
         self.feedbackCard.clicked.connect(

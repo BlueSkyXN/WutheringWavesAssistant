@@ -16,46 +16,153 @@ logger = logging.getLogger(__name__)
 class BaseChecker:
 
     def __init__(self):
-        self.unit = (1280, 720)  # 坐标参考系，默认使用1280x720下的坐标，根据传入的图片动态等比缩放
+        pass
 
     def check(self, img: np.ndarray) -> bool:
         pass
 
-    def get_scale(self, img: np.ndarray) -> float:
-        h, w = img.shape[:2]
-        if abs(w / h - self.unit[0] / self.unit[1]) > 0.05:
-            raise ValueError("不支持的像素比例，请使用16:9")
-        scale = w / self.unit[0]
-        # logger.debug(f"scale: {scale:.4f}")
-        return scale
+
+class LogicEnum(Enum):
+    """
+    多点匹配，逻辑或、与
+    """
+    OR = "or"  # 默认使用或，一点匹配即可，适用于一个技能只有亮或灰两种状态
+    AND = "and"  # 当一个技能有多种变化，比如今汐E，则需要多点联合点位，使用与
+
+
+class AlignEnum(Enum):
+    """
+    对齐方式，默认底部对齐
+    """
+    BUTTON_RIGHT = "button_right"  # 底部对齐，右对齐，如角色的技能
+    BUTTON_CENTER = "button_center"  # 底部对齐，居中，如角色的血条、能量条
+    TOP_RIGHT = "top_right"  # 顶部对齐，右对齐，右侧的角色头像
+    TOP_CENTER = "top_center"  # 顶部对齐，居中，如boss血条
+
+
+class ResolutionEnum(Enum):
+    """
+    分辨率类型
+    """
+    STANDARD = 0  # 标准16:9
+    TALL = 1  # 更高，如16:10等
+    WIDE = 2  # 更宽，如21:9等
+
+
+class DynamicPointTransformer:
+
+    def __init__(self, h_w: np.ndarray | tuple[int, int]):
+        if isinstance(h_w, tuple):
+            h, w = h_w
+        elif isinstance(h_w, np.ndarray):
+            h, w = h_w.shape[:2]
+        else:
+            raise TypeError("h_w must be either a ndarray or a tuple")
+        if w == 0 or h == 0:
+            raise ValueError("宽高异常，不能为0")
+
+        self.h = h
+        self.w = w
+        self.ratio_16_9 = 16 / 9
+        self.ratio_w_h = w / h
+        self.ratio_w_1280 = w / 1280
+        self.ratio_h_720 = h / 720
+        self.w_diff = w - 1280 * h / 720
+        self.h_diff = h - 720 * w / 1280
+
+        if abs(self.ratio_w_h - self.ratio_16_9) <= 0.01:
+            # 16:9
+            resolution = ResolutionEnum.STANDARD
+            # logger.debug(f"比例: 16:9")
+        elif self.ratio_w_h < self.ratio_16_9:
+            # 16:10等，高度更高
+            resolution = ResolutionEnum.TALL
+            # logger.debug(f"比例: 16:{16 * h / w:.2f}")
+        else: # self.ratio_w_h > self.ratio_16_9:
+            # 21:9等，宽度更宽
+            resolution = ResolutionEnum.WIDE
+            # logger.debug(f"比例: 16:{16 * h / w:.2f}")
+        self.resolution = resolution
+
+    def transform(self, src_point: tuple[int, int], align: AlignEnum | None = None) -> tuple[int, int]:
+        # 标准分辨率直接等比缩放
+        if self.resolution == ResolutionEnum.STANDARD:
+            return int(src_point[0] * self.ratio_w_1280), int(src_point[1] * self.ratio_w_1280)
+
+        # 非标准分辨率，按对齐方式选择映射方式
+        new_x = None
+        new_y = None
+
+        # x
+        if align is None or align in [AlignEnum.BUTTON_RIGHT, AlignEnum.TOP_RIGHT]:
+            if self.resolution == ResolutionEnum.TALL:
+                new_x = src_point[0] * self.ratio_w_1280
+            elif self.resolution == ResolutionEnum.WIDE:
+                new_x = self.w_diff + src_point[0] * self.ratio_h_720
+        elif align in [AlignEnum.BUTTON_CENTER, AlignEnum.TOP_CENTER]:
+            if self.resolution == ResolutionEnum.TALL:
+                new_x = src_point[0] * self.ratio_w_1280
+            elif self.resolution == ResolutionEnum.WIDE:
+                new_x = self.w_diff / 2 + src_point[0] * self.ratio_h_720
+        else:
+            # 左对齐，暂时没有
+            pass
+
+        # y
+        if align is None or align in [AlignEnum.BUTTON_RIGHT, AlignEnum.BUTTON_CENTER]:
+            if self.resolution == ResolutionEnum.TALL:
+                new_y = self.h_diff + src_point[1] * self.ratio_w_1280
+            elif self.resolution == ResolutionEnum.WIDE:
+                new_y = src_point[1] * self.ratio_h_720
+        elif align in [AlignEnum.TOP_RIGHT, AlignEnum.TOP_CENTER]:
+            if self.resolution == ResolutionEnum.TALL:
+                new_y = src_point[1] * self.ratio_w_1280
+            elif self.resolution == ResolutionEnum.WIDE:
+                new_y = src_point[1] * self.ratio_h_720
+
+        if new_x is None or new_y is None:
+            logger.debug(f"new_x: {new_x}, new_y: {new_y}")
+            raise ValueError("未知的枚举值")
+
+        new_point = (int(new_x), int(new_y))
+        # logger.debug(f"src_point: {src_point}, new_point: {new_point}")
+        return new_point
+
+    # def equals(self, h_w: np.ndarray | tuple[int, int]):
+    #     if isinstance(h_w, np.ndarray):
+    #         h, w = h_w.shape[:2]
+    #     elif isinstance(h_w, tuple):
+    #         h, w = h_w
+    #     else:
+    #         raise TypeError("h_w must be either a ndarray or a tuple")
+    #     return self.h == h and self.w == w
 
 
 class ColorChecker(BaseChecker):
     """ 像素颜色校验器 """
 
-    class LogicEnum(Enum):
-        """
-        多点匹配，逻辑或、与
-        """
-        OR = "or"  # 默认使用或，一点匹配即可，适用于一个技能只有亮或灰两种状态
-        AND = "and"  # 当一个技能有多种变化，比如今汐E，则需要多点联合点位，使用与
-
     def __init__(self, points: Sequence[tuple[int, int]], colors: Sequence[tuple[int, int, int]], tolerance: int = 30,
-                 logic=LogicEnum.OR):
+                 logic=LogicEnum.OR, align: AlignEnum = None):
         super().__init__()
         self.points = points  # 坐标 x,y
         self.colors = np.array(colors)  # BGR
         self.tolerance = tolerance  # 容差
         self.logic = logic
+        self.align = align  # 对齐方式
 
     def check(self, img: np.ndarray) -> bool:
         if self.points is None or len(self.points) == 0:
             raise ValueError("Points is empty")
-        if self.logic == self.LogicEnum.OR:
+
+        dpt = DynamicPointTransformer(img)
+
+        if self.logic == LogicEnum.OR:
             # 多点匹配，一个点的颜色匹配上就为真
-            scale = self.get_scale(img)
-            for point in self.points:
-                target = img[int(scale * point[1]), int(scale * point[0])]
+            # scale = self.get_scale(img)
+            for pre_point in self.points:
+                point = dpt.transform(pre_point, self.align)
+                # target = img[int(scale * point[1]), int(scale * point[0])]
+                target = img[point[1], point[0]]
                 # logger.debug(f"target: {target}")
                 # 颜色按或匹配
                 for sample in self.colors:
@@ -63,11 +170,13 @@ class ColorChecker(BaseChecker):
                         # logger.debug(f"sample: {sample}")
                         return True
             return False
-        elif self.logic == self.LogicEnum.AND:
+        elif self.logic == LogicEnum.AND:
             # 多点匹配，所有点的颜色都匹配才为真
-            scale = self.get_scale(img)
-            for point in self.points:
-                target = img[int(scale * point[1]), int(scale * point[0])]
+            # scale = self.get_scale(img)
+            for pre_point in self.points:
+                point = dpt.transform(pre_point, self.align)
+                # target = img[int(scale * point[1]), int(scale * point[0])]
+                target = img[point[1], point[0]]
                 # logger.debug(f"target: {target}")
                 # 颜色按或匹配
                 is_color_match = False
@@ -195,6 +304,10 @@ class CharClassEnum(Enum):
 class BaseResonator:
     """ 共鸣者 """
 
+    def __init__(self, control_service: ControlService, img_service: ImgService):
+        self.control_service = control_service
+        self.img_service = img_service
+
     def char_class(self) -> list[CharClassEnum]:
         """ 角色分类 """
         raise NotImplementedError()
@@ -220,17 +333,11 @@ class BaseResonator:
 
     @classmethod
     def is_avatar_grey(cls, img: np.ndarray, member: int) -> bool:
-        # 角色头像检查点，一般是中心点
-        point = [1195, 168, 1]  # 坐标x,y，第三个是采样点在几号角色位
-        # 右侧123号位角色血条起始点，用于定位，计算相对位置
-        team_member_health_points = [(1170, 192), (1170, 280), (1170, 368)]
-        if member > 1:
-            member_1_point = team_member_health_points[0]
-            member_n_point = team_member_health_points[member - 1]
-            point = [
-                point[0],
-                point[1] + member_n_point[1] - member_1_point[1]
-            ]
+        dpt = DynamicPointTransformer(img)
+        # team_member_health_points = [(1170, 192), (1170, 280), (1170, 368)]  # 右侧123号位角色血条起始点，用于定位，计算相对位置
+        team_member_points = [(1195, 168), (1195, 168 + 280 - 192), (1195, 168 + 368 - 192)]
+        point = team_member_points[member - 1]
+        point = dpt.transform(point, AlignEnum.TOP_RIGHT)
         b, g, r = img[point[1], point[0]]
         tolerance = 1  # 容差
         # uint8转为int
@@ -242,7 +349,7 @@ class BaseResonator:
     def boss_hp(cls, img: np.ndarray) -> float:
         """ boss剩余血条比例，归一 """
         # 血条为黄到红的渐变色
-        health_01_point = [(452, 41)]
+        health_01_point = [(454, 41)]
         health_01_color = [(68, 179, 255)]  # BGR
 
         health_20_point = [(528, 41)]
@@ -258,18 +365,18 @@ class BaseResonator:
         health_100_color = [(8, 37, 255)]  # BGR
 
         health = 0.0
-        if ColorChecker(health_01_point, health_01_color).check(img):
-            health = 0.01  # 这里不准，不能用来判断boss是否存活
-        if ColorChecker(health_20_point, health_20_color).check(img):
+        if ColorChecker(health_01_point, health_01_color, align=AlignEnum.TOP_CENTER).check(img):
+            health = 0.01  # 血量1%
+        if ColorChecker(health_20_point, health_20_color, align=AlignEnum.TOP_CENTER).check(img):
             health = 0.20
             # logger.debug("boss_hp: %s", health)
-        if ColorChecker(health_30_point, health_30_color).check(img):
+        if ColorChecker(health_30_point, health_30_color, align=AlignEnum.TOP_CENTER).check(img):
             health = 0.30
             # logger.debug("boss_hp: %s", health)
-        if ColorChecker(health_50_point, health_50_color).check(img):
+        if ColorChecker(health_50_point, health_50_color, align=AlignEnum.TOP_CENTER).check(img):
             health = 0.50
             # logger.debug("boss_hp: %s", health)
-        if ColorChecker(health_100_point, health_100_color).check(img):
+        if ColorChecker(health_100_point, health_100_color, align=AlignEnum.TOP_CENTER).check(img):
             health = 1.00
 
         logger.debug("boss_hp: %s", health)
@@ -283,27 +390,27 @@ class BaseResonator:
         # 血条为黄到红的渐变色
         health_01_point = [(449, 41)]
         health_01_color = [(68, 179, 255), (68, 168, 240), (68, 155, 219)]  # BGR
-        health_01_checker = ColorChecker(health_01_point, health_01_color, tolerance=tolerance)
+        health_01_checker = ColorChecker(health_01_point, health_01_color, tolerance=tolerance, align=AlignEnum.TOP_CENTER)
 
         health_02_point = [(452, 41), (451, 41), (450, 41)]
         # health_02_color = [(68, 179, 255), (47, 20, 37)]  # BGR
         health_02_color = [(69, 138, 194), (68, 179, 255)]  # BGR
-        health_02_checker = ColorChecker(health_02_point, health_02_color, tolerance=tolerance)
+        health_02_checker = ColorChecker(health_02_point, health_02_color, tolerance=tolerance, align=AlignEnum.TOP_CENTER)
 
         health_20_point = [(528, 41)]
         # health_20_color = [(62, 164, 255), (47, 18, 28)]  # BGR
         health_20_color = [(62, 164, 255)]  # BGR
-        health_20_checker = ColorChecker(health_20_point, health_20_color, tolerance=tolerance)
+        health_20_checker = ColorChecker(health_20_point, health_20_color, tolerance=tolerance, align=AlignEnum.TOP_CENTER)
 
         health_30_point = [(565, 41)]
         # health_30_color = [(55, 148, 255), (47, 17, 27)]  # BGR
         health_30_color = [(55, 148, 255)]  # BGR
-        health_30_checker = ColorChecker(health_30_point, health_30_color, tolerance=tolerance)
+        health_30_checker = ColorChecker(health_30_point, health_30_color, tolerance=tolerance, align=AlignEnum.TOP_CENTER)
 
         health_50_point = [(641, 41)]
         # health_50_color = [(38, 109, 255), (51, 19, 29)]  # BGR
         health_50_color = [(38, 109, 255)]  # BGR
-        health_50_checker = ColorChecker(health_50_point, health_50_color, tolerance=tolerance)
+        health_50_checker = ColorChecker(health_50_point, health_50_color, tolerance=tolerance, align=AlignEnum.TOP_CENTER)
 
         # health_100_point = [(830, 41)]
         # health_100_color = [(8, 37, 255), (65, 30, 41), (93, 80, 83)]  # BGR
@@ -331,7 +438,7 @@ class BaseResonator:
 
         # 瘫痪后，共振条由白色变为黄色
         immobilize_color = [(28, 235, 255)]  # BGR
-        checker = ColorChecker(vibration_strength_00_point, immobilize_color)
+        checker = ColorChecker(vibration_strength_00_point, immobilize_color, align=AlignEnum.TOP_CENTER)
         is_immobilized = checker.check(img)
         logger.debug("is_immobilized: %s", is_immobilized)
         return is_immobilized
@@ -352,19 +459,19 @@ class TeamMemberSelector:
         self._team_member_1_point = [*self.point_2, *self.point_3]
         self._team_member_1_color = self.colors
         self._team_member_1_checker = ColorChecker(
-            self._team_member_1_point, self._team_member_1_color, 20, logic=ColorChecker.LogicEnum.AND)
+            self._team_member_1_point, self._team_member_1_color, 20, logic=LogicEnum.AND, align=AlignEnum.TOP_RIGHT)
 
         # team_member 2
         self._team_member_2_point = [*self.point_1, *self.point_3]
         self._team_member_2_color = self.colors
         self._team_member_2_checker = ColorChecker(
-            self._team_member_2_point, self._team_member_2_color, 20, logic=ColorChecker.LogicEnum.AND)
+            self._team_member_2_point, self._team_member_2_color, 20, logic=LogicEnum.AND, align=AlignEnum.TOP_RIGHT)
 
         # team_member 3
         self._team_member_3_point = [*self.point_1, *self.point_2]
         self._team_member_3_color = self.colors
         self._team_member_3_checker = ColorChecker(
-            self._team_member_3_point, self._team_member_3_color, 20, logic=ColorChecker.LogicEnum.AND)
+            self._team_member_3_point, self._team_member_3_color, 20, logic=LogicEnum.AND, align=AlignEnum.TOP_RIGHT)
 
         self._team_member_map = {
             1: self._team_member_1_checker,
@@ -372,89 +479,89 @@ class TeamMemberSelector:
             3: self._team_member_3_checker,
         }
 
-    def get_avatars(self) -> dict[str, np.ndarray]:
-        """ 获取所有角色的头像 """
-        from src.util import file_util, img_util
-        # 所有头像都放在一张透明图里1280x720，按网格摆放
-        img_path = file_util.get_assets_template("Avatars.png")
-        img = img_util.read_img(img_path, alpha=False)
-        # logger.debug("img shape: %s", img.shape)
-        # 头像摆放顺序
-        avatar_names = [ # 重复的为皮肤或亮暗背景下的头像
-            "jinhsi", "jinhsi", "jinhsi", "jinhsi", "jinhsi", "changli", "changli", "changli", "shorekeeper",
-            "verina", "verina", "verina", "encore", "encore", "encore",
-            "camellya", "rover", "sanhua", "sanhua", "sanhua", "cantarella",
-            "zani", "baizhi", "xiangliyao", "calcharo", "jianxin",
-            "cartethyia", #"ciaccona",
-        ]
-        # 头像网格，40像素放一个，1280宽度，一行放32个
-        avatar_grid = (40, 40)
-        # 头像在网格内的位置，左上角0,0 到 右下角这个位置的正方形。有四个像素的空白间隙
-        avatar_wh = (36, 36)
-        x = 0
-        y = 0
-        avatar_map = {}
-        for name in avatar_names:
-            avatar_grid_img = img[y:y + avatar_grid[1], x:x + avatar_grid[0]]
-            avatar_img = avatar_grid_img[0:avatar_wh[1], 0:avatar_wh[0]]
-            avatar_map[name] = avatar_img
-            # img_util.save_img_in_temp(avatar_img)
-            x = x + avatar_grid[0]
-            if x >= 1280:
-                x = 0
-                y = y + avatar_grid[1]
-        return avatar_map
-
-    def get_team_members(self, img: np.ndarray | None = None) -> list[str]:
-        """
-        识别画面中的角色，从上到下
-        :param img: 16:9 BGR
-        :return:
-        """
-        if img is None:
-            img = self.img_service.screenshot()
-            # from src.util import img_util
-            # img_util.save_img_in_temp(img)
-        img = self.img_service.resize(img)
-        logger.debug("img shape: %s", img.shape)
-        # start_col = int(img.shape[1] * 0.85)
-        # img = img[:, start_col:]
-        # img = img[135:372, 1168:1225]
-        # 123号位角色头像在图中的区域
-        member_regions = [(1167, 135, 1230, 198), (1167, 224, 1230, 285), (1167, 314, 1230, 373)]
-        avatars = self.get_avatars()
-        members = []
-        for i, region in enumerate(member_regions):
-            # 每个位置都匹配一遍头像，找出相似度最高的那个
-            region_img = img[region[1]:region[3], region[0]:region[2]]
-            # from src.util import img_util
-            # img_util.save_img_in_temp(region_img)
-            match_results = []
-            for avatar_name, avatar_img in avatars.items():
-                position = self.img_service.match_template(region_img, avatar_img, threshold=0.3)
-                logger.debug(f"{i} avatar: {avatar_name}, position: {position}")
-                if not position:
-                    continue
-                match_results.append((avatar_name, position.confidence))
-            logger.debug(f"{i} match_results: {match_results}")
-            if len(match_results) == 0:
-                members.append(None)
-                continue
-            if len(match_results) > 1:
-                match_results.sort(key=lambda x: x[1], reverse=True)  # 从大到小
-            logger.debug(f"{i} match_results: {match_results}")
-            members.append(match_results[0])
-
-        logger.debug(f"members: {members}")
-        member_names = []
-        for i, member in enumerate(members):
-            if member is None:
-                logger.warning(f"无法识别{i + 1}号位角色")
-                member_names.append(None)
-                continue
-            member_names.append(member[0])
-        logger.info(f"member_names: {member_names}")
-        return member_names
+    # def get_avatars(self) -> dict[str, np.ndarray]:
+    #     """ 获取所有角色的头像 """
+    #     from src.util import file_util, img_util
+    #     # 所有头像都放在一张透明图里1280x720，按网格摆放
+    #     img_path = file_util.get_assets_template("Avatars.png")
+    #     img = img_util.read_img(img_path, alpha=False)
+    #     # logger.debug("img shape: %s", img.shape)
+    #     # 头像摆放顺序
+    #     avatar_names = [ # 重复的为皮肤或亮暗背景下的头像
+    #         "jinhsi", "jinhsi", "jinhsi", "jinhsi", "jinhsi", "changli", "changli", "changli", "shorekeeper",
+    #         "verina", "verina", "verina", "encore", "encore", "encore",
+    #         "camellya", "rover", "sanhua", "sanhua", "sanhua", "cantarella",
+    #         "zani", "baizhi", "xiangliyao", "calcharo", "jianxin",
+    #         "cartethyia", #"ciaccona",
+    #     ]
+    #     # 头像网格，40像素放一个，1280宽度，一行放32个
+    #     avatar_grid = (40, 40)
+    #     # 头像在网格内的位置，左上角0,0 到 右下角这个位置的正方形。有四个像素的空白间隙
+    #     avatar_wh = (36, 36)
+    #     x = 0
+    #     y = 0
+    #     avatar_map = {}
+    #     for name in avatar_names:
+    #         avatar_grid_img = img[y:y + avatar_grid[1], x:x + avatar_grid[0]]
+    #         avatar_img = avatar_grid_img[0:avatar_wh[1], 0:avatar_wh[0]]
+    #         avatar_map[name] = avatar_img
+    #         # img_util.save_img_in_temp(avatar_img)
+    #         x = x + avatar_grid[0]
+    #         if x >= 1280:
+    #             x = 0
+    #             y = y + avatar_grid[1]
+    #     return avatar_map
+    #
+    # def get_team_members(self, img: np.ndarray | None = None) -> list[str]:
+    #     """
+    #     识别画面中的角色，从上到下
+    #     :param img: 16:9 BGR
+    #     :return:
+    #     """
+    #     if img is None:
+    #         img = self.img_service.screenshot()
+    #         # from src.util import img_util
+    #         # img_util.save_img_in_temp(img)
+    #     img = self.img_service.resize(img)
+    #     logger.debug("img shape: %s", img.shape)
+    #     # start_col = int(img.shape[1] * 0.85)
+    #     # img = img[:, start_col:]
+    #     # img = img[135:372, 1168:1225]
+    #     # 123号位角色头像在图中的区域
+    #     member_regions = [(1167, 135, 1230, 198), (1167, 224, 1230, 285), (1167, 314, 1230, 373)]
+    #     avatars = self.get_avatars()
+    #     members = []
+    #     for i, region in enumerate(member_regions):
+    #         # 每个位置都匹配一遍头像，找出相似度最高的那个
+    #         region_img = img[region[1]:region[3], region[0]:region[2]]
+    #         # from src.util import img_util
+    #         # img_util.save_img_in_temp(region_img)
+    #         match_results = []
+    #         for avatar_name, avatar_img in avatars.items():
+    #             position = self.img_service.match_template(region_img, avatar_img, threshold=0.3)
+    #             logger.debug(f"{i} avatar: {avatar_name}, position: {position}")
+    #             if not position:
+    #                 continue
+    #             match_results.append((avatar_name, position.confidence))
+    #         logger.debug(f"{i} match_results: {match_results}")
+    #         if len(match_results) == 0:
+    #             members.append(None)
+    #             continue
+    #         if len(match_results) > 1:
+    #             match_results.sort(key=lambda x: x[1], reverse=True)  # 从大到小
+    #         logger.debug(f"{i} match_results: {match_results}")
+    #         members.append(match_results[0])
+    #
+    #     logger.debug(f"members: {members}")
+    #     member_names = []
+    #     for i, member in enumerate(members):
+    #         if member is None:
+    #             logger.warning(f"无法识别{i + 1}号位角色")
+    #             member_names.append(None)
+    #             continue
+    #         member_names.append(member[0])
+    #     logger.info(f"member_names: {member_names}")
+    #     return member_names
 
     def toggle(self, index: int, event: threading.Event | None,
                resonators: list[BaseResonator] | None, timeout_seconds: float = 1.0) -> bool | None:

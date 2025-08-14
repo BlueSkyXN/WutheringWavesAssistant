@@ -284,6 +284,10 @@ class GameControlService(ABC):
         pass
 
     @abstractmethod
+    def enter(self):
+        pass
+
+    @abstractmethod
     def sleep(self, seconds: float = 0.0):
         pass
 
@@ -370,6 +374,11 @@ class ExtendedControlService(ABC):
     @abstractmethod
     def click_window(self, window, x: int = 0, y: int = 0):
         """在指定窗口内点击"""
+        pass
+
+    @abstractmethod
+    def input_text(self, text: str, seconds: float = 0.0):
+        """输入文本"""
         pass
 
     @abstractmethod

@@ -53,6 +53,8 @@ class Config(QConfig):
 
     # main window
     micaEnabled = ConfigItem("MainWindow", "MicaEnabled", isWin11(), BoolValidator())
+    windowSize = OptionsConfigItem(
+        "MainWindow", "WindowSize", "Default", OptionsValidator(["720x720", "Default"]), restart=False)
     dpiScale = OptionsConfigItem(
         "MainWindow", "DpiScale", "Auto", OptionsValidator([1, 1.25, 1.5, 1.75, 2, "Auto"]), restart=True)
     language = OptionsConfigItem(

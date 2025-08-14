@@ -1,4 +1,5 @@
 import logging
+import re
 import time
 from abc import ABC
 from datetime import datetime, timedelta
@@ -6,6 +7,7 @@ from typing import Callable
 
 import numpy as np
 
+from src.core.combat.combat_core import DynamicPointTransformer
 from src.core.combat.combat_system import CombatSystem
 from src.core.constants import BossNameEnum
 from src.core.contexts import Context, Status
@@ -827,6 +829,7 @@ class PageEventAbstractService(PageEventService, ABC):
                     return True
 
                 self.combat_system.move_prepare()
+                logger.info(f"self._info.needAbsorption: {self._info.needAbsorption}")
                 if self._info.needAbsorption:
                     self.search_echo()
 
@@ -892,8 +895,7 @@ class PageEventAbstractService(PageEventService, ABC):
                         self.team_members_ocr()
                         return True
                     if self.combat_system.is_boss_health_bar_exist():
-                        is_nightmare = self._boss_info_service.is_nightmare(self._info.lastBossName)
-                        self.combat_system.is_nightmare = is_nightmare
+                        self.combat_system.is_nightmare = self._boss_info_service.is_nightmare(self._info.lastBossName)
                         self.combat_system.start(3.5)
                         time.sleep(1.5)
                     else:
@@ -911,7 +913,8 @@ class PageEventAbstractService(PageEventService, ABC):
             targetTexts=[
                 TextMatch(
                     name="战斗",
-                    text=r"(击败|对战|泰缇斯系统|凶戾之齿|倦怠之翼|妒恨之眼|(无餍?之舌)|(僭?越之矛)|(谵?妄之爪)|爱欲之容|盖希诺姆|(愚执之瞳?)|背誓之脊|遗恨之指|异海归途)",
+                    # text=r"(击败|对战|泰缇斯系统|凶戾之齿|倦怠之翼|妒恨之眼|(无餍之舌)|(僭?越之矛)|(谵?妄之爪)|爱欲之容|盖希诺姆|(愚执之瞳?)|背誓之脊|遗恨之指|异海归途)",
+                    text=r"(击败|对战|泰缇斯系统|凶戾之齿|倦怠之翼|妒恨之眼|(无.?之舌)|(.?越之矛)|(.?妄之爪)|爱欲之容|盖希诺姆|(愚执之.?)|背誓之脊|遗恨之指|异海归途)",
                 ),
             ],
             excludeTexts=[
@@ -1474,8 +1477,10 @@ class PageEventAbstractService(PageEventService, ABC):
             #     time.sleep(1)
             return
 
-        # if self._info.lastBossName == "芙露德莉斯":
-        if self._info.lastBossName in ["芙露德莉斯", "芬莱克"]:
+        if self._info.lastBossName == BossNameEnum.Fleurdelys.value:
+            self.absorption_action_fleurdelys()
+            return
+        elif self._info.lastBossName == BossNameEnum.Fenrico.value:
             self.absorption_action_fleurdelys()
             return
 
@@ -1780,17 +1785,18 @@ class PageEventAbstractService(PageEventService, ABC):
 
             self._info.lastBossName = "治疗"
             self._transfer_to_heal()
+        elif self._context.param_config.autoCombatBeta is True and self.combat_system.resonators is None:
+            time.sleep(1)
+            self.team_members_ocr()
 
         bossName = self._config.TargetBoss[self._info.bossIndex % len(self._config.TargetBoss)]
 
         self._control_service.activate()
         time.sleep(0.2)
 
-        if self._context.param_config.autoCombatBeta is True and self.combat_system.resonators is None:
-            self.team_members_ocr()
-
-        if self._context.param_config.autoCombatBeta is True and self.combat_system.resonators is None:
-            self.team_members_ocr()
+        # if self._context.param_config.autoCombatBeta is True and self.combat_system.resonators is None:
+        #     time.sleep(1)
+        #     self.team_members_ocr()
 
         self._control_service.guide_book()
         time.sleep(1)
@@ -1803,13 +1809,12 @@ class PageEventAbstractService(PageEventService, ABC):
         self._info.bossIndex += 1
         return self.transfer_to_boss(bossName)
 
-    def _transfer_to_heal(self):
-        # control.activate()
-        # control.tap("m")
+    def _transfer_to_heal(self, skip_map=False):
         self._control_service.activate()
-        self._control_service.map()
-        time.sleep(2)
-        toggle_map = self._ocr_service.find_text("切换地图")
+        if skip_map is False:
+            self._control_service.map()
+        time.sleep(3)
+        toggle_map = self._ocr_service.wait_text("切换地图")
         if not toggle_map:
             # control.esc()
             self._control_service.esc()
@@ -1830,9 +1835,10 @@ class PageEventAbstractService(PageEventService, ABC):
                 time.sleep(0.5)
                 self.click_position(jzc_text)
                 time.sleep(1.5)
+                w, h = self._window_service.get_client_wh()
                 jzcj_text = self._ocr_service.wait_text("今州城界")
-                tmp_x = jzcj_text.x1 - 5
-                tmp_y = jzcj_text.y1 - 40
+                tmp_x = jzcj_text.x1 - 12 * w // 1280
+                tmp_y = jzcj_text.y1 - 45 * w // 1280
                 # random_click(tmp_x, tmp_y, ratio=False)
                 self._control_service.click(tmp_x, tmp_y)
                 time.sleep(2)
@@ -1893,11 +1899,13 @@ class PageEventAbstractService(PageEventService, ABC):
                 need_retry = True
                 continue
 
-            receive_rewards = self._ocr_service.search_texts(results, "领取奖励")
+            receive_rewards = self._ocr_service.search_texts(results, r"^领取奖励$")
+            # 部分boss可以重新挑战
+            restart = self._ocr_service.search_text(results, r"^重新挑战$")
             receive_reward = None
             if receive_rewards:
                 for ele in receive_rewards:
-                    # 左侧的领取不要
+                    # 左侧任务下面的领取不要
                     if ele.x1 < w // 3:
                         continue
                     receive_reward = ele
@@ -1905,10 +1913,21 @@ class PageEventAbstractService(PageEventService, ABC):
             # 有吸收和领取奖励，吸收在下则滚动到下方
             if receive_reward:
                 logger.debug(f"absorption: {absorption}, receive_rewards: {receive_rewards}")
-                if receive_reward and absorption.y1 > receive_reward.y1:
-                    logger.info("向下滚动")
-                    keymouse_util.scroll_mouse(self._window_service.window, -1)
-                    time.sleep(1)
+                if restart:
+                    points = [absorption, receive_reward, restart]
+                else:
+                    points = [absorption, receive_reward]
+                sorted_points = sorted(points, key=lambda x: x.y1)
+                absorption_index = 0
+                for index, point in enumerate(sorted_points):
+                    if point.y1 == absorption.y1:
+                        absorption_index = index
+                        break
+                if absorption_index > 0:
+                    for _ in range(absorption_index):
+                        logger.info("向下滚动")
+                        keymouse_util.scroll_mouse(self._window_service.window, -1)
+                        time.sleep(0.5)
 
             count += 1
             self._control_service.pick_up()
@@ -1945,13 +1964,24 @@ class PageEventAbstractService(PageEventService, ABC):
             "梦魇辉萤军势": 2.6, "梦魇凯尔匹": 5.2, "荣耀狮像": 2.6, "芬莱克": 3.4,
         }
         # position = self.find_pic(template_img_name="UI_F2_Guidebook_EchoHunting.png", threshold=0.5)
-        position = self._img_service.match_template(img=None, template_img="UI_F2_Guidebook_EchoHunting.png",
-                                                    threshold=0.5)
-        if not position:
-            logger.warning("识别残像探寻失败")
-            self._control_service.esc()
-            return False
-        self._control_service.click(*position.center)  # 进入残像探寻
+        # position = self._img_service.match_template(img=None, template_img="UI_F2_Guidebook_EchoHunting.png",
+        #                                             threshold=0.5)
+        echo_hunting_pos_1280 = (54, 387)
+        w, h = self._window_service.get_client_wh()
+        scale = w / 1280
+        echo_hunting_pos = (int(echo_hunting_pos_1280[0] * scale), echo_hunting_pos_1280[1] * scale)
+        # if not position:
+        #     logger.warning("识别残像探寻失败")
+        #     self._control_service.esc()
+        #     return False
+        # self._control_service.click(*position.center)  # 进入残像探寻
+
+        # 暂停自动战斗，否则会把按键打在输入框里
+        if self._context.param_config.autoCombatBeta is True:
+            self.combat_system.pause()
+            time.sleep(0.2)
+
+        self._control_service.click(*echo_hunting_pos)  # 进入残像探寻
         if not self._ocr_service.wait_text("探测"):
             logger.warning("未进入残象探寻")
             self._control_service.esc()
@@ -1959,34 +1989,71 @@ class PageEventAbstractService(PageEventService, ABC):
         logger.info(f"当前目标boss：{bossName}")
         # model_boss_yolo(bossName)
         boss_name_reg_mapping = {
-            "哀声鸷": "哀声鸷?",
-            "赫卡忒": "赫卡忒?",
+            "哀声鸷": "[哀袁]声.?",
+            "赫卡忒": "赫卡.?",
             "梦魇飞廉之猩": "梦.*飞廉之猩",
             "梦魇无常凶鹭": "梦.*无常凶鹭",
             "梦魇云闪之鳞": "梦.*云闪之鳞",
             "梦魇朔雷之鳞": "梦.*朔雷之鳞",
             "梦魇无冠者": "梦.*无冠者",
             "梦魇燎照之骑": "梦.*燎照之骑",
-            "梦魇哀声鸷": "梦.*哀声鸷?",
+            "梦魇哀声鸷": "梦.*[哀袁]声.?",
             "梦魇辉萤军势": "梦.*辉萤军势",
             "梦魇凯尔匹": "梦.*凯尔匹",
-            "梦魇赫卡忒": "梦.*赫卡忒",
+            "梦魇赫卡忒": "梦.*赫卡.?",
         }
         find_boss_name_reg = boss_name_reg_mapping.get(bossName, bossName)
+        # findBoss = None
+        search_boss_name = bossName
+        if self._boss_info_service.is_nightmare(bossName):
+            search_boss_name = bossName[:2] + "." + bossName[2:]
+
+        search_tips_pos = self._ocr_service.wait_text("输入搜索内容")
+        if not search_tips_pos:
+            logger.warning("识别输入框失败")
+            self._control_service.esc()
+            return False
+
+        self._control_service.click(*search_tips_pos.center)
+        time.sleep(0.2)
+        self._control_service.click(*search_tips_pos.center)
+        time.sleep(0.3)
+        self._control_service.input_text(search_boss_name)
+        time.sleep(0.5)
+        self._control_service.enter()
+        time.sleep(0.8)
+
         findBoss = None
-        y = 113
-        while y < 700:
-            y = y + 22
-            if y > 700:
-                y = 700
-            findBoss = self._ocr_service.find_text(find_boss_name_reg)
-            if findBoss:
-                break
-            # control.click(855 * width_ratio, y * height_ratio)
-            # random_click(855, y, 1, 3)
-            # self._control_service.click(855, y)
-            self._control_service.click(570, y)
-            time.sleep(0.5)
+        img = self._img_service.screenshot()
+        results = self._ocr_service.ocr(img)
+        # logger.info(f"results：{results}")
+        findBossList = self._ocr_service.search_texts(results, rf"^{find_boss_name_reg}")
+        # logger.info(f"findBossList：{findBossList}")
+        if findBossList and len(findBossList) >= 2:
+            sortedFindBossList = sorted(findBossList, key=lambda x: x.y1)
+            # logger.info(f"sortedFindBossList：{sortedFindBossList}")
+            for index, findBossTemp in enumerate(sortedFindBossList):
+                # 第一个是输入框
+                # if index == 0:
+                if findBossTemp.y1 < search_tips_pos.y2:
+                    continue
+                if re.match(find_boss_name_reg, findBossTemp.text):
+                    # logger.info(f"匹配坐标：{findBossTemp}")
+                    findBoss = findBossTemp
+
+        # y = 113
+        # while y < 700:
+        #     y = y + 22
+        #     if y > 700:
+        #         y = 700
+        #     findBoss = self._ocr_service.find_text(find_boss_name_reg)
+        #     if findBoss:
+        #         break
+        #     # control.click(855 * width_ratio, y * height_ratio)
+        #     # random_click(855, y, 1, 3)
+        #     # self._control_service.click(855, y)
+        #     self._control_service.click(570, y)
+        #     time.sleep(0.5)
         if not findBoss:
             self._control_service.esc()
             logger.warning("未找到目标boss")
@@ -2025,9 +2092,9 @@ class PageEventAbstractService(PageEventService, ABC):
             if self._context.param_config.autoCombatBeta is True:
                 if self.combat_system.resonators is None:
                     self.team_members_ocr()
-
-                # 移动前检查，如 椿退出红椿状态
-                self.combat_system.move_prepare(camellya_reset=(bossName == BossNameEnum.NightmareHecate.value))
+                if self.combat_system.resonators is None:
+                    # 移动前检查，如 椿退出红椿状态
+                    self.combat_system.move_prepare(camellya_reset=(bossName == BossNameEnum.NightmareHecate.value))
 
             if forward_walk_times > 0:
                 if bossName == "赫卡忒" and self._ocr_service.find_text("进入声之领域"):
@@ -2066,11 +2133,13 @@ class PageEventAbstractService(PageEventService, ABC):
         logger.info("罗蕾莱不在家，等她")
         self._control_service.esc()
         time.sleep(2)
-        if not self._ocr_service.wait_text("^终端$", timeout=5):
+        if not self._ocr_service.wait_text("^(教程百科|Tutorials)$", timeout=5):
             self._control_service.esc()
             return
-        # random_click(1374, 1038)
-        self._control_service.click(915, 686)
+        # 进入时钟
+        dpt = DynamicPointTransformer(self._window_service.get_client_wh()[::-1])
+        terminal_clock = dpt.transform((915, 686))
+        self._control_service.click(*terminal_clock)
         time.sleep(2)
         tomorrow = self._ocr_service.wait_text("^次日$", timeout=5)
         if not tomorrow:
@@ -2079,14 +2148,16 @@ class PageEventAbstractService(PageEventService, ABC):
             return
         self.click_position(tomorrow)
         time.sleep(1)
-
-        self._control_service.click(1180, 377)
+        # 右侧下一个时间
+        w, h = self._window_service.get_client_wh()
+        next_clock_16_9 = (1180, 360) # x随宽度等比放大，y为高度一半，不固定
+        next_clock = (int(w * next_clock_16_9[0] / 1280), h // 2)
+        self._control_service.click(*next_clock)
         time.sleep(0.3)
-        self._control_service.click(1180, 377)
+        self._control_service.click(*next_clock)
         time.sleep(0.3)
-        self._control_service.click(1180, 377)
+        self._control_service.click(*next_clock)
         time.sleep(0.3)
-
 
         confirm_text = self._ocr_service.find_text("确定")
         self.click_position(confirm_text)
@@ -2271,7 +2342,7 @@ class PageEventAbstractService(PageEventService, ABC):
         if team_pos is None:
             self._control_service.esc()
             time.sleep(1.5)
-            self._ocr_service.wait_text(["确认离开", "^确认$", "编队", "终端", "活动"])
+            self._ocr_service.wait_text(["^确认离开", "^确认$", "^编队$", "^终端$", "^活动$"])
             time.sleep(0.8)
             img = self._img_service.screenshot()
             ocr_results = self._ocr_service.ocr(img)
@@ -2292,6 +2363,7 @@ class PageEventAbstractService(PageEventService, ABC):
 
         team_pos = self._ocr_service.wait_text("^编队$")
         if team_pos:
+            logger.info("识别编队")
             time.sleep(0.6)
             self._control_service.click(*team_pos.center)
             time.sleep(1)
@@ -2328,3 +2400,42 @@ class PageEventAbstractService(PageEventService, ABC):
                 self.combat_system.set_resonators(team_members)
                 self._control_service.esc()
                 time.sleep(3)
+            else:
+                logger.info("编队已锁定")
+                w, h = self._window_service.get_client_wh()
+                def _find_pos(pos_list):
+                    if not pos_list:
+                        return None
+                    # logger.info(f"pos_list: {pos_list}")
+                    if isinstance(pos_list, Position):
+                        pos_list = [pos_list]
+                    for pos in pos_list:
+                        # logger.info(f"pos: {pos}")
+                        if pos.x1 > w * 580 // 1600:
+                            return pos
+                    return None
+
+                results = self._ocr_service.ocr(self._img_service.screenshot())
+                map_pos_list = self._ocr_service.search_texts(results, "^(地图|Map)$")
+                map_pos = _find_pos(map_pos_list)
+                if not map_pos:
+                    tutorials_pos_list = self._ocr_service.search_texts(results, "^(教程百科|Tutorials)$")
+                    tutorials_pos = _find_pos(tutorials_pos_list)
+                    if not tutorials_pos:
+                        return
+                    next_pos = (
+                        int(tutorials_pos.x2 + (w - tutorials_pos.x2) * (1197 - 1155) / (1280 - 1155)),
+                        int(h * 351 / 720)
+                    )
+                    self._control_service.click(*next_pos)
+                    time.sleep(0.5)
+                    map_pos_list = self._ocr_service.wait_text("^(地图|Map)$")
+                    map_pos = _find_pos(map_pos_list)
+
+                if map_pos:
+                    time.sleep(0.3)
+                    self._control_service.click(*map_pos.center)
+                    self._transfer_to_heal(skip_map=True)
+                    return
+                else:
+                    logger.info("未找到地图")

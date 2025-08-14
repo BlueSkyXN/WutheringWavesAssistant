@@ -160,6 +160,11 @@ class Win32GameControlServiceImpl(GameControlService, BaseControlService):
                 logger.warning("Unknown member index")
         return self
 
+    def enter(self):
+        key = self._get_mapping_key("ENTER", win32con.VK_RETURN)
+        keymouse_util.tap_key(self._window_service.window, key, seconds=0.05)
+        return self
+
     def sleep(self, seconds: float = 0.0):
         if seconds > 0.0:
             time.sleep(seconds)
@@ -272,6 +277,9 @@ class Win32ExtendedControlServiceImpl(ExtendedControlService, BaseControlService
     def click_window(self, window, x: int = 0, y: int = 0):
         keymouse_util.click(window, x, y, seconds=0.05)
         return self
+
+    def input_text(self, text: str, seconds: float = 0.0):
+        keymouse_util.input_text(self._window_service.window, text, seconds)
 
     def activate_window(self, window):
         keymouse_util.window_activate(window)

@@ -77,7 +77,7 @@ class ParamConfig(BaseModel):
             pre_data = cls.pre_date(data)
             config = cls.model_validate(pre_data)
         else:
-            config = cls(bossName=None, bossLevel=None, autoRestartPeriod=None, gamePath=None)
+            config = cls(bossName=None, bossLevel=None, autoRestartPeriod=None, gamePath=None, autoCombatBeta=None)
         logger.debug(config)
         return config
 

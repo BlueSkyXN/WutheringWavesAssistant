@@ -12,8 +12,7 @@ logger = logging.getLogger(__name__)
 class BaseCiaccona(BaseResonator):
 
     def __init__(self, control_service: ControlService, img_service: ImgService):
-        super().__init__(control_service)
-        self.img_service = img_service
+        super().__init__(control_service, img_service)
 
         self.name = "夏空"
         self.name_en = "ciaccona"

@@ -50,6 +50,7 @@ KEYBOARD_VK_MAPPING: dict[str, int] = {
     "SPACE": win32con.VK_SPACE,
     "F1": win32con.VK_F1,
     "F2": win32con.VK_F2,
+    "ENTER": win32con.VK_RETURN,
 }
 
 VK_KEYBOARD_MAPPING: dict[int, str] = {v: k for k, v in KEYBOARD_VK_MAPPING.items()}
@@ -206,6 +207,10 @@ def tap_space(hwnd):
     tap_key(hwnd, win32con.VK_SPACE)
 
 
+def tap_enter(hwnd):
+    tap_key(hwnd, win32con.VK_RETURN)
+
+
 # noinspection PyUnresolvedReferences
 def get_key_state(vk_code):
     return win32api.GetAsyncKeyState(vk_code) < 0
@@ -221,3 +226,19 @@ def get_mouse_position():
 # noinspection PyUnresolvedReferences
 def set_mouse_position(hwnd, x: int, y: int):
     win32api.SetCursorPos((x, y))
+
+
+def input_char(hwnd, char, seconds: float = 0.0):
+    """ 发送文本，一次一个字符 """
+    win32gui.PostMessage(hwnd, win32con.WM_CHAR, ord(char), 0)
+    __sleep(seconds)
+
+
+def input_text(hwnd, text: str, seconds: float = 0.0):
+    """ 发送文本，字符串 """
+    if len(text) == 0:
+        return
+    for char in text:
+        input_char(hwnd, char, 0.03)
+    __sleep(seconds)
+

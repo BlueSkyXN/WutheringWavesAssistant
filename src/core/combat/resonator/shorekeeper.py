@@ -13,8 +13,7 @@ logger = logging.getLogger(__name__)
 class BaseShorekeeper(BaseResonator):
 
     def __init__(self, control_service: ControlService, img_service: ImgService):
-        super().__init__(control_service)
-        self.img_service = img_service
+        super().__init__(control_service, img_service)
 
         self.name = "守岸人"
         self.name_en = "shorekeeper"

@@ -1,6 +1,9 @@
 import logging
 import time
 
+import win32con
+import win32gui
+
 from src.util import hwnd_util, keymouse_util
 
 logger = logging.getLogger(__name__)
@@ -89,5 +92,51 @@ def test_scroll2():
     time.sleep(2)
 
 
+def find_child_window(parent_hwnd, class_name=None, window_title=None):
+    """
+    查找子窗口句柄
+    :param parent_hwnd: 父窗口句柄
+    :param class_name: 控件类名（如 "Edit", "RichEdit"）
+    :param window_title: 窗口标题（可选）
+    :return: 子窗口句柄，找不到返回 None
+    """
+    child = win32gui.FindWindowEx(parent_hwnd, None, class_name, window_title)
+    return child
+
+def enum_child_windows(hwnd):
+    children = []
+    def callback(hwnd_child, _):
+        class_name = win32gui.GetClassName(hwnd_child)
+        title = win32gui.GetWindowText(hwnd_child)
+        children.append((hwnd_child, class_name, title))
+        return True
+    win32gui.EnumChildWindows(hwnd, callback, None)
+    return children
+
+
+
+def test_post_text():
+    logger.debug("\n")
+    hwnd = hwnd_util.get_hwnd()
+    hwnd_util.enable_dpi_awareness()
+    time.sleep(0.5)
+    keymouse_util.window_activate(hwnd)
+    time.sleep(0.5)
+    keymouse_util.click(hwnd, 176, 102, 0.05)
+    time.sleep(0.5)
+
+    text = "芬莱克"
+    # win32gui.SendMessage(hwnd, win32con.WM_SETTEXT, None, text)
+
+    for char in text:
+        # 发送 WM_CHAR 消息（模拟键盘输入）
+        win32gui.PostMessage(hwnd, win32con.WM_CHAR, ord(char), 0)
+        time.sleep(0.03)  # 避免输入过快被游戏丢弃
+
+    time.sleep(0.3)
+    win32gui.PostMessage(hwnd, win32con.WM_KEYDOWN, win32con.VK_RETURN, 0)
+    time.sleep(0.03)
+    win32gui.PostMessage(hwnd, win32con.WM_KEYUP, win32con.VK_RETURN, 0)
+    time.sleep(0.3)
 
 

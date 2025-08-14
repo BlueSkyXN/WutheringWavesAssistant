@@ -64,16 +64,16 @@ class CombatSystem:
 
         self.is_nightmare: bool = False
 
-    def get_resonators(self) -> list[BaseResonator]:
-        resonators = []
-        member_names = self.team_member_selector.get_team_members()
-        member_names_log = []
-        for member_name in member_names:
-            resonator = self.resonator_map.get(member_name)
-            resonators.append(resonator)
-            member_names_log.append(resonator.name)
-        logger.info(f"编队: {member_names_log}")
-        return resonators
+    # def get_resonators(self) -> list[BaseResonator]:
+    #     resonators = []
+    #     member_names = self.team_member_selector.get_team_members()
+    #     member_names_log = []
+    #     for member_name in member_names:
+    #         resonator = self.resonator_map.get(member_name)
+    #         resonators.append(resonator)
+    #         member_names_log.append(resonator.name)
+    #     logger.info(f"编队: {member_names_log}")
+    #     return resonators
 
     def _sort_resonators(self, resonators: list):
         dps = []
@@ -96,7 +96,8 @@ class CombatSystem:
 
     def run(self, event: threading.Event):
         if self.resonators is None:
-            self.resonators = self.get_resonators()
+            # self.resonators = self.get_resonators()
+            return
         if self.resonators and self._sorted_resonators is None:
             self._sorted_resonators = self._sort_resonators(self.resonators)
         index = 0
@@ -203,7 +204,7 @@ class CombatSystem:
                     resonators.append(resonator)
                     resonators_names_en.append(resonator.name_en)
                     break
-        logger.info(resonators_names_en)
+        logger.info(f"member_names: {resonators_names_en}")
         logger.info(f"编队: {resonator_names_zh}")
         self.resonators = resonators
 
@@ -212,7 +213,7 @@ class CombatSystem:
 
     def move_prepare(self, camellya_reset: bool = False):
         if self.resonators is None:
-            self.resonators = self.get_resonators()
+            return
         try:
             cur_member_number = self.team_member_selector.get_cur_member_number()
             if cur_member_number is None:

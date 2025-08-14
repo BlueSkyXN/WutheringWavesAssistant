@@ -3,7 +3,7 @@ import time
 
 import numpy as np
 
-from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo, CharClassEnum
+from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo, CharClassEnum, LogicEnum
 from src.core.interface import ControlService, ImgService
 
 logger = logging.getLogger(__name__)
@@ -12,8 +12,7 @@ logger = logging.getLogger(__name__)
 class BaseSanhua(BaseResonator):
 
     def __init__(self, control_service: ControlService, img_service: ImgService):
-        super().__init__(control_service)
-        self.img_service = img_service
+        super().__init__(control_service, img_service)
 
         self.name = "散华"
         self.name_en = "sanhua"
@@ -25,7 +24,7 @@ class BaseSanhua(BaseResonator):
         self._resonance_skill_point = [(1065, 630), (1062, 661)]
         self._resonance_skill_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_checker = ColorChecker(
-            self._resonance_skill_point, self._resonance_skill_color, logic=ColorChecker.LogicEnum.AND)
+            self._resonance_skill_point, self._resonance_skill_color, logic=LogicEnum.AND)
 
         # 声骸技能
         self._echo_skill_point = [(1129, 655), (1136, 654)]

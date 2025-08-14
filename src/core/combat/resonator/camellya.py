@@ -3,7 +3,7 @@ import time
 
 import numpy as np
 
-from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo, CharClassEnum
+from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo, CharClassEnum, LogicEnum
 from src.core.interface import ControlService, ImgService
 
 logger = logging.getLogger(__name__)
@@ -12,8 +12,7 @@ logger = logging.getLogger(__name__)
 class BaseCamellya(BaseResonator):
 
     def __init__(self, control_service: ControlService, img_service: ImgService):
-        super().__init__(control_service)
-        self.img_service = img_service
+        super().__init__(control_service, img_service)
 
         self.name = "椿"
         self.name_en = "camellya"
@@ -36,14 +35,14 @@ class BaseCamellya(BaseResonator):
         self._resonance_skill_crimson_blossom_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_crimson_blossom_checker = ColorChecker(
             self._resonance_skill_crimson_blossom_point, self._resonance_skill_crimson_blossom_color,
-            logic=ColorChecker.LogicEnum.AND)
+            logic=LogicEnum.AND)
 
         # 共鸣技能 E 黯蕊猎心 退出盛绽状态
         self._resonance_skill_floral_ravage_point = [(1058, 654)]
         self._resonance_skill_floral_ravage_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_floral_ravage_checker = ColorChecker(
             self._resonance_skill_floral_ravage_point, self._resonance_skill_floral_ravage_color,
-            logic=ColorChecker.LogicEnum.AND)
+            logic=LogicEnum.AND)
 
         # 共鸣技能 E 一日花
         self._resonance_skill_ephemeral_point = [(1072, 635), (1073, 634)]
@@ -51,7 +50,7 @@ class BaseCamellya(BaseResonator):
         self._resonance_skill_ephemeral_checker = ColorChecker(
             self._resonance_skill_ephemeral_point,
             self._resonance_skill_ephemeral_color,
-            logic=ColorChecker.LogicEnum.AND
+            logic=LogicEnum.AND
         )
 
         # 共鸣技能 E 一日花 入场粉紫色
@@ -59,7 +58,7 @@ class BaseCamellya(BaseResonator):
         self._resonance_skill_ephemeral_incoming_checker = ColorChecker(
             self._resonance_skill_ephemeral_point,
             self._resonance_skill_ephemeral_incoming_color,
-            logic=ColorChecker.LogicEnum.AND
+            logic=LogicEnum.AND
         )
 
         # 声骸技能

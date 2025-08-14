@@ -67,6 +67,7 @@ class MainWindow(FluentWindow):
         signalBus.micaEnableChanged.connect(self.setMicaEffectEnabled)
         signalBus.switchToSampleCard.connect(self.switchToSample)
         signalBus.supportSignal.connect(self.onSupport)
+        signalBus.windowSizeChanged.connect(self.windowResize)
         self.remoteVersionFinishedSignal.connect(self.showUpdateVersion)
 
     def initNavigation(self):
@@ -81,9 +82,11 @@ class MainWindow(FluentWindow):
             self.settingInterface, FIF.SETTING, self.tr('Settings'), NavigationItemPosition.BOTTOM)
 
     def initWindow(self):
-        self.resize(1280, 800)
+        self.windowResize()
+        # self.resize(1280, 800)
+        # self.resize(720, 720)
         # self.resize(960, 780)
-        self.setMinimumWidth(760)
+        self.setMinimumWidth(700)
         self.setWindowIcon(QIcon(':/gallery/images/logo.ico'))
         self.setWindowTitle(f'Wuthering Waves Assistant {VERSION}')
 
@@ -94,11 +97,14 @@ class MainWindow(FluentWindow):
         self.splashScreen.setIconSize(QSize(106, 106))
         self.splashScreen.raise_()
 
+        self.alignWindowToCenter()
+        self.show()
+        QApplication.processEvents()
+
+    def alignWindowToCenter(self):
         desktop = QApplication.screens()[0].availableGeometry()
         w, h = desktop.width(), desktop.height()
         self.move(w // 2 - self.width() // 2, h // 2 - self.height() // 2)
-        self.show()
-        QApplication.processEvents()
 
     def onSupport(self):
         language = cfg.get(cfg.language).value
@@ -106,6 +112,16 @@ class MainWindow(FluentWindow):
             QDesktopServices.openUrl(QUrl(ZH_SUPPORT_URL))
         else:
             QDesktopServices.openUrl(QUrl(EN_SUPPORT_URL))
+
+    def windowResize(self):
+        windowSize = cfg.get(cfg.windowSize)
+        if windowSize == "Default":
+            windowSize = (1280, 800)
+        else:
+            window_wh = windowSize.split("x")
+            windowSize = (int(window_wh[0]), int(window_wh[1]))
+        self.resize(*windowSize)
+        self.alignWindowToCenter()
 
     def resizeEvent(self, e):
         super().resizeEvent(e)

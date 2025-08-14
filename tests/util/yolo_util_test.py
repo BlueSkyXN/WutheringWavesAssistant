@@ -38,9 +38,9 @@ def test_yolo_util_from_screen():
     hwnd = hwnd_util.get_hwnd()
     img = screenshot_util.screenshot(hwnd)
     logger.debug("img shape: %s", img.shape)  # (720, 1280, 3) HWC
-    # model = yolo_util.MODEL_BOSS_V20
+    model = yolo_util.MODEL_BOSS_V20
     # model = yolo_util.MODEL_REWARD
-    model = yolo_util.MODEL_BOSS_FLEURDELYS
+    # model = yolo_util.MODEL_BOSS_FLEURDELYS
     ort_provider = yolo_util.get_ort_providers()
     ort_session_options = yolo_util.create_ort_session_options()
     session = yolo_util.create_ort_session(

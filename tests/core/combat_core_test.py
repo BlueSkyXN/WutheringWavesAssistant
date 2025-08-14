@@ -41,8 +41,8 @@ def img_service(container):
     return img_service
 
 
-def test_get_team_members(control_service, img_service):
-    team_member_selector = TeamMemberSelector(control_service, img_service)
-    # img = img_util.read_img(file_util.get_temp_screenshot("screenshot_1746901046_31874794.png"))
-    # img = img_util.read_img(file_util.get_temp_screenshot("screenshot_1748341981_13141297.png"))
-    team_members = team_member_selector.get_team_members()
+# def test_get_team_members(control_service, img_service):
+#     team_member_selector = TeamMemberSelector(control_service, img_service)
+#     # img = img_util.read_img(file_util.get_temp_screenshot("screenshot_1746901046_31874794.png"))
+#     # img = img_util.read_img(file_util.get_temp_screenshot("screenshot_1748341981_13141297.png"))
+#     team_members = team_member_selector.get_team_members()
