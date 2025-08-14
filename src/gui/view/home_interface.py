@@ -113,7 +113,7 @@ class HomeInterface(ScrollArea):
             icon=":/gallery/images/controls/Checkbox.png",
             title="自动刷boss",
             content=self.tr(
-                "旧版迁移的功能，老用户将原config.yaml覆盖到启动目录即可，后续会做全自动连招，支持1280x720，最低画质"),
+                "支持任意分辨率，建议1280x720最低画质省电，可开启智能连招"),
             routeKey="basicInputInterface",
             index=0,
             task_name="AutoBossProcessTask",
