@@ -9,7 +9,7 @@ from src.core.interface import ControlService, ImgService
 logger = logging.getLogger(__name__)
 
 
-class BaseChangli(BaseResonator):
+class BasePhrolova(BaseResonator):
 
     def __init__(self, control_service: ControlService, img_service: ImgService):
         super().__init__(control_service, img_service)
@@ -57,7 +57,7 @@ class BaseChangli(BaseResonator):
         return self.resonator_name().name
 
     def resonator_name(self) -> ResonatorNameEnum:
-        return ResonatorNameEnum.changli
+        return ResonatorNameEnum.phrolova
 
     def char_class(self) -> list[CharClassEnum]:
         return [CharClassEnum.SubDPS]
@@ -96,7 +96,7 @@ class BaseChangli(BaseResonator):
         return is_ready
 
 
-class Changli(BaseChangli):
+class Phrolova(BasePhrolova):
     # COMBO_SEQ 为训练场单人静态完整连段，后续开发以此为准从中拆分截取
 
     # 常规轴

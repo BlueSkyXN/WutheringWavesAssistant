@@ -7,7 +7,7 @@ from typing import Callable
 
 import numpy as np
 
-from src.core.combat.combat_core import DynamicPointTransformer
+from src.core.combat.combat_core import DynamicPointTransformer, ResonatorNameEnum, AlignEnum, ResolutionEnum
 from src.core.combat.combat_system import CombatSystem
 from src.core.constants import BossNameEnum
 from src.core.contexts import Context, Status
@@ -781,14 +781,14 @@ class PageEventAbstractService(PageEventService, ABC):
 
         if action is None:
             def default_action(positions: dict[str, Position]) -> bool:
-                time.sleep(2)
+                time.sleep(0.2)
                 if not self._ocr_service.find_text(["吸收"]):
                     return False
                 # dump_img()
 
                 self._info.absorptionCount += 1
                 self._control_service.pick_up()
-                time.sleep(2)
+                time.sleep(0.5)
                 self._info.needAbsorption = False
                 if self._config.CharacterHeal and not self._info.isCheckedHeal:
                     self._check_heal()
@@ -817,19 +817,21 @@ class PageEventAbstractService(PageEventService, ABC):
 
         if action is None:
             def default_action(positions: dict[str, Position]) -> bool:
+                is_nightmare = self._boss_info_service.is_nightmare(self._info.lastBossName)
                 if self._context.param_config.autoCombatBeta is True:
                     self.combat_system.pause()
+                    if is_nightmare:
+                        self._control_service.pick_up()
                 else:
                     time.sleep(1)
                     return True
 
-                is_nightmare = self._boss_info_service.is_nightmare(self._info.lastBossName)
                 if not is_nightmare:
                     time.sleep(1)
                     return True
 
                 self.combat_system.move_prepare()
-                logger.info(f"self._info.needAbsorption: {self._info.needAbsorption}")
+                # logger.info(f"self._info.needAbsorption: {self._info.needAbsorption}")
                 if self._info.needAbsorption:
                     self.search_echo()
 
@@ -1816,7 +1818,6 @@ class PageEventAbstractService(PageEventService, ABC):
         time.sleep(3)
         toggle_map = self._ocr_service.wait_text("切换地图")
         if not toggle_map:
-            # control.esc()
             self._control_service.esc()
             logger.info("未找到切换地图")
             return False
@@ -1826,6 +1827,10 @@ class PageEventAbstractService(PageEventService, ABC):
             # random_click(tmp_x, tmp_y, ratio=False)
             self.click_position(toggle_map)
             huanglong_text = self._ocr_service.wait_text("瑝?珑")
+            if not huanglong_text:
+                self._control_service.esc()
+                logger.info("未找到瑝珑")
+                return False
             self.click_position(huanglong_text)
             time.sleep(0.5)
             self.click_position(huanglong_text)
@@ -1835,13 +1840,19 @@ class PageEventAbstractService(PageEventService, ABC):
                 time.sleep(0.5)
                 self.click_position(jzc_text)
                 time.sleep(1.5)
-                w, h = self._window_service.get_client_wh()
-                jzcj_text = self._ocr_service.wait_text("今州城界")
-                tmp_x = jzcj_text.x1 - 12 * w // 1280
-                tmp_y = jzcj_text.y1 - 45 * w // 1280
-                # random_click(tmp_x, tmp_y, ratio=False)
-                self._control_service.click(tmp_x, tmp_y)
+
+                jzcj_pos = self._ocr_service.wait_text("今州城界")
+                if not jzcj_pos:
+                    self._control_service.esc()
+                    logger.info("未找到今州城界")
+                    return False
+                dpt = DynamicPointTransformer(self._window_service.get_client_wh())
+                jzcj_pos_1280_720 = dpt.untransform((jzcj_pos.x1, jzcj_pos.y1), AlignEnum.CENTER)
+                jinzhou_resonance_nexus_1280_720 = (jzcj_pos_1280_720[0] - 12, jzcj_pos_1280_720[1] - 45)
+                jinzhou_resonance_nexus = dpt.transform(jinzhou_resonance_nexus_1280_720, AlignEnum.CENTER)
+                self._control_service.click(*jinzhou_resonance_nexus)
                 time.sleep(2)
+
                 if transfer := self._ocr_service.wait_text("快速旅行"):
                     self.click_position(transfer)
                     time.sleep(0.1)
@@ -1967,9 +1978,8 @@ class PageEventAbstractService(PageEventService, ABC):
         # position = self._img_service.match_template(img=None, template_img="UI_F2_Guidebook_EchoHunting.png",
         #                                             threshold=0.5)
         echo_hunting_pos_1280 = (54, 387)
-        w, h = self._window_service.get_client_wh()
-        scale = w / 1280
-        echo_hunting_pos = (int(echo_hunting_pos_1280[0] * scale), echo_hunting_pos_1280[1] * scale)
+        dpt = DynamicPointTransformer(self._window_service.get_client_wh())
+        echo_hunting_pos = dpt.transform(echo_hunting_pos_1280, AlignEnum.TOP_LEFT)
         # if not position:
         #     logger.warning("识别残像探寻失败")
         #     self._control_service.esc()
@@ -2092,7 +2102,7 @@ class PageEventAbstractService(PageEventService, ABC):
             if self._context.param_config.autoCombatBeta is True:
                 if self.combat_system.resonators is None:
                     self.team_members_ocr()
-                if self.combat_system.resonators is None:
+                if self.combat_system.resonators is not None:
                     # 移动前检查，如 椿退出红椿状态
                     self.combat_system.move_prepare(camellya_reset=(bossName == BossNameEnum.NightmareHecate.value))
 
@@ -2137,7 +2147,7 @@ class PageEventAbstractService(PageEventService, ABC):
             self._control_service.esc()
             return
         # 进入时钟
-        dpt = DynamicPointTransformer(self._window_service.get_client_wh()[::-1])
+        dpt = DynamicPointTransformer(self._window_service.get_client_wh())
         terminal_clock = dpt.transform((915, 686))
         self._control_service.click(*terminal_clock)
         time.sleep(2)
@@ -2185,7 +2195,7 @@ class PageEventAbstractService(PageEventService, ABC):
             role_index = (self._info.roleIndex + i) % 3
             # logger.debug("role_index: %s", role_index)
             self._control_service.toggle_team_member(role_index + 1)
-            time.sleep(0.5)
+            time.sleep(0.2)
         # position = Position.build(325, 190, 690, 330)
         if self._ocr_service.wait_text("选择复苏物品", timeout=2):
             logger.debug("检测到角色需要复苏")
@@ -2371,31 +2381,54 @@ class PageEventAbstractService(PageEventService, ABC):
             if quick_setup_pos:
                 img = self._img_service.screenshot()
                 ocr_results = self._ocr_service.ocr(img)
-                avatar_names = [
-                    "今汐", "长离",
-                    "守岸人",
-                    "维里奈", "安可",
-                    "椿", "散华", "坎特蕾拉",
-                    # "zani", "baizhi", "xiangliyao", "calcharo", "jianxin",
-                    "卡提希娅",  # "ciaccona",
+
+                # 识别编队
+                dpt = DynamicPointTransformer(img)
+                # 编队123位方框，左上右下坐标
+                member1 = [(205, 123), (439, 583)]
+                member2 = [(549, 123), (783, 583)]
+                member3 = [(893, 123), (1127, 583)]
+                member1 = (dpt.transform(member1[0], AlignEnum.CENTER), dpt.transform(member1[1], AlignEnum.CENTER))
+                member2 = (dpt.transform(member2[0], AlignEnum.CENTER), dpt.transform(member2[1], AlignEnum.CENTER))
+                member3 = (dpt.transform(member3[0], AlignEnum.CENTER), dpt.transform(member3[1], AlignEnum.CENTER))
+
+                members_info: list[list] = [
+                    # name text is_exist
+                    [None, None, None], [None, None, None], [None, None, None]
                 ]
-                avatar_pos_array = []
-                for avatar_name in avatar_names:
-                    avatar_pos = self._ocr_service.search_text(ocr_results, f"^{avatar_name}$")
-                    if avatar_pos:
-                        avatar_pos_array.append((avatar_name, avatar_pos))
-                avatar_pos_array_sorted = sorted(avatar_pos_array, key=lambda x: x[1].x1)
-                logger.debug(f"avatar_pos_array_sorted: {avatar_pos_array_sorted}")
-                team_members = [None, None, None]
-                w, h = self._window_service.get_client_wh()
-                for avatar_tuple in avatar_pos_array_sorted:
-                    if avatar_tuple[1].x2 < int(w * 500 / 1280):
-                        index = 0
-                    elif avatar_tuple[1].x2 > int(w * 850 / 1280):
-                        index = 2
+                member_names_zh = ResonatorNameEnum.get_names_zh()
+                # logger.info(f"ocr_results: {ocr_results}")
+                for ocr_position in ocr_results:
+                    if ocr_position.y1 < member1[0][1] or ocr_position.y1 > member1[1][1]:
+                        continue
+                    if member1[0][0] <= ocr_position.x2 < member1[1][0]:
+                        member_index = 0
+                    elif member2[0][0] <= ocr_position.x2 < member2[1][0]:
+                        member_index = 1
+                    elif member3[0][0] <= ocr_position.x2 < member3[1][0]:
+                        member_index = 2
                     else:
-                        index = 1
-                    team_members[index] = avatar_tuple[0]
+                        continue
+                    # logger.info(f"ocr_position: {ocr_position}")
+                    if ocr_position and ocr_position.text.startswith("Lv"):
+                        members_info[member_index][2] = True
+                        continue
+                    members_info[member_index][1] = ocr_position
+                    for name_zh in member_names_zh:
+                        if ocr_position.text and name_zh == ocr_position.text.strip():
+                            members_info[member_index][0] = name_zh
+                            break
+                # logger.info(f"members_info: {members_info}")
+                team_members = [None, None, None]
+                for index, member_info in enumerate(members_info):
+                    if member_info[2] is True:
+                        if member_info[0] is None:  # 角色名都对不上，默认为主角
+                            team_members[index] = ResonatorNameEnum.rover.value
+                        else:
+                            team_members[index] = member_info[0]
+                    else:
+                        team_members[index] = ResonatorNameEnum.none.value
+                # logger.info(f"编队: {team_members}")
 
                 self.combat_system.set_resonators(team_members)
                 self._control_service.esc()
@@ -2415,18 +2448,14 @@ class PageEventAbstractService(PageEventService, ABC):
                             return pos
                     return None
 
-                results = self._ocr_service.ocr(self._img_service.screenshot())
+                img = self._img_service.screenshot()
+                results = self._ocr_service.ocr(img)
                 map_pos_list = self._ocr_service.search_texts(results, "^(地图|Map)$")
                 map_pos = _find_pos(map_pos_list)
                 if not map_pos:
-                    tutorials_pos_list = self._ocr_service.search_texts(results, "^(教程百科|Tutorials)$")
-                    tutorials_pos = _find_pos(tutorials_pos_list)
-                    if not tutorials_pos:
-                        return
-                    next_pos = (
-                        int(tutorials_pos.x2 + (w - tutorials_pos.x2) * (1197 - 1155) / (1280 - 1155)),
-                        int(h * 351 / 720)
-                    )
+                    next_pos = (1197, 350)
+                    dpt = DynamicPointTransformer(img)
+                    next_pos = dpt.transform(next_pos, AlignEnum.CENTER_RIGHT)
                     self._control_service.click(*next_pos)
                     time.sleep(0.5)
                     map_pos_list = self._ocr_service.wait_text("^(地图|Map)$")

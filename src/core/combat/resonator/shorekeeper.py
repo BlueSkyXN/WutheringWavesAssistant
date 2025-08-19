@@ -3,7 +3,7 @@ import time
 
 import numpy as np
 
-from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo, CharClassEnum
+from src.core.combat.combat_core import ColorChecker, BaseResonator, CharClassEnum, ResonatorNameEnum
 from src.core.exceptions import StopError
 from src.core.interface import ControlService, ImgService
 
@@ -14,9 +14,6 @@ class BaseShorekeeper(BaseResonator):
 
     def __init__(self, control_service: ControlService, img_service: ImgService):
         super().__init__(control_service, img_service)
-
-        self.name = "守岸人"
-        self.name_en = "shorekeeper"
 
         # 协奏 左下血条旁黄圈
         self._concerto_energy_checker = ColorChecker.concerto_spectro()
@@ -63,7 +60,10 @@ class BaseShorekeeper(BaseResonator):
             self._resonance_liberation_point, self._resonance_liberation_color)
 
     def __str__(self):
-        return self.name_en
+        return self.resonator_name().name
+
+    def resonator_name(self) -> ResonatorNameEnum:
+        return ResonatorNameEnum.shorekeeper
 
     def char_class(self) -> list[CharClassEnum]:
         return [CharClassEnum.Healer]
@@ -80,31 +80,31 @@ class BaseShorekeeper(BaseResonator):
             energy_count = 4
         if self._energy5_checker.check(img):
             energy_count = 5
-        logger.debug(f"{self.name}-能量: {energy_count}格")
+        logger.debug(f"{self.resonator_name().value}-能量: {energy_count}格")
         return energy_count
 
     def is_concerto_energy_ready(self, img: np.ndarray) -> bool:
         is_ready = self._concerto_energy_checker.check(img)
-        logger.debug(f"{self.name}-协奏: {is_ready}")
+        logger.debug(f"{self.resonator_name().value}-协奏: {is_ready}")
         return is_ready
 
     def is_resonance_skill_ready(self, img: np.ndarray) -> bool:
         is_ready = self._resonance_skill_checker.check(img)
-        logger.debug(f"{self.name}-共鸣技能: {is_ready}")
+        logger.debug(f"{self.resonator_name().value}-共鸣技能: {is_ready}")
         return is_ready
 
     def is_echo_skill_ready(self, img: np.ndarray) -> bool:
         is_ready = self._echo_skill_checker.check(img)
-        logger.debug(f"{self.name}-声骸技能: {is_ready}")
+        logger.debug(f"{self.resonator_name().value}-声骸技能: {is_ready}")
         return is_ready
 
     def is_resonance_liberation_ready(self, img: np.ndarray) -> bool:
         is_ready = self._resonance_liberation_checker.check(img)
-        logger.debug(f"{self.name}-共鸣解放: {is_ready}")
+        logger.debug(f"{self.resonator_name().value}-共鸣解放: {is_ready}")
         return is_ready
 
 
-class Shorekeeper(BaseShorekeeper, BaseCombo):
+class Shorekeeper(BaseShorekeeper):
     # COMBO_SEQ 为训练场单人静态完整连段，后续开发以此为准从中拆分截取
 
     # 常规轴
@@ -151,6 +151,12 @@ class Shorekeeper(BaseShorekeeper, BaseCombo):
 
     def __init__(self, control_service: ControlService, img_service: ImgService):
         super().__init__(control_service, img_service)
+
+    def E(self):
+        logger.debug("E")
+        return [
+            ["E", 0.05, 0.10],
+        ]
 
     def zE(self):
         logger.debug("zE")
@@ -305,6 +311,7 @@ class Shorekeeper(BaseShorekeeper, BaseCombo):
                 self.combo_action(self.R(), False)
                 if is_resonance_liberation_ready:
                     time.sleep(0.1)
+            self.combo_action(self.E(), False)
         except StopError as e:
             self.control_service.jump()  # 打断守岸人变身蝴蝶
             raise e

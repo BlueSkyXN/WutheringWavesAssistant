@@ -3,7 +3,7 @@ import time
 
 import numpy as np
 
-from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo, CharClassEnum, LogicEnum
+from src.core.combat.combat_core import ColorChecker, BaseResonator, CharClassEnum, LogicEnum, ResonatorNameEnum
 from src.core.interface import ControlService, ImgService
 
 logger = logging.getLogger(__name__)
@@ -14,16 +14,8 @@ class BaseJinhsi(BaseResonator):
     def __init__(self, control_service: ControlService, img_service: ImgService):
         super().__init__(control_service, img_service)
 
-        self.name = "今汐"
-        self.name_en = "jinhsi"
-
         # 协奏 左下血条旁黄圈
         self._concerto_energy_checker = ColorChecker.concerto_spectro()
-
-        # # TODO 同奏 左下血条旁黄圈
-        # self._concerto_energy_point = [(513, 669), (514, 669), (514, 670), (514, 671)]
-        # self._concerto_energy_color = [(81, 112, 210)]
-        # self._concerto_energy_checker = ColorChecker(self._concerto_energy_point, self._concerto_energy_color)
 
         # 共鸣技能 E1 流光夕影
         self._resonance_skill_point = [(1045, 651), (1059, 664)]
@@ -71,58 +63,61 @@ class BaseJinhsi(BaseResonator):
             self._resonance_liberation_point, self._resonance_liberation_color)
 
     def __str__(self):
-        return self.name_en
+        return self.resonator_name().name
+
+    def resonator_name(self) -> ResonatorNameEnum:
+        return ResonatorNameEnum.jinhsi
 
     def char_class(self) -> list[CharClassEnum]:
         return [CharClassEnum.MainDPS]
 
     def is_concerto_energy_ready(self, img: np.ndarray) -> bool:
         is_ready = self._concerto_energy_checker.check(img)
-        logger.debug(f"{self.name}-协奏: {is_ready}")
+        logger.debug(f"{self.resonator_name().value}-协奏: {is_ready}")
         return is_ready
 
     def is_resonance_skill_ready(self, img: np.ndarray) -> bool:
         is_ready = self._resonance_skill_checker.check(img)
-        logger.debug(f"{self.name}-共鸣技能-流光夕影: {is_ready}")
+        logger.debug(f"{self.resonator_name().value}-共鸣技能-流光夕影: {is_ready}")
         return is_ready
 
     def is_resonance_skill_2_ready(self, img: np.ndarray) -> bool:
         is_ready = self._resonance_skill_2_checker.check(img)
-        logger.debug(f"{self.name}-共鸣技能2-神霓飞芒: {is_ready}")
+        logger.debug(f"{self.resonator_name().value}-共鸣技能2-神霓飞芒: {is_ready}")
         return is_ready
 
     def is_resonance_skill_2_incoming_ready(self, img: np.ndarray) -> bool:
         is_ready = self._resonance_skill_2_incoming_checker.check(img)
-        logger.debug(f"{self.name}-共鸣技能2-神霓飞芒-入场: {is_ready}")
+        logger.debug(f"{self.resonator_name().value}-共鸣技能2-神霓飞芒-入场: {is_ready}")
         return is_ready
 
     def is_resonance_skill_3_ready(self, img: np.ndarray) -> bool:
         is_ready = self._resonance_skill_3_checker.check(img)
-        logger.debug(f"{self.name}-共鸣技能3-逐天取月: {is_ready}")
+        logger.debug(f"{self.resonator_name().value}-共鸣技能3-逐天取月: {is_ready}")
         return is_ready
 
     def is_resonance_skill_4_ready(self, img: np.ndarray) -> bool:
         is_ready = self._resonance_skill_4_checker.check(img)
-        logger.debug(f"{self.name}-共鸣技能4-惊龙破空: {is_ready}")
+        logger.debug(f"{self.resonator_name().value}-共鸣技能4-惊龙破空: {is_ready}")
         return is_ready
 
     def is_resonance_skill_4_incoming_ready(self, img: np.ndarray) -> bool:
         is_ready = self._resonance_skill_4_incoming_checker.check(img)
-        logger.debug(f"{self.name}-共鸣技能4-惊龙破空-入场: {is_ready}")
+        logger.debug(f"{self.resonator_name().value}-共鸣技能4-惊龙破空-入场: {is_ready}")
         return is_ready
 
     def is_echo_skill_ready(self, img: np.ndarray) -> bool:
         is_ready = self._echo_skill_checker.check(img)
-        logger.debug(f"{self.name}-声骸技能: {is_ready}")
+        logger.debug(f"{self.resonator_name().value}-声骸技能: {is_ready}")
         return is_ready
 
     def is_resonance_liberation_ready(self, img: np.ndarray) -> bool:
         is_ready = self._resonance_liberation_checker.check(img)
-        logger.debug(f"{self.name}-共鸣解放: {is_ready}")
+        logger.debug(f"{self.resonator_name().value}-共鸣解放: {is_ready}")
         return is_ready
 
 
-class Jinhsi(BaseJinhsi, BaseCombo):
+class Jinhsi(BaseJinhsi):
     # COMBO_SEQ 为训练场单人静态完整连段，后续开发以此为准从中拆分截取
 
     # 常规轴

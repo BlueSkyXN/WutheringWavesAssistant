@@ -13,6 +13,112 @@ from src.core.interface import ControlService, ImgService
 logger = logging.getLogger(__name__)
 
 
+class ResonatorNameEnum(Enum):
+    # 特殊
+    rover = "漂泊者"
+    generic = "generic"
+    none = "None"
+
+    # 常驻
+    encore = "安可"
+    verina = "维里奈"
+    calcharo = "卡卡罗"
+    lingyang = "凌阳"
+    jianxin = "鉴心"
+
+    yangyang = "秧秧"
+    baizhi = "白芷"
+    chixia = "炽霞"
+    sanhua = "散华"
+    aalto = "秋水"
+    danjin = "丹瑾"
+    mortefi = "莫特斐"
+    yuanwu = "渊武"
+    taoqi = "桃祈"
+
+    # v1.0
+    jiyan = "忌炎"
+    yinlin = "吟霖"
+
+    # v1.1
+    jinhsi = "今汐"
+    changli = "长离"
+
+    # v1.2
+    zhezhi = "折枝"
+    xiangliyao = "相里要"
+
+    # v1.3
+    shorekeeper = "守岸人"
+    youhu = "釉瑚"
+
+    # v1.4
+    camellya = "椿"
+    lumi = "灯灯"
+
+    # v2.0
+    carlotta = "珂莱塔"
+    roccia = "洛可可"
+
+    # v2.1
+    phoebe = "菲比"
+    brant = "布兰特"
+
+    # v2.2
+    cantarella = "坎特蕾拉"
+
+    # v2.3
+    zanni = "赞妮"
+    ciaccona = "夏空"
+
+    # v2.4
+    cartethyia = "卡提希娅"
+    lupa = "露帕"
+
+    # v2.5
+    phrolova = "弗洛洛"
+
+    # v2.6
+    augusta = "奥古斯塔"
+    iuno = "尤诺"
+
+    # v2.7
+    qiuyuan = "仇远"
+    galbrena = "嘉贝莉娜"
+
+    # v2.8
+    chisa = "千咲"
+
+    # v3.0
+
+    # 缓存
+    __value_map = None
+
+    @classmethod
+    def get_enum_map(cls):
+        """ 获取枚举集合，不包含特殊的几个 """
+        if cls.__value_map is None:
+            # cls.__value_map = {member.value: member for member in cls}
+            cls.__value_map = {}
+            for member in cls:
+                if member in [cls.rover, cls.generic, cls.none]:
+                    continue
+                cls.__value_map[member.value] = member
+        return cls.__value_map
+
+    @classmethod
+    def get_names_zh(cls):
+        return list(cls.get_enum_map().keys())
+
+    @classmethod
+    def get_names_en(cls):
+        return [i.name for i in cls.get_enum_map().values()]
+
+    @classmethod
+    def get_enum_by_value(cls, value):
+        return cls.get_enum_map().get(value)
+
+
 class BaseChecker:
 
     def __init__(self):
@@ -32,12 +138,19 @@ class LogicEnum(Enum):
 
 class AlignEnum(Enum):
     """
-    对齐方式，默认底部对齐
+    对齐方式，默认底端对齐，右对齐
     """
-    BUTTON_RIGHT = "button_right"  # 底部对齐，右对齐，如角色的技能
-    BUTTON_CENTER = "button_center"  # 底部对齐，居中，如角色的血条、能量条
-    TOP_RIGHT = "top_right"  # 顶部对齐，右对齐，右侧的角色头像
-    TOP_CENTER = "top_center"  # 顶部对齐，居中，如boss血条
+    BUTTON_RIGHT = "button_right"  # 底端对齐，右对齐，如角色的技能
+    BUTTON_CENTER = "button_center"  # 底端对齐，水平居中，如角色的血条、能量条
+    BUTTON_LEFT = "button_left"  # 底端对齐，左对齐
+
+    TOP_RIGHT = "top_right"  # 顶端对齐，右对齐，右侧的角色头像
+    TOP_CENTER = "top_center"  # 顶端对齐，水平居中，如boss血条
+    TOP_LEFT = "top_left"  # 顶端对齐，左对齐，如编队左上角队伍
+
+    CENTER = "center"  # 中心对齐，如编队
+    CENTER_LEFT = "center_left"  # 垂直居中，左对齐
+    CENTER_RIGHT = "center_right"  # 垂直居中，右对齐
 
 
 class ResolutionEnum(Enum):
@@ -51,11 +164,11 @@ class ResolutionEnum(Enum):
 
 class DynamicPointTransformer:
 
-    def __init__(self, h_w: np.ndarray | tuple[int, int]):
-        if isinstance(h_w, tuple):
-            h, w = h_w
-        elif isinstance(h_w, np.ndarray):
-            h, w = h_w.shape[:2]
+    def __init__(self, img_or_wh: np.ndarray | tuple[int, int]):
+        if isinstance(img_or_wh, tuple):
+            w, h = img_or_wh
+        elif isinstance(img_or_wh, np.ndarray):
+            h, w = img_or_wh.shape[:2]
         else:
             raise TypeError("h_w must be either a ndarray or a tuple")
         if w == 0 or h == 0:
@@ -78,64 +191,117 @@ class DynamicPointTransformer:
             # 16:10等，高度更高
             resolution = ResolutionEnum.TALL
             # logger.debug(f"比例: 16:{16 * h / w:.2f}")
-        else: # self.ratio_w_h > self.ratio_16_9:
+        else:  # self.ratio_w_h > self.ratio_16_9:
             # 21:9等，宽度更宽
             resolution = ResolutionEnum.WIDE
             # logger.debug(f"比例: 16:{16 * h / w:.2f}")
         self.resolution = resolution
 
-    def transform(self, src_point: tuple[int, int], align: AlignEnum | None = None) -> tuple[int, int]:
+    def transform(self, point: tuple[int, int], align: AlignEnum | None = None) -> tuple[int, int]:
+        """ 将1280x720下的坐标转换成当前分辨率下的坐标点 """
+
         # 标准分辨率直接等比缩放
         if self.resolution == ResolutionEnum.STANDARD:
-            return int(src_point[0] * self.ratio_w_1280), int(src_point[1] * self.ratio_w_1280)
+            return int(point[0] * self.ratio_w_1280), int(point[1] * self.ratio_w_1280)
 
         # 非标准分辨率，按对齐方式选择映射方式
         new_x = None
         new_y = None
 
         # x
-        if align is None or align in [AlignEnum.BUTTON_RIGHT, AlignEnum.TOP_RIGHT]:
+        if align is None or align in [AlignEnum.BUTTON_RIGHT, AlignEnum.TOP_RIGHT, AlignEnum.CENTER_RIGHT]:  # 右对齐
             if self.resolution == ResolutionEnum.TALL:
-                new_x = src_point[0] * self.ratio_w_1280
+                new_x = point[0] * self.ratio_w_1280
             elif self.resolution == ResolutionEnum.WIDE:
-                new_x = self.w_diff + src_point[0] * self.ratio_h_720
-        elif align in [AlignEnum.BUTTON_CENTER, AlignEnum.TOP_CENTER]:
+                new_x = self.w_diff + point[0] * self.ratio_h_720
+        elif align in [AlignEnum.BUTTON_CENTER, AlignEnum.TOP_CENTER, AlignEnum.CENTER]:  # 水平居中
             if self.resolution == ResolutionEnum.TALL:
-                new_x = src_point[0] * self.ratio_w_1280
+                new_x = point[0] * self.ratio_w_1280
             elif self.resolution == ResolutionEnum.WIDE:
-                new_x = self.w_diff / 2 + src_point[0] * self.ratio_h_720
-        else:
-            # 左对齐，暂时没有
-            pass
+                new_x = self.w_diff / 2 + point[0] * self.ratio_h_720
+        elif align in [AlignEnum.BUTTON_LEFT, AlignEnum.TOP_LEFT, AlignEnum.CENTER_LEFT]:  # 左对齐
+            if self.resolution == ResolutionEnum.TALL:
+                new_x = point[0] * self.ratio_w_1280
+            elif self.resolution == ResolutionEnum.WIDE:
+                new_x = point[0] * self.ratio_h_720
 
         # y
-        if align is None or align in [AlignEnum.BUTTON_RIGHT, AlignEnum.BUTTON_CENTER]:
+        if align is None or align in [AlignEnum.BUTTON_RIGHT, AlignEnum.BUTTON_LEFT, AlignEnum.BUTTON_CENTER]:  # 底端对齐
             if self.resolution == ResolutionEnum.TALL:
-                new_y = self.h_diff + src_point[1] * self.ratio_w_1280
+                new_y = self.h_diff + point[1] * self.ratio_w_1280
             elif self.resolution == ResolutionEnum.WIDE:
-                new_y = src_point[1] * self.ratio_h_720
-        elif align in [AlignEnum.TOP_RIGHT, AlignEnum.TOP_CENTER]:
+                new_y = point[1] * self.ratio_h_720
+        elif align in [AlignEnum.TOP_RIGHT, AlignEnum.TOP_LEFT, AlignEnum.TOP_CENTER]:  # 顶端对齐
             if self.resolution == ResolutionEnum.TALL:
-                new_y = src_point[1] * self.ratio_w_1280
+                new_y = point[1] * self.ratio_w_1280
             elif self.resolution == ResolutionEnum.WIDE:
-                new_y = src_point[1] * self.ratio_h_720
+                new_y = point[1] * self.ratio_h_720
+        elif align in [AlignEnum.CENTER, AlignEnum.CENTER_LEFT, AlignEnum.CENTER_RIGHT]:  # 垂直居中
+            if self.resolution == ResolutionEnum.TALL:
+                new_y = self.h_diff / 2 + point[1] * self.ratio_w_1280
+            elif self.resolution == ResolutionEnum.WIDE:
+                new_y = point[1] * self.ratio_h_720
 
         if new_x is None or new_y is None:
             logger.debug(f"new_x: {new_x}, new_y: {new_y}")
             raise ValueError("未知的枚举值")
 
         new_point = (int(new_x), int(new_y))
-        # logger.debug(f"src_point: {src_point}, new_point: {new_point}")
+        # logger.debug(f"point: {point}, new_point: {new_point}")
         return new_point
 
-    # def equals(self, h_w: np.ndarray | tuple[int, int]):
-    #     if isinstance(h_w, np.ndarray):
-    #         h, w = h_w.shape[:2]
-    #     elif isinstance(h_w, tuple):
-    #         h, w = h_w
-    #     else:
-    #         raise TypeError("h_w must be either a ndarray or a tuple")
-    #     return self.h == h and self.w == w
+    def untransform(self, point: tuple[int, int], align: AlignEnum | None = None) -> tuple[int, int]:
+        """ 将当前分辨率下的坐标点转换成1280x720下的坐标 """
+
+        # 标准分辨率直接等比缩放
+        if self.resolution == ResolutionEnum.STANDARD:
+            return int(point[0] / self.ratio_w_1280), int(point[1] / self.ratio_w_1280)
+
+        # 非标准分辨率，按对齐方式选择映射方式
+        new_x = None
+        new_y = None
+
+        # x
+        if align is None or align in [AlignEnum.BUTTON_RIGHT, AlignEnum.TOP_RIGHT, AlignEnum.CENTER_RIGHT]:  # 右对齐
+            if self.resolution == ResolutionEnum.TALL:
+                new_x = point[0] / self.ratio_w_1280
+            elif self.resolution == ResolutionEnum.WIDE:
+                new_x = (point[0] - self.w_diff) / self.ratio_h_720
+        elif align in [AlignEnum.BUTTON_CENTER, AlignEnum.TOP_CENTER, AlignEnum.CENTER]:  # 水平居中
+            if self.resolution == ResolutionEnum.TALL:
+                new_x = point[0] / self.ratio_w_1280
+            elif self.resolution == ResolutionEnum.WIDE:
+                new_x = (point[0] - self.w_diff / 2) * self.ratio_h_720
+        elif align in [AlignEnum.BUTTON_LEFT, AlignEnum.TOP_LEFT, AlignEnum.CENTER_LEFT]:  # 左对齐
+            if self.resolution == ResolutionEnum.TALL:
+                new_x = point[0] / self.ratio_w_1280
+            elif self.resolution == ResolutionEnum.WIDE:
+                new_x = point[0] / self.ratio_h_720
+
+        # y
+        if align is None or align in [AlignEnum.BUTTON_RIGHT, AlignEnum.BUTTON_LEFT, AlignEnum.BUTTON_CENTER]:  # 底端对齐
+            if self.resolution == ResolutionEnum.TALL:
+                new_y = (point[1] - self.h_diff) / self.ratio_w_1280
+            elif self.resolution == ResolutionEnum.WIDE:
+                new_y = point[1] / self.ratio_h_720
+        elif align in [AlignEnum.TOP_RIGHT, AlignEnum.TOP_LEFT, AlignEnum.TOP_CENTER]:  # 顶端对齐
+            if self.resolution == ResolutionEnum.TALL:
+                new_y = point[1] / self.ratio_w_1280
+            elif self.resolution == ResolutionEnum.WIDE:
+                new_y = point[1] / self.ratio_h_720
+        elif align in [AlignEnum.CENTER, AlignEnum.CENTER_LEFT, AlignEnum.CENTER_RIGHT]:  # 垂直居中
+            if self.resolution == ResolutionEnum.TALL:
+                new_y = (point[1] - self.h_diff / 2) / self.ratio_w_1280
+            elif self.resolution == ResolutionEnum.WIDE:
+                new_y = point[1] / self.ratio_h_720
+
+        if new_x is None or new_y is None:
+            logger.debug(f"new_x: {new_x}, new_y: {new_y}")
+            raise ValueError("未知的枚举值")
+
+        new_point = (int(new_x), int(new_y))
+        # logger.debug(f"point: {point}, new_point: {new_point}")
+        return new_point
 
 
 class ColorChecker(BaseChecker):
@@ -230,6 +396,7 @@ class BaseCombo:
     """ 连招 """
 
     def __init__(self, control_service: ControlService):
+        super().__init__()
         self.control_service = control_service
         self.event: threading.Event | None = None
         self.is_nightmare: bool = False
@@ -301,12 +468,74 @@ class CharClassEnum(Enum):
     Healer = "Healer"
 
 
-class BaseResonator:
+class BaseResonator(BaseCombo):
     """ 共鸣者 """
 
+    ## boss hp
+    # 血条为黄到红的渐变色
+    _health_01_point = [(454, 41)]
+    _health_01_color = [(68, 179, 255)]  # BGR
+
+    _health_20_point = [(528, 41)]
+    _health_20_color = [(62, 164, 255)]  # BGR
+
+    _health_30_point = [(565, 41)]
+    _health_30_color = [(55, 148, 255)]  # BGR
+
+    _health_50_point = [(641, 41)]
+    _health_50_color = [(38, 109, 255)]  # BGR
+
+    _health_100_point = [(830, 41)]
+    _health_100_color = [(8, 37, 255)]  # BGR
+
+    _health_01_color_checker = ColorChecker(_health_01_point, _health_01_color, align=AlignEnum.TOP_CENTER)
+    _health_20_color_checker = ColorChecker(_health_20_point, _health_20_color, align=AlignEnum.TOP_CENTER)
+    _health_30_color_checker = ColorChecker(_health_30_point, _health_30_color, align=AlignEnum.TOP_CENTER)
+    _health_50_color_checker = ColorChecker(_health_50_point, _health_50_color, align=AlignEnum.TOP_CENTER)
+    _health_100_color_checker = ColorChecker(_health_100_point, _health_100_color, align=AlignEnum.TOP_CENTER)
+
+    ## is_boss_health_bar_exist
+    _tolerance = 20
+    # 血条为黄到红的渐变色
+    _a_health_01_point = [(449, 41)]
+    _a_health_01_color = [(68, 179, 255), (68, 168, 240), (68, 155, 219)]  # BGR
+    _a_health_01_checker = ColorChecker(
+        _a_health_01_point, _a_health_01_color, tolerance=_tolerance, align=AlignEnum.TOP_CENTER)
+
+    _a_health_02_point = [(452, 41), (451, 41), (450, 41)]
+    # health_02_color = [(68, 179, 255), (47, 20, 37)]  # BGR
+    _a_health_02_color = [(69, 138, 194), (68, 179, 255)]  # BGR
+    _a_health_02_checker = ColorChecker(
+        _a_health_02_point, _a_health_02_color, tolerance=_tolerance, align=AlignEnum.TOP_CENTER)
+
+    _a_health_20_point = [(528, 41)]
+    # health_20_color = [(62, 164, 255), (47, 18, 28)]  # BGR
+    _a_health_20_color = [(62, 164, 255)]  # BGR
+    _a_health_20_checker = ColorChecker(
+        _a_health_20_point, _a_health_20_color, tolerance=_tolerance, align=AlignEnum.TOP_CENTER)
+
+    _a_health_30_point = [(565, 41)]
+    # health_30_color = [(55, 148, 255), (47, 17, 27)]  # BGR
+    _a_health_30_color = [(55, 148, 255)]  # BGR
+    _a_health_30_checker = ColorChecker(
+        _a_health_30_point, _a_health_30_color, tolerance=_tolerance, align=AlignEnum.TOP_CENTER)
+
+    _a_health_50_point = [(641, 41)]
+    # health_50_color = [(38, 109, 255), (51, 19, 29)]  # BGR
+    _a_health_50_color = [(38, 109, 255)]  # BGR
+    _a_health_50_checker = ColorChecker(
+        _a_health_50_point, _a_health_50_color, tolerance=_tolerance, align=AlignEnum.TOP_CENTER)
+
+    # health_100_point = [(830, 41)]
+    # health_100_color = [(8, 37, 255), (65, 30, 41), (93, 80, 83)]  # BGR
+
     def __init__(self, control_service: ControlService, img_service: ImgService):
-        self.control_service = control_service
+        super().__init__(control_service)
         self.img_service = img_service
+
+    def resonator_name(self) -> ResonatorNameEnum:
+        """ 角色名 """
+        raise NotImplementedError()
 
     def char_class(self) -> list[CharClassEnum]:
         """ 角色分类 """
@@ -325,6 +554,9 @@ class BaseResonator:
         raise NotImplementedError()
 
     def is_resonance_liberation_ready(self, img: np.ndarray) -> bool:
+        raise NotImplementedError()
+
+    def combo(self) -> bool:
         raise NotImplementedError()
 
     @classmethod
@@ -348,35 +580,19 @@ class BaseResonator:
     @classmethod
     def boss_hp(cls, img: np.ndarray) -> float:
         """ boss剩余血条比例，归一 """
-        # 血条为黄到红的渐变色
-        health_01_point = [(454, 41)]
-        health_01_color = [(68, 179, 255)]  # BGR
-
-        health_20_point = [(528, 41)]
-        health_20_color = [(62, 164, 255)]  # BGR
-
-        health_30_point = [(565, 41)]
-        health_30_color = [(55, 148, 255)]  # BGR
-
-        health_50_point = [(641, 41)]
-        health_50_color = [(38, 109, 255)]  # BGR
-
-        health_100_point = [(830, 41)]
-        health_100_color = [(8, 37, 255)]  # BGR
-
         health = 0.0
-        if ColorChecker(health_01_point, health_01_color, align=AlignEnum.TOP_CENTER).check(img):
+        if cls._health_01_color_checker.check(img):
             health = 0.01  # 血量1%
-        if ColorChecker(health_20_point, health_20_color, align=AlignEnum.TOP_CENTER).check(img):
+        if cls._health_20_color_checker.check(img):
             health = 0.20
             # logger.debug("boss_hp: %s", health)
-        if ColorChecker(health_30_point, health_30_color, align=AlignEnum.TOP_CENTER).check(img):
+        if cls._health_30_color_checker.check(img):
             health = 0.30
             # logger.debug("boss_hp: %s", health)
-        if ColorChecker(health_50_point, health_50_color, align=AlignEnum.TOP_CENTER).check(img):
+        if cls._health_50_color_checker.check(img):
             health = 0.50
             # logger.debug("boss_hp: %s", health)
-        if ColorChecker(health_100_point, health_100_color, align=AlignEnum.TOP_CENTER).check(img):
+        if cls._health_100_color_checker.check(img):
             health = 1.00
 
         logger.debug("boss_hp: %s", health)
@@ -385,41 +601,11 @@ class BaseResonator:
     @classmethod
     def is_boss_health_bar_exist(cls, img: np.ndarray) -> float:
         """ boss剩余血条比例，归一 """
-        tolerance = 20
-
-        # 血条为黄到红的渐变色
-        health_01_point = [(449, 41)]
-        health_01_color = [(68, 179, 255), (68, 168, 240), (68, 155, 219)]  # BGR
-        health_01_checker = ColorChecker(health_01_point, health_01_color, tolerance=tolerance, align=AlignEnum.TOP_CENTER)
-
-        health_02_point = [(452, 41), (451, 41), (450, 41)]
-        # health_02_color = [(68, 179, 255), (47, 20, 37)]  # BGR
-        health_02_color = [(69, 138, 194), (68, 179, 255)]  # BGR
-        health_02_checker = ColorChecker(health_02_point, health_02_color, tolerance=tolerance, align=AlignEnum.TOP_CENTER)
-
-        health_20_point = [(528, 41)]
-        # health_20_color = [(62, 164, 255), (47, 18, 28)]  # BGR
-        health_20_color = [(62, 164, 255)]  # BGR
-        health_20_checker = ColorChecker(health_20_point, health_20_color, tolerance=tolerance, align=AlignEnum.TOP_CENTER)
-
-        health_30_point = [(565, 41)]
-        # health_30_color = [(55, 148, 255), (47, 17, 27)]  # BGR
-        health_30_color = [(55, 148, 255)]  # BGR
-        health_30_checker = ColorChecker(health_30_point, health_30_color, tolerance=tolerance, align=AlignEnum.TOP_CENTER)
-
-        health_50_point = [(641, 41)]
-        # health_50_color = [(38, 109, 255), (51, 19, 29)]  # BGR
-        health_50_color = [(38, 109, 255)]  # BGR
-        health_50_checker = ColorChecker(health_50_point, health_50_color, tolerance=tolerance, align=AlignEnum.TOP_CENTER)
-
-        # health_100_point = [(830, 41)]
-        # health_100_color = [(8, 37, 255), (65, 30, 41), (93, 80, 83)]  # BGR
-
-        if (health_02_checker.check(img)
-                or health_01_checker.check(img)
-                or health_20_checker.check(img)
-                or health_30_checker.check(img)
-                or health_50_checker.check(img)):
+        if (cls._a_health_02_checker.check(img)
+                or cls._a_health_01_checker.check(img)
+                or cls._a_health_20_checker.check(img)
+                or cls._a_health_30_checker.check(img)
+                or cls._a_health_50_checker.check(img)):
             is_exist = True
         else:
             is_exist = False
@@ -454,30 +640,49 @@ class TeamMemberSelector:
         self.point_2 = [(1159, 234), (1167, 231)]
         self.point_3 = [(1159, 322), (1167, 319)]
         self.colors = [(247, 250, 254)]
+        self.tolerance = 20
 
         # team_member 1
-        self._team_member_1_point = [*self.point_2, *self.point_3]
-        self._team_member_1_color = self.colors
         self._team_member_1_checker = ColorChecker(
-            self._team_member_1_point, self._team_member_1_color, 20, logic=LogicEnum.AND, align=AlignEnum.TOP_RIGHT)
+            self.point_1, self.colors, self.tolerance, logic=LogicEnum.AND, align=AlignEnum.TOP_RIGHT)
 
         # team_member 2
-        self._team_member_2_point = [*self.point_1, *self.point_3]
-        self._team_member_2_color = self.colors
         self._team_member_2_checker = ColorChecker(
-            self._team_member_2_point, self._team_member_2_color, 20, logic=LogicEnum.AND, align=AlignEnum.TOP_RIGHT)
+            self.point_2, self.colors, self.tolerance, logic=LogicEnum.AND, align=AlignEnum.TOP_RIGHT)
 
         # team_member 3
-        self._team_member_3_point = [*self.point_1, *self.point_2]
-        self._team_member_3_color = self.colors
         self._team_member_3_checker = ColorChecker(
-            self._team_member_3_point, self._team_member_3_color, 20, logic=LogicEnum.AND, align=AlignEnum.TOP_RIGHT)
+            self.point_3, self.colors, self.tolerance, logic=LogicEnum.AND, align=AlignEnum.TOP_RIGHT)
 
         self._team_member_map = {
             1: self._team_member_1_checker,
             2: self._team_member_2_checker,
             3: self._team_member_3_checker,
         }
+
+    def _get_team_member_checker(self, index: int, resonators: list[BaseResonator]) -> BaseChecker:
+        # 兼容编队少人，只检查有人的数字标
+        # 若有三人则需检查当前角色外的另外两人的数字标
+        # 若有空两人则跳过没人的数字标
+        length = len(resonators)
+        # 找出哪几个位置有人
+        need_check_index_list = []
+        for i in range(length):
+            if i == index:  # 不检查自己的，比如2号角色需检查13的数字标
+                continue
+            if resonators[i] is not None:  # 若没带3号角色，跳过
+                need_check_index_list.append(i)
+        team_member_points = []
+        for check_index in need_check_index_list:
+            member = check_index + 1
+            if member == 1:
+                team_member_points.extend(self.point_1)
+            elif member == 2:
+                team_member_points.extend(self.point_2)
+            elif member == 3:
+                team_member_points.extend(self.point_3)
+        return ColorChecker(
+            team_member_points, self.colors, self.tolerance, logic=LogicEnum.AND, align=AlignEnum.TOP_RIGHT)
 
     # def get_avatars(self) -> dict[str, np.ndarray]:
     #     """ 获取所有角色的头像 """
@@ -564,7 +769,7 @@ class TeamMemberSelector:
     #     return member_names
 
     def toggle(self, index: int, event: threading.Event | None,
-               resonators: list[BaseResonator] | None, timeout_seconds: float = 1.0) -> bool | None:
+               resonators: list[BaseResonator], timeout_seconds: float = 1.0) -> bool | None:
         member = index + 1
 
         resonator = resonators[index]
@@ -576,7 +781,7 @@ class TeamMemberSelector:
         else:
             logger.debug(f"角色{member}存活")
 
-        team_member_checker = self._team_member_map.get(member)
+        team_member_checker = self._get_team_member_checker(index, resonators)
         start_time = time.monotonic()
 
         while time.monotonic() - start_time < timeout_seconds:
@@ -596,11 +801,16 @@ class TeamMemberSelector:
             time.sleep(0.1)
         return False
 
-    def get_cur_member_number(self) -> int | None:
+    def get_cur_member_number(self, resonators: list[BaseResonator]) -> int | None:
         img = self.img_service.screenshot()
-        for member, team_member_checker in self._team_member_map.items():
-            if team_member_checker.check(img):
-                return member
+        is_exists = [
+            self._team_member_1_checker.check(img),
+            self._team_member_2_checker.check(img),
+            self._team_member_3_checker.check(img),
+        ]
+        for index, resonator in enumerate(resonators):
+            if is_exists[index] is False and resonator is not None:
+                return index + 1
         return None
 
 # circular import

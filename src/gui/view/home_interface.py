@@ -113,7 +113,7 @@ class HomeInterface(ScrollArea):
             icon=":/gallery/images/controls/Checkbox.png",
             title="自动刷boss",
             content=self.tr(
-                "支持任意分辨率，建议1280x720最低画质省电，可开启智能连招"),
+                "支持任意分辨率，建议1280x720最低画质省电"),
             routeKey="basicInputInterface",
             index=0,
             task_name="AutoBossProcessTask",

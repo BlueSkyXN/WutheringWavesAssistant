@@ -3,7 +3,7 @@ import time
 
 import numpy as np
 
-from src.core.combat.combat_core import ColorChecker, BaseResonator, BaseCombo, CharClassEnum, LogicEnum
+from src.core.combat.combat_core import ColorChecker, BaseResonator, CharClassEnum, LogicEnum, ResonatorNameEnum
 from src.core.interface import ControlService, ImgService
 
 logger = logging.getLogger(__name__)
@@ -13,9 +13,6 @@ class BaseCartethyia(BaseResonator):
 
     def __init__(self, control_service: ControlService, img_service: ImgService):
         super().__init__(control_service, img_service)
-
-        self.name = "卡提希娅"
-        self.name_en = "cartethyia"
 
         # 协奏 左下血条旁绿圈
         self._concerto_energy_checker = ColorChecker.concerto_aero()
@@ -110,7 +107,7 @@ class BaseCartethyia(BaseResonator):
         self._conviction_color = [
             (170, 161, 160),  # 灰色空能量
             (251, 187, 114),  # 蓝色能量未全满
-            (255, 241, 135), (255, 254, 165), (242, 201, 117),   # 绿色满能量
+            (255, 241, 135), (255, 254, 165), (242, 201, 117),  # 绿色满能量
         ]  # BGR
         self._conviction_checker = ColorChecker(self._conviction_point, self._conviction_color)
 
@@ -120,29 +117,32 @@ class BaseCartethyia(BaseResonator):
         self.is_avatar_cartethyia_attack_done = False
 
     def __str__(self):
-        return self.name_en
+        return self.resonator_name().value
+
+    def resonator_name(self) -> ResonatorNameEnum:
+        return ResonatorNameEnum.cartethyia
 
     def char_class(self) -> list[CharClassEnum]:
         return [CharClassEnum.MainDPS]
 
     def is_concerto_energy_ready(self, img: np.ndarray) -> bool:
         is_ready = self._concerto_energy_checker.check(img)
-        logger.debug(f"{self.name}-协奏: {is_ready}")
+        logger.debug(f"{self.resonator_name().value}-协奏: {is_ready}")
         return is_ready
 
     def is_resonance_skill_cartethyia_ready(self, img: np.ndarray) -> bool:
         is_ready = self._resonance_skill_cartethyia_checker.check(img)
-        logger.debug(f"{self.name}-共鸣技能: {is_ready}")
+        logger.debug(f"{self.resonator_name().value}-共鸣技能: {is_ready}")
         return is_ready
 
     def is_echo_skill_ready(self, img: np.ndarray) -> bool:
         is_ready = self._echo_skill_checker.check(img)
-        logger.debug(f"{self.name}-声骸技能: {is_ready}")
+        logger.debug(f"{self.resonator_name().value}-声骸技能: {is_ready}")
         return is_ready
 
     def is_resonance_liberation_ready(self, img: np.ndarray) -> bool:
         is_ready = self._resonance_liberation_checker.check(img)
-        logger.debug(f"{self.name}-共鸣解放: {is_ready}")
+        logger.debug(f"{self.resonator_name().value}-共鸣解放: {is_ready}")
         return is_ready
 
     def is_resonance_skill_fleurdelys_ready(self, img: np.ndarray) -> bool:
@@ -162,7 +162,7 @@ class BaseCartethyia(BaseResonator):
 
     def is_resonance_liberation_avatar_cartethyia_ready(self, img: np.ndarray) -> bool:
         is_ready = self._resonance_liberation_avatar_cartethyia_checker.check(img)
-        logger.debug(f"化身·{self.name}-共鸣解放 R: {is_ready}")
+        logger.debug(f"化身·{self.resonator_name().value}-共鸣解放 R: {is_ready}")
         return is_ready
 
     def is_resonance_liberation_blade_of_howling_squall_ready(self, img: np.ndarray) -> bool:
@@ -172,17 +172,17 @@ class BaseCartethyia(BaseResonator):
 
     def is_sword_of_discord_existing(self, img: np.ndarray) -> bool:
         is_existing = self._sword_of_discord_checker.check(img)
-        logger.debug(f"{self.name}-剑一 异权剑: {is_existing}")
+        logger.debug(f"{self.resonator_name().value}-剑一 异权剑: {is_existing}")
         return is_existing
 
     def is_sword_of_divinity_existing(self, img: np.ndarray) -> bool:
         is_existing = self._sword_of_divinity_checker.check(img)
-        logger.debug(f"{self.name}-剑二 神权剑: {is_existing}")
+        logger.debug(f"{self.resonator_name().value}-剑二 神权剑: {is_existing}")
         return is_existing
 
     def is_sword_of_virtue_existing(self, img: np.ndarray) -> bool:
         is_existing = self._sword_of_virtue_checker.check(img)
-        logger.debug(f"{self.name}-剑三 人权剑: {is_existing}")
+        logger.debug(f"{self.resonator_name().value}-剑三 人权剑: {is_existing}")
         return is_existing
 
     def is_manifest_existing(self, img: np.ndarray) -> bool:
@@ -196,7 +196,7 @@ class BaseCartethyia(BaseResonator):
         return is_existing
 
 
-class Cartethyia(BaseCartethyia, BaseCombo):
+class Cartethyia(BaseCartethyia):
     # COMBO_SEQ 为训练场单人静态完整连段，后续开发以此为准从中拆分截取
 
     # 常规轴
@@ -806,7 +806,8 @@ class Cartethyia(BaseCartethyia, BaseCombo):
         # is_resonance_skill_fleurdelys_2_ready = self.is_resonance_skill_fleurdelys_2_ready(img)
         is_resonance_liberation_avatar_fleurdelys_ready = self.is_resonance_liberation_avatar_fleurdelys_ready(img)
         is_resonance_liberation_avatar_cartethyia_ready = self.is_resonance_liberation_avatar_cartethyia_ready(img)
-        is_resonance_liberation_blade_of_howling_squall_ready = self.is_resonance_liberation_blade_of_howling_squall_ready(img)
+        is_resonance_liberation_blade_of_howling_squall_ready = self.is_resonance_liberation_blade_of_howling_squall_ready(
+            img)
         # 状态
         is_sword_of_discord_existing = self.is_sword_of_discord_existing(img)
         is_sword_of_divinity_existing = self.is_sword_of_divinity_existing(img)
@@ -832,7 +833,7 @@ class Cartethyia(BaseCartethyia, BaseCombo):
                 self.combo_action(self.cartethyia_E(), False)
                 time.sleep(0.2)
             return
-        
+
         # 化身·卡提希娅
         avatar_cartethyia_to_fleurdelys = False
         if is_resonance_liberation_avatar_cartethyia_ready:
@@ -877,7 +878,8 @@ class Cartethyia(BaseCartethyia, BaseCombo):
             if boss_hp <= 0.1:
                 return
             is_resonance_skill_fleurdelys_ready = self.is_resonance_skill_fleurdelys_ready(img)
-            is_resonance_liberation_blade_of_howling_squall_ready = self.is_resonance_liberation_blade_of_howling_squall_ready(img)
+            is_resonance_liberation_blade_of_howling_squall_ready = self.is_resonance_liberation_blade_of_howling_squall_ready(
+                img)
             if not is_resonance_liberation_blade_of_howling_squall_ready:
                 if is_resonance_skill_fleurdelys_ready:
                     self.combo_action(self.fleurdelys_EaaEaaa(), True)
@@ -889,14 +891,16 @@ class Cartethyia(BaseCartethyia, BaseCombo):
                 boss_hp = self.boss_hp(img)
                 if boss_hp <= 0.1:
                     return
-                is_resonance_liberation_blade_of_howling_squall_ready = self.is_resonance_liberation_blade_of_howling_squall_ready(img)
+                is_resonance_liberation_blade_of_howling_squall_ready = self.is_resonance_liberation_blade_of_howling_squall_ready(
+                    img)
                 if not is_resonance_liberation_blade_of_howling_squall_ready:
                     self.combo_action(self.fleurdelys_za_a3(), True)
                     img = self.img_service.screenshot()
                     boss_hp = self.boss_hp(img)
                     if boss_hp <= 0.1:
                         return
-                    is_resonance_liberation_blade_of_howling_squall_ready = self.is_resonance_liberation_blade_of_howling_squall_ready(img)
+                    is_resonance_liberation_blade_of_howling_squall_ready = self.is_resonance_liberation_blade_of_howling_squall_ready(
+                        img)
 
             # 此剑，斩灭诸恶
             if is_resonance_liberation_blade_of_howling_squall_ready:
@@ -934,7 +938,7 @@ class Cartethyia(BaseCartethyia, BaseCombo):
                 elif not is_sword_of_discord_existing:
                     self.combo_action(self.cartethyia_z(), True)
                     self.combo_action(self.cartethyia_ja(), True)
-            else: # 没大，打一套普攻连
+            else:  # 没大，打一套普攻连
                 self.combo_action(self.cartethyia_a4(), False)
                 # 检查E
                 img = self.img_service.screenshot()

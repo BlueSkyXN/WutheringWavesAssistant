@@ -232,7 +232,7 @@ class ParamConfig(QConfig):
     # ]
     # comboSequence = ConfigItem("BossRush", "ComboSequence", defaultComboSequence)
 
-    autoCombat = ConfigItem("BossRush", "AutoCombatBeta", False, BoolValidator())
+    autoCombat = ConfigItem("BossRush", "AutoCombatBetaV2", True, BoolValidator())
 
     autoRestartPeriod = ConfigItem("BossRush", "AutoRestartPeriod", 'Close')
 

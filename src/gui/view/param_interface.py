@@ -1021,8 +1021,8 @@ class ParamInterface(ScrollArea):
 
         self.autoCombatCard = AutoCombatSwitchSettingCard(
             FIF.LABEL,
-            self.tr('智能连招 测试V0.3 支持：守岸人、长离、今汐、安可、维里奈、椿、散华、卡提希娅，替代无效'),
-            self.tr('默认关闭，此开关仅在测试阶段可见。征集角色账号包含：菲比、珂莱塔、洛可可、折枝、忌炎、布兰特，用于制作连招，在群里先@群主，借号有风险！请勿借与陌生人！'),
+            self.tr('智能连招Beta'),
+            self.tr('默认开启，推荐角色: 守岸人、长离、今汐、安可、维里奈、椿、散华、卡提希娅'),
             configItem=paramConfig.autoCombat,
             parent=self.bossGroup
         )

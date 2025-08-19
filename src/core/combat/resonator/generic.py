@@ -1,4 +1,6 @@
 import logging
+import random
+import time
 
 from src.core.combat.combat_core import BaseResonator, CharClassEnum, ResonatorNameEnum
 from src.core.interface import ControlService, ImgService
@@ -6,7 +8,7 @@ from src.core.interface import ControlService, ImgService
 logger = logging.getLogger(__name__)
 
 
-class BaseRover(BaseResonator):
+class BaseGeneric(BaseResonator):
 
     def __init__(self, control_service: ControlService, img_service: ImgService):
         super().__init__(control_service, img_service)
@@ -15,13 +17,13 @@ class BaseRover(BaseResonator):
         return self.resonator_name().name
 
     def resonator_name(self) -> ResonatorNameEnum:
-        return ResonatorNameEnum.rover
+        return ResonatorNameEnum.generic
 
     def char_class(self) -> list[CharClassEnum]:
         return [CharClassEnum.SubDPS]
 
 
-class Rover(BaseRover):
+class GenericResonator(BaseGeneric):
     COMBO_SEQ = [
         ["a", 0.05, 0.30],
         ["a", 0.05, 0.30],
@@ -41,13 +43,6 @@ class Rover(BaseRover):
         return [
             ["a", 0.05, 0.30],
             ["a", 0.05, 0.30],
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.30],
-        ]
-
-    def a2(self):
-        logger.debug("a2")
-        return [
             ["a", 0.05, 0.30],
             ["a", 0.05, 0.30],
         ]
@@ -90,9 +85,12 @@ class Rover(BaseRover):
         return self.COMBO_SEQ
 
     def combo(self):
-        self.combo_action(self.a2(), True)
-        self.combo_action(self.Eaa(), True)
-        self.combo_action(self.z(), False)
-        self.combo_action(self.a2(), True)
-        self.combo_action(self.R(), False)
+        self.combo_action(self.a4(), False)
+
+        combo_list = [self.Eaa(), self.R(), self.z()]
+        random.shuffle(combo_list)
+        for i in combo_list:
+            self.combo_action(i, False)
+            time.sleep(0.15)
+
         self.combo_action(self.Q(), False)

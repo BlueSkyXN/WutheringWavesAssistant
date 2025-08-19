@@ -2,14 +2,17 @@ import logging
 import threading
 import time
 
-from src.core.combat.combat_core import TeamMemberSelector, BaseCombo, BaseResonator, CharClassEnum
+from src.core.combat.combat_core import TeamMemberSelector, BaseCombo, BaseResonator, CharClassEnum, ResonatorNameEnum
 from src.core.combat.resonator.camellya import Camellya
 from src.core.combat.resonator.cartethyia import Cartethyia
 from src.core.combat.resonator.changli import Changli
 from src.core.combat.resonator.ciaccona import Ciaccona
 from src.core.combat.resonator.encore import Encore
+from src.core.combat.resonator.generic import GenericResonator
 from src.core.combat.resonator.jinhsi import Jinhsi
 from src.core.combat.resonator.phoebe import Phoebe
+from src.core.combat.resonator.phrolova import Phrolova
+from src.core.combat.resonator.rover import Rover
 from src.core.combat.resonator.sanhua import Sanhua
 from src.core.combat.resonator.shorekeeper import Shorekeeper
 from src.core.combat.resonator.verina import Verina
@@ -36,6 +39,9 @@ class CombatSystem:
         self._delay_time = None
         self._lock = threading.Lock()
 
+        self.rover = Rover(self.control_service, self.img_service)
+        self.generic_resonator = GenericResonator(self.control_service, self.img_service)
+
         self.jinhsi = Jinhsi(self.control_service, self.img_service)
         self.changli = Changli(self.control_service, self.img_service)
         self.shorekeeper = Shorekeeper(self.control_service, self.img_service)
@@ -46,21 +52,23 @@ class CombatSystem:
         self.cartethyia = Cartethyia(self.control_service, self.img_service)
         self.ciaccona = Ciaccona(self.control_service, self.img_service)
         self.phoebe = Phoebe(self.control_service, self.img_service)
+        self.phrolova = Phrolova(self.control_service, self.img_service)
 
-        self.resonator_map = {
-            self.jinhsi.name_en: self.jinhsi,
-            self.changli.name_en: self.changli,
-            self.shorekeeper.name_en: self.shorekeeper,
-            self.encore.name_en: self.encore,
-            self.verina.name_en: self.verina,
-            self.camellya.name_en: self.camellya,
-            self.sanhua.name_en: self.sanhua,
-            self.cartethyia.name_en: self.cartethyia,
-            self.ciaccona.name_en: self.ciaccona,
-            self.phoebe.name_en: self.phoebe,
+        self.resonator_map: dict[ResonatorNameEnum, BaseResonator] = {
+            ResonatorNameEnum.jinhsi: self.jinhsi,
+            ResonatorNameEnum.changli: self.changli,
+            ResonatorNameEnum.shorekeeper: self.shorekeeper,
+            ResonatorNameEnum.encore: self.encore,
+            ResonatorNameEnum.verina: self.verina,
+            ResonatorNameEnum.camellya: self.camellya,
+            ResonatorNameEnum.sanhua: self.sanhua,
+            ResonatorNameEnum.cartethyia: self.cartethyia,
+            ResonatorNameEnum.ciaccona: self.ciaccona,
+            ResonatorNameEnum.phoebe: self.phoebe,
+            # ResonatorNameEnum.phrolova: self.phrolova,
         }
-        self.resonators = None
-        self._sorted_resonators = None
+        self.resonators: list[BaseResonator] | None = None
+        self._sorted_resonators: list[tuple[BaseResonator, int]] | None = None
 
         self.is_nightmare: bool = False
 
@@ -75,11 +83,15 @@ class CombatSystem:
     #     logger.info(f"编队: {member_names_log}")
     #     return resonators
 
-    def _sort_resonators(self, resonators: list):
+    def _sort_resonators(self, resonators: list[BaseResonator]) -> list[tuple[BaseResonator, int]]:
         dps = []
         support = []
         healer = []
+        none = []
         for index, resonator in enumerate(resonators):
+            if resonator is None:
+                none.append((None, index))
+                continue
             char_class = resonator.char_class()
             if CharClassEnum.MainDPS in char_class or CharClassEnum.SubDPS in char_class:
                 dps.append((resonator, index))
@@ -88,65 +100,100 @@ class CombatSystem:
             elif CharClassEnum.Healer in char_class:
                 healer.append((resonator, index))
             else:
-                raise NotImplementedError()
+                raise ValueError("未知的枚举值")
         # 辅助先于输出
-        sorted_resonators = support + dps + healer
+        sorted_resonators: list[tuple[BaseResonator, int]] = support + dps + healer + none
         logger.debug(f"sorted_resonators: {sorted_resonators}")
         return sorted_resonators
 
     def run(self, event: threading.Event):
         if self.resonators is None:
-            # self.resonators = self.get_resonators()
             return
         if self.resonators and self._sorted_resonators is None:
             self._sorted_resonators = self._sort_resonators(self.resonators)
+
         index = 0
+        exists_length = sum(1 for i in self.resonators if i is not None)
         seq_length = len(self.resonators)
+
         last_index = index
         last_index_toggle = True
+        is_toggle_failed = False
+        last_time = None
+
         while True:
+            # 暂停
             # logger.debug("member: %s", index + 1)
+            # 主动暂停
             if not event.is_set():
                 # logger.info("暂停中，event.is_set()")
                 time.sleep(0.3)
                 continue
+            # 超时暂停
             if self.is_async and self._delay_time - time.monotonic() < 0.0:
                 # logger.info("暂停中，delay_time")
                 time.sleep(0.3)
                 continue
-            # logger.info("index：%s", index)
-            if self.is_nightmare:
-                self.control_service.fight_tap("F", 0.001)
-            if index % 3 == 0:
+
+            if last_time is None:
+                last_time = time.monotonic()
                 self.control_service.activate()
-            if index % 2 == 0:
                 self.control_service.camera_reset()
+            else:
+                cur_time = time.monotonic()
+                if cur_time - last_time >= 5:
+                    self.control_service.activate()
+                if cur_time - last_time >= 3:
+                    self.control_service.camera_reset()
+                last_time = time.monotonic()
+
+            # if self.is_nightmare:
+            #     self.control_service.fight_tap("F", 0.001)
+
+            # logger.info("index：%s", index)
             resonator, src_index = self._sorted_resonators[index]
             if resonator is None:
                 time.sleep(0.3)
-                continue
-            is_toggled = self.team_member_selector.toggle(src_index, event=event, resonators=self.resonators)
-            if not is_toggled:
+                last_index_toggle = True
+                last_index = index
                 index = self._next_index(index, seq_length)
                 continue
-            # 大招期间无法切人，若又切到同一个角色，尝试切下一个人
-            # 避免单角色连续站场两次
-            if last_index == index and last_index_toggle:
-                logger.debug(f"又轮到同一个角色，跳过, member: {index + 1}")
+
+            # 编队至少有两人才切人
+            if exists_length > 1:
+                is_toggled = self.team_member_selector.toggle(src_index, event=event, resonators=self.resonators)
+                logger.debug(f"is_toggled: {is_toggled}")
+                if is_toggled is None:
+                    index = self._next_index(index, seq_length)
+                    continue
+                elif is_toggled is False:
+                    is_toggle_failed = True
+                    index = self._next_index(index, seq_length)
+                    continue
+
+                # 大招期间无法切人，若又切到同一个角色，尝试切下一个人，避免单角色连续站场两次
+                # 阵亡或当前索引没有角色导致的切人失败而回到当前角色，属于正常，让当前角色再打一套才切
+                # 能切（待切索引位有存活角色）但没切过去就继续切
+                if last_index == index and last_index_toggle and is_toggle_failed:
+                    logger.debug(f"又轮到同一个角色，跳过, member: {index + 1}")
+                    index = self._next_index(index, seq_length)
+                    last_index_toggle = False
+                    continue
+                # 切成功，重置状态
+                last_index_toggle = True
+                is_toggle_failed = False
+                last_index = index
                 index = self._next_index(index, seq_length)
-                last_index_toggle = False
-                continue
-            last_index_toggle = True
-            last_index = index
-            index = self._next_index(index, seq_length)
+
             resonator.event = event
-            if isinstance(resonator, BaseCombo):
-                resonator.is_nightmare = self.is_nightmare
+            resonator.is_nightmare = self.is_nightmare
             try:
+                # logger.debug(f"combo: {resonator.resonator_name().value}")
                 resonator.combo()
             except StopError:  # 主动抛出异常快速跳出连招序列
-                if self.is_nightmare:
-                    self.control_service.pick_up()
+                # if self.is_nightmare:
+                #     self.control_service.pick_up()
+                pass
             finally:
                 self.control_service.mouse_left_up()
 
@@ -164,6 +211,7 @@ class CombatSystem:
                 if delay_seconds > 0.0:
                     self._delay_seconds = delay_seconds
                     self._delay_time = time.monotonic() + delay_seconds
+                    # logger.debug(f"+{delay_seconds}s")
                 if self._thread is None:
                     self._thread = threading.Thread(target=self.run, args=(self.event,))
                     self._thread.daemon = True
@@ -182,29 +230,31 @@ class CombatSystem:
     def pause(self):
         with self._lock:
             self.event.clear()
-
-    # def _auto_pause_after(self):
-    #     self.control_service.mouse_left_up()
-    #     self.control_service.mouse_right_up()
-    #     self.control_service.jump()  # 退出蝴蝶/红椿
-
-    # def is_running(self):
-    #     with self._lock:
-    #         return self.event.is_set()
+            # logger.debug("combat pause")
 
     def set_resonators(self, resonator_names_zh: list[str]):
         resonators: list[BaseResonator] = []
-        resonators_names_en = []
+        _resonators_names_en = []
         for name_zh in resonator_names_zh:
             if not name_zh:
-                resonators.append(None)
-                continue
-            for names_en, resonator in self.resonator_map.items():
-                if resonator.name == name_zh:
-                    resonators.append(resonator)
-                    resonators_names_en.append(resonator.name_en)
-                    break
-        logger.info(f"member_names: {resonators_names_en}")
+                break
+            resonator_temp = None
+            if name_zh == ResonatorNameEnum.rover.value:
+                resonator_temp = self.rover
+            elif name_zh == ResonatorNameEnum.none.value:
+                resonator_temp = None
+            else:
+                name_enum = ResonatorNameEnum.get_enum_by_value(name_zh)
+                if name_enum:
+                    # 找出定制连招
+                    resonator_temp = self.resonator_map.get(name_enum)
+                # 没有定制连招则使用默认连招
+                if resonator_temp is None:
+                    resonator_temp = self.generic_resonator
+            resonators.append(resonator_temp)
+            _resonators_names_en.append(resonator_temp.resonator_name().name if resonator_temp else None)
+
+        logger.info(f"team_members: {_resonators_names_en}")
         logger.info(f"编队: {resonator_names_zh}")
         self.resonators = resonators
 
@@ -215,7 +265,7 @@ class CombatSystem:
         if self.resonators is None:
             return
         try:
-            cur_member_number = self.team_member_selector.get_cur_member_number()
+            cur_member_number = self.team_member_selector.get_cur_member_number(self.resonators)
             if cur_member_number is None:
                 return
             resonator = self.resonators[cur_member_number - 1]
@@ -225,7 +275,5 @@ class CombatSystem:
                 if camellya_reset:
                     self.control_service.dash_dodge()
                     time.sleep(0.3)
-            # elif isinstance(resonator, Shorekeeper):
-            #     self.control_service.jump()
         except IndexError as e:
             logger.exception(e)
