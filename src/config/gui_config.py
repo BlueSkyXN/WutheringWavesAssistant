@@ -58,7 +58,7 @@ class ParamConfig(BaseModel):
         pre_data["bossName"] = bossRush.get("BossName")
         pre_data["bossLevel"] = bossRush.get("BossLevel")
         pre_data["autoRestartPeriod"] = bossRush.get("AutoRestartPeriod")
-        pre_data["autoCombatBeta"] = bossRush.get("AutoCombatBeta")
+        pre_data["autoCombatBeta"] = bossRush.get("AutoCombatBetaV2")
 
         pre_data["gamePath"] = data.get("Game", {}).get("GamePath")
         return pre_data
