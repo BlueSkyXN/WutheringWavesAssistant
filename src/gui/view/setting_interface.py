@@ -197,11 +197,11 @@ class SettingInterface(ScrollArea):
     def showUpdateVersion(self):
         result = self.remoteVersion.checkVersion()
         if result is None:
-            self.remoteVersion.showErrorBar(self.tr("检查更新失败"), 5000, self)
+            self.remoteVersion.showErrorBar(self.tr("检查更新失败"), 5000, self.parent())
             return
         if result is False:
-            self.remoteVersion.showInfoBar(self.tr("无需更新"), 5000, self)
+            self.remoteVersion.showInfoBar(self.tr("已经是最新版了"), 5000, self.parent())
             return
         if result is True:
             msg = self.tr(" *有新版本 {version}").format(version=self.remoteVersion.version)
-            self.remoteVersion.showSuccessBar(msg, 5000, self)
+            self.remoteVersion.showSuccessBar(msg, 5000, self.parent())

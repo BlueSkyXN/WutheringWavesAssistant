@@ -990,7 +990,6 @@ class AutoBossServiceImpl(PageEventAbstractService):
                 self.absorption_and_receive_rewards({})
             if self._config.CharacterHeal and not self._info.isCheckedHeal:
                 self._check_heal()
-            logger.debug("tap---------------esc--------------")
             self._control_service.esc()
             time.sleep(1)
             self._info.lastFightTime = datetime.now()

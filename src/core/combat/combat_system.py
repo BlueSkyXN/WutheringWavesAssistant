@@ -2,7 +2,7 @@ import logging
 import threading
 import time
 
-from src.core.combat.combat_core import TeamMemberSelector, BaseCombo, BaseResonator, CharClassEnum, ResonatorNameEnum
+from src.core.combat.combat_core import TeamMemberSelector, BaseResonator, CharClassEnum, ResonatorNameEnum
 from src.core.combat.resonator.camellya import Camellya
 from src.core.combat.resonator.cartethyia import Cartethyia
 from src.core.combat.resonator.changli import Changli
@@ -70,7 +70,7 @@ class CombatSystem:
         self.resonators: list[BaseResonator] | None = None
         self._sorted_resonators: list[tuple[BaseResonator, int]] | None = None
 
-        self.is_nightmare: bool = False
+        self.auto_pickup: bool = False
 
     # def get_resonators(self) -> list[BaseResonator]:
     #     resonators = []
@@ -138,17 +138,12 @@ class CombatSystem:
             if last_time is None:
                 last_time = time.monotonic()
                 self.control_service.activate()
-                self.control_service.camera_reset()
+                # self.control_service.camera_reset()
             else:
                 cur_time = time.monotonic()
                 if cur_time - last_time >= 5:
                     self.control_service.activate()
-                if cur_time - last_time >= 3:
-                    self.control_service.camera_reset()
                 last_time = time.monotonic()
-
-            # if self.is_nightmare:
-            #     self.control_service.fight_tap("F", 0.001)
 
             # logger.info("index：%s", index)
             resonator, src_index = self._sorted_resonators[index]
@@ -186,13 +181,11 @@ class CombatSystem:
                 index = self._next_index(index, seq_length)
 
             resonator.event = event
-            resonator.is_nightmare = self.is_nightmare
+            resonator.auto_pickup = self.auto_pickup
             try:
                 # logger.debug(f"combo: {resonator.resonator_name().value}")
                 resonator.combo()
             except StopError:  # 主动抛出异常快速跳出连招序列
-                # if self.is_nightmare:
-                #     self.control_service.pick_up()
                 pass
             finally:
                 self.control_service.mouse_left_up()
@@ -207,6 +200,8 @@ class CombatSystem:
         if self.is_async:
             with self._lock:
                 # logger.info("Combat system started.")
+                if not self.event.is_set():
+                    self.control_service.camera_reset()
                 self.event.set()
                 if delay_seconds > 0.0:
                     self._delay_seconds = delay_seconds

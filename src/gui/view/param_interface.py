@@ -975,7 +975,7 @@ class ParamInterface(ScrollArea):
             FIF.LABEL,
             # self.tr('选择刷哪些boss'),
             self.tr('Target Boss Names'),
-            self.tr("可任选。建议大世界选三个循环刷，梦魇和副本里的选一个单刷。日常可刷无妄者，高链可刷梦魇哀声鸷"),
+            self.tr("可任选。建议大世界选三个循环刷，梦魇和副本里的选一个单刷。日常可刷梦魇哀声鸷、无妄者"),
             # self.tr("Choose any bosses, suggested: one for instances and nightmare, three for open world"),
             texts=None,
             parent=self.bossGroup

@@ -408,3 +408,8 @@ class BossInfoService(ABC):
     @abstractmethod
     def is_nightmare(self, boss_name: str) -> bool:
         pass
+
+    @abstractmethod
+    def is_auto_pickup(self, boss_name: str) -> bool:
+        pass
+

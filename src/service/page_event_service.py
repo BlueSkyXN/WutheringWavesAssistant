@@ -7,7 +7,7 @@ from typing import Callable
 
 import numpy as np
 
-from src.core.combat.combat_core import DynamicPointTransformer, ResonatorNameEnum, AlignEnum, ResolutionEnum
+from src.core.combat.combat_core import DynamicPointTransformer, ResonatorNameEnum, AlignEnum
 from src.core.combat.combat_system import CombatSystem
 from src.core.constants import BossNameEnum
 from src.core.contexts import Context, Status
@@ -16,7 +16,6 @@ from src.core.interface import ControlService, OCRService, PageEventService, Img
 from src.core.languages import Languages
 from src.core.pages import ConditionalAction, TextMatch, Page
 from src.core.regions import TextPosition, DynamicPosition, Position
-from src.util import keymouse_util
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +51,9 @@ class PageEventAbstractService(PageEventService, ABC):
 
         self.combat_system = CombatSystem(control_service, img_service)
         self.combat_system.is_async = True
+
+        # param
+        self._echo_hunting_pos_1280_list = [(50, 385), (50, 475)]
 
     def execute(self,
                 src_img: np.ndarray | None = None,
@@ -437,8 +439,13 @@ class PageEventAbstractService(PageEventService, ABC):
                 self._control_service.activate()
                 time.sleep(0.2)
                 if self._need_retry() and not self._info.needHeal:
-                    logger.info("战斗次数：%s 吸收次数：%s 治疗次数：%s", self._info.fightCount,
-                                self._info.absorptionCount, self._info.healCount)
+                    if self._boss_info_service.is_nightmare(self._info.lastBossName):
+                        logger.info("治疗次数：%s", self._info.healCount)
+                    elif self._boss_info_service.is_auto_pickup(self._info.lastBossName):
+                        logger.info("战斗次数：%s 治疗次数：%s", self._info.fightCount, self._info.healCount)
+                    else:
+                        logger.info("战斗次数：%s 吸收次数：%s 治疗次数：%s", self._info.fightCount,
+                                    self._info.absorptionCount, self._info.healCount)
                     self.click_position(positions["重新挑战|Restart"])
                     if not self._info.lastBossName:
                         self._info.lastBossName = self._config.TargetBoss[0]
@@ -781,6 +788,9 @@ class PageEventAbstractService(PageEventService, ABC):
 
         if action is None:
             def default_action(positions: dict[str, Position]) -> bool:
+                # if self._info.lastBossName == BossNameEnum.Fenrico.value:
+                #     return False
+
                 time.sleep(0.2)
                 if not self._ocr_service.find_text(["吸收"]):
                     return False
@@ -897,7 +907,7 @@ class PageEventAbstractService(PageEventService, ABC):
                         self.team_members_ocr()
                         return True
                     if self.combat_system.is_boss_health_bar_exist():
-                        self.combat_system.is_nightmare = self._boss_info_service.is_nightmare(self._info.lastBossName)
+                        self.combat_system.auto_pickup = self._boss_info_service.is_auto_pickup(self._info.lastBossName)
                         self.combat_system.start(3.5)
                         time.sleep(1.5)
                     else:
@@ -1483,7 +1493,7 @@ class PageEventAbstractService(PageEventService, ABC):
             self.absorption_action_fleurdelys()
             return
         elif self._info.lastBossName == BossNameEnum.Fenrico.value:
-            self.absorption_action_fleurdelys()
+            self.absorption_action_fenrico()
             return
 
         start_time = datetime.now()  # 开始时间
@@ -1502,14 +1512,7 @@ class PageEventAbstractService(PageEventService, ABC):
         self._control_service.camera_reset()
         time.sleep(0.5)
 
-        search_region = DynamicPosition(
-            rate=(
-                788 / 1280,
-                300 / 720,
-                1100 / 1280,
-                560 / 720,
-            ),
-        )
+        search_region = self.get_dialogue_region()
 
         while not stop_search and (datetime.now() - start_time).seconds < absorption_max_time:  # 未超过最大吸收时间
 
@@ -1600,8 +1603,7 @@ class PageEventAbstractService(PageEventService, ABC):
         #     time.sleep(1)
 
     def absorption_action_fleurdelys(self):
-        # run_param = [("w", 0.5), ("a", 0.4), ("s", 1.0), ("d", 0.8), ("w", 0.6)]
-        # run_param = [("w", 0.22), ("w", 0.23), ("a", 0.25), ("s", 0.3), ("s", 0.3), ("d", 0.25), ("w", 0.3), ("d", 0.25), ("w", 0.25), ("s", 0.55)]
+        search_region = self.get_dialogue_region()
         run_param = [("w", 0.22), ("w", 0.23), ("a", 0.22), ("s", 0.27), ("s", 0.27), ("d", 0.22), ("w", 0.27), ("d", 0.22), ("w", 0.23), ("s", 0.53)]
         for i in range(len(run_param)):
             key, sleep_time = run_param[i]
@@ -1610,8 +1612,136 @@ class PageEventAbstractService(PageEventService, ABC):
                 self._control_service.player().fight_tap(key, 0.05)
             self._control_service.forward_run(sleep_time, key)
             time.sleep(0.75)
-            if self._ocr_service.find_text("吸收"):
+            if self._ocr_service.find_text("^吸收$", None, search_region):
                 self.absorption_and_receive_rewards({})
+                return
+
+    def absorption_action_fenrico(self):
+        self._info.challengeFenricoCount += 1
+
+        # 牢芬打完得时停一下才爆金币
+        time.sleep(2)
+        for i in range(3):
+            if self._ocr_service.find_text("^(芬莱克|仍可留下)$"):
+                time.sleep(1.25)
+                continue
+            break
+
+        # 单刷
+        is_solo_boss = len(self._config.TargetBoss) == 1 and self._config.TargetBoss[0] == BossNameEnum.Fenrico.value
+
+        search_region = self.get_dialogue_region()
+        dpt = DynamicPointTransformer(self._window_service.get_client_wh())
+
+        skip_search = False
+        absorb = self._ocr_service.find_text("^吸收$", None, search_region)
+        if absorb and self.absorption_and_receive_rewards({}):
+            time.sleep(0.2)
+            skip_search = True
+
+        # 单刷就刷几轮再去一次性全吸收，声骸位置固定都在一起
+        if is_solo_boss and self._info.challengeFenricoCount % 3 != 1:
+            skip_search = True
+
+        for step in range(3):
+            # 正好在脚下，已经吸收了，跳过搜索
+            if step == 0 and skip_search:
+                continue
+
+            # 捡完声骸，仅单选这个boss时才触发寻找重新挑战，若多选boss，退出正常触发传送下一个boss
+            if step > 0 and not is_solo_boss:
+                return
+
+            time.sleep(1.0)
+            self._control_service.map()
+            time.sleep(2.5)
+            lumen_tower_pos = self._ocr_service.wait_text(r"^(涌明高塔|Lumen\s*Tower)$", timeout=5)
+            if not lumen_tower_pos:
+                logger.warning("未找到涌明高塔")
+                self._control_service.esc()
+                time.sleep(2.0)
+                return
+
+            # 通过文本动态计算相对位置
+            lumen_tower_pos_1280_720 = dpt.untransform((lumen_tower_pos.x1, lumen_tower_pos.y1), AlignEnum.CENTER)
+            fenrico_pos_1280_720 = (
+                lumen_tower_pos_1280_720[0] - (605 - 600),
+                lumen_tower_pos_1280_720[1] - (351 - 300)
+            )
+            fenrico_pos = dpt.transform(fenrico_pos_1280_720, AlignEnum.CENTER)
+
+            time.sleep(0.7)
+            self._control_service.click(*fenrico_pos)
+            time.sleep(0.7)
+            position = self._ocr_service.wait_text(r"^(快速旅行|Fast\s*Travel)$", timeout=5)
+            if not position:
+                logger.warning("未找到快速旅行")
+                self._control_service.esc()
+                time.sleep(0.5)
+                return
+
+            time.sleep(0.7)
+            self._control_service.click(*position.random)
+            time.sleep(2.5)
+            self.wait_home()
+            time.sleep(1.5)
+
+            if step == 0:
+                self._control_service.forward_run(4.0)
+
+                i = 0
+                while i < 14:
+                    if not self._ocr_service.find_text("^吸收$", None, search_region):
+                        self._control_service.forward_walk(2)
+                        i += 1
+                        continue
+                    # 一但找到吸收，原地一直吸，因为前面设置了打几轮才触发一次吸收，声骸可能有多个
+                    max_search = 5
+                    while max_search > 0 and self.absorption_and_receive_rewards({}):
+                        max_search -= 1
+                        time.sleep(0.5)
+                    break
+
+            elif step >= 1:
+                self._control_service.forward_run(0.85)
+
+                found_restart = False
+                i = 0
+                while i < 9:
+                    restart = self._ocr_service.find_text(r"^(重新挑战|Restart)$", None, search_region)
+                    if restart:
+                        found_restart = True
+                        time.sleep(0.3)
+                        break
+                    self._control_service.forward_walk(2)
+                    i += 1
+
+                fenrico_pos = None
+                # 理论上有重新挑战，若没有，可能是boss又刷出来了，再检查boss
+                if not found_restart:
+                    fenrico_pos = self._ocr_service.find_text(rf"^{BossNameEnum.Fenrico.value}$")
+                    # boss也没有，再重试
+                    if not fenrico_pos:
+                        continue
+
+                if not fenrico_pos:
+                    self._control_service.scroll_mouse(-1)
+                    time.sleep(0.5)
+                    logger.info("重新挑战")
+                    self._control_service.pick_up()
+                    time.sleep(3.6)
+                # 跑去打boss
+                self._control_service.forward_run(3.4 - 1.5)
+
+                self._info.status = Status.idle
+                now = datetime.now()
+                self._info.idleTime = now  # 重置空闲时间
+                self._info.lastFightTime = now  # 重置最近检测到战斗时间
+                self._info.fightTime = now  # 重置战斗时间
+                # self._info.lastBossName = bossName
+                self._info.waitBoss = True
+
+                time.sleep(1)
                 return
 
     def search_reward_action(self):
@@ -1750,8 +1880,13 @@ class PageEventAbstractService(PageEventService, ABC):
         return False
 
     def transfer(self) -> bool:
-        logger.info("战斗次数：%s 吸收次数：%s 治疗次数：%s", self._info.fightCount,
-                    self._info.absorptionCount, self._info.healCount)
+        if self._boss_info_service.is_nightmare(self._info.lastBossName):
+            logger.info("治疗次数：%s", self._info.healCount)
+        elif self._boss_info_service.is_auto_pickup(self._info.lastBossName):
+            logger.info("战斗次数：%s 治疗次数：%s", self._info.fightCount, self._info.healCount)
+        else:
+            logger.info("战斗次数：%s 吸收次数：%s 治疗次数：%s", self._info.fightCount,
+                        self._info.absorptionCount, self._info.healCount)
         self._info.isCheckedHeal = False
         if self._config.CharacterHeal and self._info.needHeal:  # 检查是否需要治疗
             logger.info("有角色阵亡，开始治疗")
@@ -1894,13 +2029,14 @@ class PageEventAbstractService(PageEventService, ABC):
         :return:
         """
         self._control_service.activate()
+        search_region = self.get_dialogue_region()
         w, h = self._window_service.get_client_wh()
         need_retry = False
         max_ocr = 3
         count = 0
         while count < max_ocr or need_retry:
             img = self._img_service.screenshot()
-            results = self._ocr_service.ocr(img)
+            results = self._ocr_service.ocr(img, search_region)
             absorption = self._ocr_service.search_text(results, "^吸收$")
 
             # 没有吸收，再试一次
@@ -1910,20 +2046,12 @@ class PageEventAbstractService(PageEventService, ABC):
                 need_retry = True
                 continue
 
-            receive_rewards = self._ocr_service.search_texts(results, r"^领取奖励$")
+            receive_reward = self._ocr_service.search_text(results, r"^领取奖励$")
             # 部分boss可以重新挑战
             restart = self._ocr_service.search_text(results, r"^重新挑战$")
-            receive_reward = None
-            if receive_rewards:
-                for ele in receive_rewards:
-                    # 左侧任务下面的领取不要
-                    if ele.x1 < w // 3:
-                        continue
-                    receive_reward = ele
-                    break
             # 有吸收和领取奖励，吸收在下则滚动到下方
             if receive_reward:
-                logger.debug(f"absorption: {absorption}, receive_rewards: {receive_rewards}")
+                logger.debug(f"absorption: {absorption}, receive_reward: {receive_reward}")
                 if restart:
                     points = [absorption, receive_reward, restart]
                 else:
@@ -1937,7 +2065,7 @@ class PageEventAbstractService(PageEventService, ABC):
                 if absorption_index > 0:
                     for _ in range(absorption_index):
                         logger.info("向下滚动")
-                        keymouse_util.scroll_mouse(self._window_service.window, -1)
+                        self._control_service.scroll_mouse(-1)
                         time.sleep(0.5)
 
             count += 1
@@ -1959,7 +2087,9 @@ class PageEventAbstractService(PageEventService, ABC):
         else:
             self._info.absorptionCount += 1
         absorption_rate = self._info.absorptionCount / self._info.fightCount
-        logger.info("目前声骸吸收率为：%s", str(format(absorption_rate * 100, ".2f")))
+        # 自动拾取的统计不准，不打印
+        if not self._boss_info_service.is_auto_pickup(self._info.lastBossName):
+            logger.info("目前声骸吸收率为：%s", str(format(absorption_rate * 100, ".2f")))
         return True
 
     def transfer_to_boss(self, bossName):
@@ -1972,32 +2102,40 @@ class PageEventAbstractService(PageEventService, ABC):
             "异构武装": 4, "罗蕾莱": 4.5, "叹息古龙": 5.6, "梦魇无常凶鹭": 5.3, "梦魇云闪之鳞": 4.8,
             "梦魇朔雷之鳞": 3.2,
             "梦魇无冠者": 2.4, "梦魇燎照之骑": 4.5, "梦魇哀声鸷": 3.6, "梦魇飞廉之猩": 1,
-            "梦魇辉萤军势": 2.6, "梦魇凯尔匹": 5.2, "荣耀狮像": 2.6, "芬莱克": 3.4,
+            "梦魇辉萤军势": 2.6, "梦魇凯尔匹": 5.2, "荣耀狮像": 2.6,
+            "芬莱克": 0.85,  # 3.4
         }
-        # position = self.find_pic(template_img_name="UI_F2_Guidebook_EchoHunting.png", threshold=0.5)
-        # position = self._img_service.match_template(img=None, template_img="UI_F2_Guidebook_EchoHunting.png",
-        #                                             threshold=0.5)
-        echo_hunting_pos_1280 = (54, 387)
-        dpt = DynamicPointTransformer(self._window_service.get_client_wh())
-        echo_hunting_pos = dpt.transform(echo_hunting_pos_1280, AlignEnum.TOP_LEFT)
-        # if not position:
-        #     logger.warning("识别残像探寻失败")
-        #     self._control_service.esc()
-        #     return False
-        # self._control_service.click(*position.center)  # 进入残像探寻
 
         # 暂停自动战斗，否则会把按键打在输入框里
         if self._context.param_config.autoCombatBeta is True:
             self.combat_system.pause()
             time.sleep(0.2)
 
-        self._control_service.click(*echo_hunting_pos)  # 进入残像探寻
-        if not self._ocr_service.wait_text("探测"):
+        dpt = DynamicPointTransformer(self._window_service.get_client_wh())
+
+        is_enemy_tracing = False
+        for echo_hunting_pos_1280 in self._echo_hunting_pos_1280_list:
+            echo_hunting_pos = dpt.transform(echo_hunting_pos_1280, AlignEnum.TOP_LEFT)
+            self._control_service.click(*echo_hunting_pos)  # 进入残像探寻
+
+            enemy_tracing_or_path_of_growth_pos = self._ocr_service.wait_text(
+                r"^(敌迹探寻|Enemy\s*Tracing|探测|Detect|强者之路|Path\s*of\s*Growth|全息战略)$")
+
+            if not enemy_tracing_or_path_of_growth_pos:
+                break
+
+            img = self._img_service.screenshot()
+            results = self._ocr_service.ocr(img)
+            enemy_tracing_pos = self._ocr_service.search_texts(results, r"^(敌迹探寻|Enemy\s*Tracing|探测|Detect)$")
+            if enemy_tracing_pos:
+                is_enemy_tracing = True
+                break
+
+        if not is_enemy_tracing:
             logger.warning("未进入残象探寻")
             self._control_service.esc()
             return False
         logger.info(f"当前目标boss：{bossName}")
-        # model_boss_yolo(bossName)
         boss_name_reg_mapping = {
             "哀声鸷": "[哀袁]声.?",
             "赫卡忒": "赫卡.?",
@@ -2051,25 +2189,11 @@ class PageEventAbstractService(PageEventService, ABC):
                     # logger.info(f"匹配坐标：{findBossTemp}")
                     findBoss = findBossTemp
 
-        # y = 113
-        # while y < 700:
-        #     y = y + 22
-        #     if y > 700:
-        #         y = 700
-        #     findBoss = self._ocr_service.find_text(find_boss_name_reg)
-        #     if findBoss:
-        #         break
-        #     # control.click(855 * width_ratio, y * height_ratio)
-        #     # random_click(855, y, 1, 3)
-        #     # self._control_service.click(855, y)
-        #     self._control_service.click(570, y)
-        #     time.sleep(0.5)
         if not findBoss:
             self._control_service.esc()
             logger.warning("未找到目标boss")
             return False
 
-        # self.click_position(findBoss)
         self._control_service.click(findBoss.x1, findBoss.y1)
         time.sleep(0.2)
         self.click_position(findBoss)
@@ -2121,6 +2245,25 @@ class PageEventAbstractService(PageEventService, ABC):
                 while i < 8 and not self._ocr_service.find_text("^声弦$"):
                     self._control_service.forward_walk(3)
                     i += 1
+            elif bossName == BossNameEnum.Fenrico.value:
+                search_region = self.get_dialogue_region()
+                i = 0
+                while i < 8:
+                    restart = self._ocr_service.find_text(r"^(重新挑战|Restart)$", None, search_region)
+                    if not restart:
+                        self._control_service.forward_walk(3)
+                        i += 1
+                        continue
+                    else:
+                        time.sleep(0.3)
+                        self._control_service.scroll_mouse(-1)
+                        time.sleep(0.5)
+                        logger.info("重新挑战")
+                        self._control_service.pick_up()
+                        time.sleep(3.0)
+                    # 跑去打boss
+                    self._control_service.forward_run(3.4 - 1.5)
+                    break
 
             now = datetime.now()
             self._info.idleTime = now  # 重置空闲时间
@@ -2143,15 +2286,15 @@ class PageEventAbstractService(PageEventService, ABC):
         logger.info("罗蕾莱不在家，等她")
         self._control_service.esc()
         time.sleep(2)
-        if not self._ocr_service.wait_text("^(教程百科|Tutorials)$", timeout=5):
+        if not self._ocr_service.wait_text(r"^(终端|Terminal|教程百科|Tutorials)$", timeout=5):
             self._control_service.esc()
             return
         # 进入时钟
         dpt = DynamicPointTransformer(self._window_service.get_client_wh())
-        terminal_clock = dpt.transform((915, 686))
+        terminal_clock = dpt.transform((915, 686), AlignEnum.BUTTON_RIGHT)
         self._control_service.click(*terminal_clock)
         time.sleep(2)
-        tomorrow = self._ocr_service.wait_text("^次日$", timeout=5)
+        tomorrow = self._ocr_service.wait_text(r"^次日$", timeout=5)
         if not tomorrow:
             logger.warning("未找到次日")
             self._control_service.esc()
@@ -2175,7 +2318,7 @@ class PageEventAbstractService(PageEventService, ABC):
         self._ocr_service.wait_text("时间", timeout=10)
         time.sleep(1)
         self._control_service.esc()
-        self._ocr_service.wait_text("^终端$", timeout=5)
+        self._ocr_service.wait_text(r"^(终端|Terminal|教程百科|Tutorials)$", timeout=5)
         time.sleep(1)
         self._control_service.esc()
         time.sleep(0.5)
@@ -2468,3 +2611,11 @@ class PageEventAbstractService(PageEventService, ABC):
                     return
                 else:
                     logger.info("未找到地图")
+
+    def get_dialogue_region(self) -> Position:
+        dpt = DynamicPointTransformer(self._window_service.get_client_wh())
+        search_region = [
+            *dpt.transform((788, 280), AlignEnum.CENTER),
+            *dpt.transform((1100, 560), AlignEnum.CENTER),
+        ]
+        return Position.build(*search_region)

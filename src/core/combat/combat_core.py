@@ -399,7 +399,7 @@ class BaseCombo:
         super().__init__()
         self.control_service = control_service
         self.event: threading.Event | None = None
-        self.is_nightmare: bool = False
+        self.auto_pickup: bool = False
 
     def combo_action(self, sequence: Sequence, end_wait: bool, ignore_event: bool = False):
         """
@@ -418,7 +418,7 @@ class BaseCombo:
                 for key_down_cache in key_down_caches:
                     self.control_service.key_up(key_down_cache, 0.001)
                 raise StopError()
-            if self.is_nightmare:
+            if self.auto_pickup:
                 tap_f_cur_time = time.monotonic()
                 # 限制自动F频率
                 if tap_f_cur_time - tap_f_time > 0.25 or (i > 0 and i == max_size - 1):

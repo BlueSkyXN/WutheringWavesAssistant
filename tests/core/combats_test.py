@@ -139,6 +139,7 @@ def test_combo_Jinhsi_AdvancedCombo(control_service):
 
 
 def test_combo_Jinhsi_AdvancedCombo2(control_service):
+    # v2.5已失效
     # 汐汐 变奏（E2下劈）速喷 BV1rS5Vz4Egy BV1dtEgzUEAF
     # E2状态 下落攻击 落地瞬间跳（翻滚） E跳 a跳a跳a跳a跳 E
     seq = [

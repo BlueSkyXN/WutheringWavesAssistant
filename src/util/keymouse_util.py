@@ -98,7 +98,7 @@ def click(hwnd, x: int | float = 0, y: int | float = 0, seconds: float = 0.0):
     l_param = win32api.MAKELONG(x, y)
     win32gui.PostMessage(hwnd, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, l_param)
     __sleep(seconds)
-    win32gui.PostMessage(hwnd, win32con.WM_LBUTTONUP, win32con.MK_LBUTTON, l_param)
+    win32gui.PostMessage(hwnd, win32con.WM_LBUTTONUP, 0, l_param)
 
 
 # noinspection PyUnresolvedReferences
@@ -117,7 +117,7 @@ def mouse_left_up(hwnd, x: int, y: int, seconds: float = 0.0):
     y = int(y)
     logger.debug("Mouse left up: %d, %d", x, y)
     l_param = win32api.MAKELONG(x, y)
-    win32gui.PostMessage(hwnd, win32con.WM_LBUTTONUP, win32con.MK_LBUTTON, l_param)
+    win32gui.PostMessage(hwnd, win32con.WM_LBUTTONUP, 0, l_param)
     __sleep(seconds)
 
 
@@ -127,9 +127,9 @@ def right_click(hwnd, x: int | float = 0, y: int | float = 0, seconds: float = 0
     y = int(y)
     logger.debug("Mouse right click: %d, %d", x, y)
     l_param = win32api.MAKELONG(x, y)
-    win32gui.PostMessage(hwnd, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, l_param)
+    win32gui.PostMessage(hwnd, win32con.WM_RBUTTONDOWN, win32con.MK_RBUTTON, l_param)
     __sleep(seconds)
-    win32gui.PostMessage(hwnd, win32con.WM_LBUTTONUP, win32con.MK_LBUTTON, l_param)
+    win32gui.PostMessage(hwnd, win32con.WM_RBUTTONUP, 0, l_param)
 
 
 # noinspection PyUnresolvedReferences
@@ -138,7 +138,7 @@ def mouse_right_down(hwnd, x: int | float = 0, y: int | float = 0, seconds: floa
     y = int(y)
     logger.debug("Mouse right down: %d, %d", x, y)
     l_param = win32api.MAKELONG(x, y)
-    win32gui.PostMessage(hwnd, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, l_param)
+    win32gui.PostMessage(hwnd, win32con.WM_RBUTTONDOWN, win32con.MK_RBUTTON, l_param)
     __sleep(seconds)
 
 
@@ -148,7 +148,7 @@ def mouse_right_up(hwnd, x: int | float = 0, y: int | float = 0, seconds: float 
     y = int(y)
     logger.debug("Mouse right up: %d, %d", x, y)
     l_param = win32api.MAKELONG(x, y)
-    win32gui.PostMessage(hwnd, win32con.WM_LBUTTONUP, win32con.MK_LBUTTON, l_param)
+    win32gui.PostMessage(hwnd, win32con.WM_RBUTTONUP, 0, l_param)
     __sleep(seconds)
 
 
