@@ -35,12 +35,28 @@ dependencies = [
 
 [project.optional-dependencies]
 cuda = [
-    "paddlepaddle-gpu (==3.0.0)",
+    "paddlepaddle-gpu (==3.1.1)",
     "onnxruntime-gpu (==1.20.0)",
+    "nvidia-cublas-cu12 (==12.6.4.1)",
+    "nvidia-cuda-runtime-cu12 (==12.6.77)",
+    "nvidia-cudnn-cu12 (==9.5.1.17)",
+    "nvidia-cufft-cu12 (==11.3.0.4)",
+    "nvidia-curand-cu12 (==10.3.7.77)",
+    "nvidia-cusolver-cu12 (==11.7.1.2)",
+    "nvidia-cusparse-cu12 (==12.5.4.2)",
+    "nvidia-nvjitlink-cu12 (==12.6.85)"
 ]
 cuda11 = [
-    "paddlepaddle-gpu (==3.0.0)",
+    "paddlepaddle-gpu (==3.1.1)",
     "onnxruntime-gpu (==1.20.0)",
+    "nvidia-cublas-cu11 (==11.11.3.6)",
+    "nvidia-cuda-nvrtc-cu11 (==11.8.89)",
+    "nvidia-cuda-runtime-cu11 (==11.8.89)",
+    "nvidia-cudnn-cu11 (==8.9.6.50)",
+    "nvidia-cufft-cu11 (==10.9.0.58)",
+    "nvidia-curand-cu11 (==10.3.0.86)",
+    "nvidia-cusolver-cu11 (==11.4.1.48)",
+    "nvidia-cusparse-cu11 (==11.7.5.86)"
 ]
 dml = [
     "onnxruntime-directml (==1.20.0)",
@@ -73,6 +89,86 @@ paddlepaddle-gpu = [
     { markers = "extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu126"},
     { markers = "extra == 'cuda11' and extra != 'cuda' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu118"},
 ]
+# cuda12
+nvidia-cublas-cu12 = [
+    { markers = "extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu126"},
+]
+nvidia-cuda-cccl-cu12 = [
+    { markers = "extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu126"},
+]
+nvidia-cuda-cupti-cu12 = [
+    { markers = "extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu126"},
+]
+nvidia-cuda-nvrtc-cu12 = [
+    { markers = "extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu126"},
+]
+nvidia-cuda-runtime-cu12 = [
+    { markers = "extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu126"},
+]
+nvidia-cudnn-cu12 = [
+    { markers = "extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu126"},
+]
+nvidia-cufft-cu12 = [
+    { markers = "extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu126"},
+]
+nvidia-cufile-cu12 = [
+    { markers = "extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu126"},
+]
+nvidia-curand-cu12 = [
+    { markers = "extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu126"},
+]
+nvidia-cusolver-cu12 = [
+    { markers = "extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu126"},
+]
+nvidia-cusparse-cu12 = [
+    { markers = "extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu126"},
+]
+nvidia-cusparselt-cu12 = [
+    { markers = "extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu126"},
+]
+nvidia-nccl-cu12 = [
+    { markers = "extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu126"},
+]
+nvidia-nvjitlink-cu12 = [
+    { markers = "extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu'", source = "tsinghua"},
+]
+nvidia-nvtx-cu12 = [
+    { markers = "extra == 'cuda' and extra != 'cuda11' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu126"},
+]
+# cuda11
+nvidia-cublas-cu11 = [
+    { markers = "extra == 'cuda11' and extra != 'cuda' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu118"},
+]
+nvidia-cuda-cupti-cu11 = [
+    { markers = "extra == 'cuda11' and extra != 'cuda' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu118"},
+]
+nvidia-cuda-nvrtc-cu11 = [
+    { markers = "extra == 'cuda11' and extra != 'cuda' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu118"},
+]
+nvidia-cuda-runtime-cu11 = [
+    { markers = "extra == 'cuda11' and extra != 'cuda' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu118"},
+]
+nvidia-cudnn-cu11 = [
+    { markers = "extra == 'cuda11' and extra != 'cuda' and extra != 'dml' and extra != 'cpu'", source = "tsinghua"},
+]
+nvidia-cufft-cu11 = [
+    { markers = "extra == 'cuda11' and extra != 'cuda' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu118"},
+]
+nvidia-curand-cu11 = [
+    { markers = "extra == 'cuda11' and extra != 'cuda' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu118"},
+]
+nvidia-cusolver-cu11 = [
+    { markers = "extra == 'cuda11' and extra != 'cuda' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu118"},
+]
+nvidia-cusparse-cu11 = [
+    { markers = "extra == 'cuda11' and extra != 'cuda' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu118"},
+]
+nvidia-nccl-cu11 = [
+    { markers = "extra == 'cuda11' and extra != 'cuda' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu118"},
+]
+nvidia-nvtx-cu11 = [
+    { markers = "extra == 'cuda11' and extra != 'cuda' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu118"},
+]
 
 
 [build-system]
@@ -98,6 +194,12 @@ priority = "primary"
 [[tool.poetry.source]]
 name = "aliyun"
 url = "https://mirrors.aliyun.com/pypi/simple/"
+priority = "supplemental"
+
+
+[[tool.poetry.source]]
+name = "nvidia-ngc"
+url = "https://pypi.ngc.nvidia.com"
 priority = "supplemental"
 
 
