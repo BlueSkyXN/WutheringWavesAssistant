@@ -151,6 +151,10 @@ if not exist "%ROOT_DIR%\.git" (
 :: git merge
 :: git pull
 
+if exist "WWA_updater.exe" (
+    del /f /q "WWA_updater.exe" >nul 2>&1
+)
+
 echo Update complete!
 pause
 exit
