@@ -20,6 +20,18 @@
 
 ## 📌 使用指南
 
+- 点击转到 [下载页](https://github.com/wakening/WutheringWavesAssistant/releases/latest)，按描述选择合适的版本下载，看不懂就选300M左右那个，网速不行就去群里下  
+- 下载后解压，双击WWA.exe启动脚本，双击一键更新并选择合适的更新渠道（无梯子建议选国内加速）进行更新  
+- Windows系统设置：关闭HDR（默认就是关闭的），关闭英伟达显卡滤镜（默认关闭的），微星小飞机关闭或挪到左下角（不认识不用管）  
+- 游戏设置：简体中文，重置按键，重置滤镜，重置亮度  
+
+---
+
+## 🔧 从源码安装（Conda）
+
+<details>
+<summary>点击这里展开/折叠</summary>
+
 ### 1️⃣ 安装 Conda
 
 群文件里有，或点击 [Miniconda官方链接](https://repo.anaconda.com/miniconda/Miniconda3-py312_24.11.1-0-Windows-x86_64.exe) 下载
@@ -119,6 +131,12 @@ conda remove --name wwa-cuda --all -y
 ### ⚠️ 依赖安装失败？
 
 重新运行 `./scripts/rebuild_conda_env.ps1` 以重建环境。
+
+</details>
+
+---
+
+## ❓ 常见问题
 
 ### ⚠️ 运行时报错？
 
