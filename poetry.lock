@@ -1893,14 +1893,15 @@ python-versions = ">=3"
 groups = ["main"]
 markers = "extra == \"cuda11\" and extra != \"cuda\" and extra != \"dml\" and extra != \"cpu\""
 files = [
-    {file = "nvidia_nvtx_cu11-11.8.86-py3-none-manylinux1_x86_64.whl", hash = "sha256:890656d8bd9b4e280231c832e1f0d03459200ba4824ddda3dcb59b1e1989b9f5"},
+    {file = "nvidia_nvtx_cu11-11.8.86-py3-none-manylinux2014_aarch64.whl", hash = "sha256:5e84b97062eb102b45a8a9172a06cfe28b239b1635075a13d6474e91295e0468"},
     {file = "nvidia_nvtx_cu11-11.8.86-py3-none-manylinux2014_x86_64.whl", hash = "sha256:979f5b2aef5da164c5c53c64c85c3dfa61b8b4704f4f963bb568bf98fa8472e8"},
+    {file = "nvidia_nvtx_cu11-11.8.86-py3-none-win_amd64.whl", hash = "sha256:59fd002205311e58ff6025eab5109671bca2be52ec0f2fcd1e5c3ede65661bc5"},
 ]
 
 [package.source]
 type = "legacy"
-url = "https://www.paddlepaddle.org.cn/packages/stable/cu118"
-reference = "paddlepaddle-cu118"
+url = "https://pypi.nvidia.com"
+reference = "nvidia"
 
 [[package]]
 name = "nvidia-nvtx-cu12"
@@ -7255,4 +7256,4 @@ paddleocr = ["paddleocr"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "60daa1ef5e02377732640b128a36f0a2e1fe0ff859a90b44044ba35f05425a0f"
+content-hash = "701e709fde153cfeb5603284bfe2dee143766307f726c13893b55bc78d9f2eb1"

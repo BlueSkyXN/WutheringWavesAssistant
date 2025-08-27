@@ -170,7 +170,7 @@ nvidia-nccl-cu11 = [
     { markers = "sys_platform == 'linux' and extra == 'cuda11' and extra != 'cuda' and extra != 'dml' and extra != 'cpu'", source = "nvidia"},
 ]
 nvidia-nvtx-cu11 = [
-    { markers = "extra == 'cuda11' and extra != 'cuda' and extra != 'dml' and extra != 'cpu'", source = "paddlepaddle-cu118"},
+    { markers = "extra == 'cuda11' and extra != 'cuda' and extra != 'dml' and extra != 'cpu'", source = "nvidia"},
 ]
 
 
