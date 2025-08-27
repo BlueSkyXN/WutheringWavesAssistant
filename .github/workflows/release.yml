@@ -38,6 +38,7 @@ jobs:
           Remove-Item -Path "src/c" -Recurse -Force -ErrorAction SilentlyContinue
           Remove-Item -Path "src/gui/resource" -Recurse -Force -ErrorAction SilentlyContinue
           Remove-Item -Path ".pre-commit-config.yaml" -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path "WWA_updater.exe" -Recurse -Force -ErrorAction SilentlyContinue
           
           $tempWorkspace = "temp-workspace"
           mkdir $tempWorkspace -Force
@@ -93,14 +94,14 @@ jobs:
           name: wwa
           path: "wwa-${{ env.VERSION }}.7z"
 
-      - name: 🧑‍💻 wwa gpu版本 安装依赖并打包
+      - name: 🧑‍💻 wwa gpu cuda12.6版本 安装依赖并打包
         run: |
           # 解压 Python 到临时目录
           Expand-Archive -Path $env:PY_ZIP_NAME -DestinationPath "$env:TEMP_WORKSPACE\py312"
-          
+
           # 切入临时目录
           Push-Location "$env:TEMP_WORKSPACE"
-          
+
           # 安装依赖到便携 Python
           & "py312\python.exe" -m pip install --upgrade pip
           & "py312\python.exe" -m pip install setuptools wheel
@@ -108,21 +109,121 @@ jobs:
           & "py312\python.exe" -m poetry config virtualenvs.create false
           & "py312\python.exe" -m poetry install -E cuda --no-root -v
           & "py312\python.exe" -m pip list
-          
+
           # 打包到上一级目录
-          7z a -mx=9 "..\wwa-gpu-${{ env.VERSION }}.7z" "*"
-          
+          7z a -mx=9 "..\wwa-gpu-cu126-${{ env.VERSION }}.7z" "*"
+
           # 清理临时 Python
           Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
-          
+
           # 回到原目录
           Pop-Location
 
       - name: 📂 上传 7z 文件作为 workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: wwa-gpu
-          path: "wwa-gpu-${{ env.VERSION }}.7z"
+          name: wwa-gpu-cu126
+          path: "wwa-gpu-cu126-${{ env.VERSION }}.7z"
+
+      - name: 🧑‍💻 wwa gpu cuda11.8版本 安装依赖并打包
+        run: |
+          # 解压 Python 到临时目录
+          Expand-Archive -Path $env:PY_ZIP_NAME -DestinationPath "$env:TEMP_WORKSPACE\py312"
+
+          # 切入临时目录
+          Push-Location "$env:TEMP_WORKSPACE"
+
+          # 安装依赖到便携 Python
+          & "py312\python.exe" -m pip install --upgrade pip
+          & "py312\python.exe" -m pip install setuptools wheel
+          & "py312\python.exe" -m pip install poetry==2.1.1
+          & "py312\python.exe" -m poetry config virtualenvs.create false
+          & "py312\python.exe" -m poetry install -E cuda11 --no-root -v
+          & "py312\python.exe" -m pip list
+
+          # 打包到上一级目录
+          7z a -mx=9 "..\wwa-gpu-cu118-${{ env.VERSION }}.7z" "*"
+
+          # 清理临时 Python
+          Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
+
+          # 回到原目录
+          Pop-Location
+
+      - name: 📂 上传 7z 文件作为 workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wwa-gpu-cu118
+          path: "wwa-gpu-cu118-${{ env.VERSION }}.7z"
+
+      - name: 提取最新版本变更记录
+        id: extract_changelog
+        shell: pwsh
+        run: |
+          # 检查文件是否存在
+          if (-not (Test-Path "CHANGELOG.md")) {
+              Write-Output "CHANGELOG.md 文件不存在"
+              "" | Out-File -FilePath "release_body.txt"
+              exit 0
+          }
+
+          # 读取文件内容
+          $content = Get-Content -Path "CHANGELOG.md" -Raw
+
+          # 逐行处理，提取第一个版本块
+          $lines = $content -split "`n"
+          $firstBlock = @()
+          $foundFirst = $false
+          $collecting = $false
+
+          foreach ($line in $lines) {
+              if ($line -match '^[vV]\d+\.\d+\.\d+') {
+                  if (-not $foundFirst) {
+                      $foundFirst = $true
+                      $collecting = $true
+                      $firstBlock += $line
+                  } else {
+                      # 遇到第二个版本号，停止收集
+                      break
+                  }
+              } elseif ($collecting) {
+                  $firstBlock += $line
+              }
+          }
+
+          # 处理结果
+          if ($firstBlock.Count -gt 0) {
+              $result = ($firstBlock -join "`n").Trim()
+              Write-Output "提取变更记录："
+              Write-Output $result
+              # 保存到文件
+              $result | Out-File -FilePath "release_body.txt"
+          } else {
+              Write-Output "未提取到版本信息"
+              "" | Out-File -FilePath "release_body.txt"
+          }
+          
+          # 组合固定话术和动态版本记录
+          $fixedText = @"
+          🎉 **新版本发布！**
+          
+          本次更新包含以下内容：
+          
+          📦 **下载说明：**
+          - `wwa-*.7z` - 标准通用版本，文件较小，适合网速慢的或AMD显卡的用户
+          - `wwa-gpu-cu118-*.7z` - NVIDIA显卡专属，GPU加速通用版，适合任意N卡
+          - `wwa-gpu-cu126-*.7z` - NVIDIA显卡专属，GPU加速新版，适合30、40、50系列显卡
+          特殊：5090系列太新，GPU版还不支持，请使用标准版
+          脚本免安装解压即可运行，游戏需设置为简体中文，重置按键，重置滤镜，重置亮度
+          
+          ⚡ **更新内容：**
+          
+          "@
+
+          $fullContent = $fixedText + "`n`n" + $changelogContent + "`n`n" + "感谢使用！如有问题请提交 Issue。"
+    
+          # 保存到文件
+          $fullContent | Out-File -FilePath "release_body.txt"
 
       - name: 🚀 发布 GitHub Release（仅 main 分支）
         if: github.ref == 'refs/heads/main'
@@ -132,8 +233,11 @@ jobs:
           name: "Release ${{ env.VERSION }}"
           files: |
             "wwa-${{ env.VERSION }}.7z"
-            "wwa-gpu-${{ env.VERSION }}.7z"
-          body: |
-            Wuthering Waves Assistant
+            "wwa-gpu-cu126-${{ env.VERSION }}.7z"
+            "wwa-gpu-cu118-${{ env.VERSION }}.7z"
+#          body: |
+#            🎉 这是由 GitHub Actions 自动发布的版本！
+#            ${{ steps.changelog.outputs.changelog }}
+          body_path: "release_body.txt"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
