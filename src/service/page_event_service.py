@@ -7,7 +7,7 @@ from typing import Callable
 
 import numpy as np
 
-from src.core.combat.combat_core import DynamicPointTransformer, ResonatorNameEnum, AlignEnum
+from src.core.combat.combat_core import DynamicPointTransformer, ResonatorNameEnum, AlignEnum, BaseResonator
 from src.core.combat.combat_system import CombatSystem
 from src.core.constants import BossNameEnum
 from src.core.contexts import Context, Status
@@ -926,7 +926,7 @@ class PageEventAbstractService(PageEventService, ABC):
                 TextMatch(
                     name="战斗",
                     # text=r"(击败|对战|泰缇斯系统|凶戾之齿|倦怠之翼|妒恨之眼|(无餍之舌)|(僭?越之矛)|(谵?妄之爪)|爱欲之容|盖希诺姆|(愚执之瞳?)|背誓之脊|遗恨之指|异海归途)",
-                    text=r"(击败|对战|泰缇斯系统|凶戾之齿|倦怠之翼|妒恨之眼|(无.?之舌)|(.?越之矛)|(.?妄之爪)|爱欲之容|盖希诺姆|(愚执之.?)|背誓之脊|遗恨之指|异海归途)",
+                    text=r"(击败|对战|泰缇斯系统|凶戾之齿|倦怠之翼|妒恨之眼|(无.?之舌)|(.?越之矛)|(.?妄之爪)|爱欲之容|盖希诺姆|(愚执之.?)|背誓之脊|遗恨之指|异海归途|荣光的灰.?)",
                 ),
             ],
             excludeTexts=[
@@ -1127,25 +1127,28 @@ class PageEventAbstractService(PageEventService, ABC):
                 self._info.in_dungeon = True
                 # TODO 启动时就站在声之领域门口，无法区分是打哪个boss
                 if not self._info.lastBossName:
-                    if "芙露德莉斯" in self._config.TargetBoss:
-                        self._info.lastBossName = "芙露德莉斯"
-                    elif "梦魇赫卡忒" in self._config.TargetBoss:
-                        self._info.lastBossName = "梦魇赫卡忒"
-                    elif "赫卡忒" in self._config.TargetBoss:
-                        self._info.lastBossName = "赫卡忒"
+                    if BossNameEnum.Fleurdelys.value in self._config.TargetBoss:
+                        self._info.lastBossName = BossNameEnum.Fleurdelys.value
+                    elif BossNameEnum.NightmareHecate.value in self._config.TargetBoss:
+                        self._info.lastBossName = BossNameEnum.NightmareHecate.value
+                    elif BossNameEnum.Hecate.value in self._config.TargetBoss:
+                        self._info.lastBossName = BossNameEnum.Hecate.value
+                    elif BossNameEnum.LadyOfTheSea.value in self._config.TargetBoss:
+                        self._info.lastBossName = BossNameEnum.LadyOfTheSea.value
+                    elif BossNameEnum.TheFalseSovereign.value in self._config.TargetBoss:
+                        self._info.lastBossName = BossNameEnum.TheFalseSovereign.value
                     else:
-                        self._info.lastBossName = "赫卡忒"
+                        self._info.lastBossName = BossNameEnum.Hecate.value
                 return True
 
             action = default_action
 
         return Page(
-            name="声之领域|梦魇领域",
+            name="声之领域|梦魇领域|最终章",
             targetTexts=[
                 TextMatch(
-                    name="声之领域|梦魇领域",
-                    text=r"^进入(声之|梦.?)领域$",
-
+                    name="声之领域|梦魇领域|最终章",
+                    text=r"^(进入声之领域|进入梦.?领域|进入.*最终章.*)$",
                 ),
             ],
             excludeTexts=[
@@ -1602,6 +1605,10 @@ class PageEventAbstractService(PageEventService, ABC):
         #     self._control_service.esc()
         #     time.sleep(1)
 
+        if self._info.lastBossName == BossNameEnum.TheFalseSovereign.value:
+            self.absorption_action_the_false_sovereign()
+            return
+
     def absorption_action_fleurdelys(self):
         search_region = self.get_dialogue_region()
         run_param = [("w", 0.22), ("w", 0.23), ("a", 0.22), ("s", 0.27), ("s", 0.27), ("d", 0.22), ("w", 0.27), ("d", 0.22), ("w", 0.23), ("s", 0.53)]
@@ -1743,6 +1750,86 @@ class PageEventAbstractService(PageEventService, ABC):
 
                 time.sleep(1)
                 return
+
+    def absorption_action_the_false_sovereign(self):
+
+        # 单刷
+        is_solo_boss = len(self._config.TargetBoss) == 1 and self._config.TargetBoss[0] == BossNameEnum.TheFalseSovereign.value
+
+        search_region = self.get_dialogue_region()
+        dpt = DynamicPointTransformer(self._window_service.get_client_wh())
+
+        if not is_solo_boss:
+            return
+
+        time.sleep(1.0)
+        self._control_service.map()
+        time.sleep(2.5)
+        map_text_pos = self._ocr_service.wait_text(r"^(彻地之.?|Earthrend\s*Wedge)$", timeout=5)
+        if not map_text_pos:
+            logger.warning("未找到彻地之楔")
+            self._control_service.esc()
+            time.sleep(2.0)
+            return
+
+        # 通过文本动态计算相对位置
+        map_text_pos_1280_720 = dpt.untransform(
+            ((map_text_pos.x1 + map_text_pos.x2) // 2, map_text_pos.y2), AlignEnum.CENTER)
+        boss_pos_1280_720 = (
+            map_text_pos_1280_720[0] - (669 - 669),
+            map_text_pos_1280_720[1] + (359 - 257)
+        )
+        boss_pos = dpt.transform(boss_pos_1280_720, AlignEnum.CENTER)
+
+        time.sleep(0.7)
+        self._control_service.click(*boss_pos)
+        time.sleep(0.7)
+        position = self._ocr_service.wait_text(r"^(快速旅行|Fast\s*Travel)$", timeout=5)
+        if not position:
+            logger.warning("未找到快速旅行")
+            self._control_service.esc()
+            time.sleep(0.5)
+            return
+
+        time.sleep(0.7)
+        self._control_service.click(*position.random)
+        time.sleep(2.5)
+        self.wait_home()
+        time.sleep(1.5)
+
+        self._control_service.forward_run(2.5)
+
+        found_restart = False
+        i = 0
+        while i < 12:
+            restart = self._ocr_service.find_text(r"^(重新挑战|Restart)$", None, search_region)
+            if restart:
+                found_restart = True
+                time.sleep(0.3)
+                break
+            self._control_service.forward_walk(2)
+            i += 1
+
+        # 理论上有重新挑战，若没有，可能是boss又刷出来了，再检查boss
+        if not found_restart:
+            return
+
+        self._control_service.scroll_mouse(-1)
+        time.sleep(0.5)
+        logger.info("重新挑战")
+        self._control_service.pick_up()
+        time.sleep(2.0)
+
+        self._info.status = Status.idle
+        now = datetime.now()
+        self._info.idleTime = now  # 重置空闲时间
+        self._info.lastFightTime = now  # 重置最近检测到战斗时间
+        self._info.fightTime = now  # 重置战斗时间
+        # self._info.lastBossName = bossName
+        self._info.waitBoss = True
+
+        time.sleep(1)
+        return
 
     def search_reward_action(self):
 
@@ -2094,7 +2181,10 @@ class PageEventAbstractService(PageEventService, ABC):
 
     def transfer_to_boss(self, bossName):
         # 传送后向前行走次数，适合短距离
-        forward_walk_times_mapping = {"无妄者": 5, "角": 4, "赫卡忒": 4, "梦魇赫卡忒": 4}
+        forward_walk_times_mapping = {
+            "无妄者": 5, "角": 4, "赫卡忒": 4, "梦魇赫卡忒": 4,
+            BossNameEnum.LadyOfTheSea.value: 7,
+        }
         # 传送后向前奔跑时间，秒，适合长距离
         forward_run_seconds_mapping = {
             "无归的谬误": 5.5, "辉萤军势": 3.6, "鸣钟之龟": 3.6, "燎照之骑": 4.2, "无常凶鹭": 4, "聚械机偶": 6.8,
@@ -2104,6 +2194,7 @@ class PageEventAbstractService(PageEventService, ABC):
             "梦魇无冠者": 2.4, "梦魇燎照之骑": 4.5, "梦魇哀声鸷": 3.6, "梦魇飞廉之猩": 1,
             "梦魇辉萤军势": 2.6, "梦魇凯尔匹": 5.2, "荣耀狮像": 2.6,
             "芬莱克": 0.85,  # 3.4
+            BossNameEnum.TheFalseSovereign.value: 2.5,
         }
 
         # 暂停自动战斗，否则会把按键打在输入框里
@@ -2263,6 +2354,31 @@ class PageEventAbstractService(PageEventService, ABC):
                         time.sleep(3.0)
                     # 跑去打boss
                     self._control_service.forward_run(3.4 - 1.5)
+                    break
+            elif bossName == BossNameEnum.LadyOfTheSea.value:
+                time.sleep(0.3)
+                i = 0
+                while i < 5 and not self._ocr_service.find_text("^进入.*最终章.*$"):
+                    self._control_service.forward_walk(1)
+                    i += 1
+            elif bossName == BossNameEnum.TheFalseSovereign.value:
+                search_region = self.get_dialogue_region()
+                i = 0
+                while i < 12:
+                    if BaseResonator.is_boss_health_bar_exist(self._img_service.screenshot()):
+                        break
+                    restart = self._ocr_service.find_text(r"^(重新挑战|Restart)$", None, search_region)
+                    if not restart:
+                        self._control_service.forward_walk(2)
+                        i += 1
+                        continue
+                    else:
+                        time.sleep(0.3)
+                        self._control_service.scroll_mouse(-1)
+                        time.sleep(0.5)
+                        logger.info("重新挑战")
+                        self._control_service.pick_up()
+                        time.sleep(3.0)
                     break
 
             now = datetime.now()

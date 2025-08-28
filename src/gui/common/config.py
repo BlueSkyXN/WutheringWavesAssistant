@@ -125,6 +125,8 @@ class BossNameEnum(Enum):
     LionessOfGlory = "荣耀狮像"
     NightmareHecate = "梦魇赫卡忒"
     Fenrico = "芬莱克"
+    LadyOfTheSea = "海之女"
+    TheFalseSovereign = "伪作的神王"
 
     # Dreamless = ("无妄者", "Dreamless")
     # FallacyOfNoReturn = ("无归的谬误", "Fallacy of No Return")
