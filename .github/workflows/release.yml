@@ -241,5 +241,6 @@ jobs:
 #            🎉 这是由 GitHub Actions 自动发布的版本！
 #            ${{ steps.changelog.outputs.changelog }}
           body_path: release_body.txt
+          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
