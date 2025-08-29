@@ -8,9 +8,9 @@ setlocal enabledelayedexpansion
 :: 不可修改此脚本，会导致更新失败，请拷贝一份再改
 :: =========================================
 set REPO_GITHUB=https://github.com/wakening/WutheringWavesAssistant.git
-set REPO_PROXY1=https://gitclone.com/github.com/wakening/WutheringWavesAssistant.git
-set REPO_PROXY2=https://ghfast.top/https://github.com/wakening/WutheringWavesAssistant.git
-set REPO_PROXY3=https://ghproxy.net/https://github.com/wakening/WutheringWavesAssistant.git
+set REPO_PROXY1=https://cnb.cool/github.wakening/WutheringWavesAssistant.git
+:: set REPO_PROXY2=https://gitclone.com/github.com/wakening/WutheringWavesAssistant.git
+:: set REPO_PROXY3=https://ghproxy.net/https://github.com/wakening/WutheringWavesAssistant.git
 
 :: =========================================
 :: 判断是否为临时更新脚本
@@ -78,26 +78,28 @@ if exist "%ROOT_DIR%\git\cmd\git.exe" (
 )
 
 :: 设置 safe.directory 防止权限/信任问题
-git config --global --add safe.directory "%ROOT_DIR%"
+git config --global --replace-all safe.directory "%ROOT_DIR%"
 
 :: 提示用户选择仓库
 echo.
 echo Please select a repository to update:
 echo [1] GitHub 	%REPO_GITHUB%
-echo [2] 国内加速1	%REPO_PROXY1%
-echo [3] 国内加速2	%REPO_PROXY2%
-echo [4] 国内加速3	%REPO_PROXY3%
+echo [2] 腾讯云    	%REPO_PROXY1%
+:: echo [3] 国内加速2	%REPO_PROXY2%
+:: echo [4] 国内加速3	%REPO_PROXY3%
 
 :CHOICE
 set "REPO_URL="
-set /p choice="Enter your choice (1, 2, 3, or 4): "
+:: set /p choice="Enter your choice (1, 2, 3, or 4): "
+set /p choice="Enter your choice (1, or 2): "
 
 if "%choice%"=="1" goto SET1
 if "%choice%"=="2" goto SET2
-if "%choice%"=="3" goto SET3
-if "%choice%"=="4" goto SET4
+:: if "%choice%"=="3" goto SET3
+:: if "%choice%"=="4" goto SET4
 
-echo Invalid selection. Please choose 1, 2, 3, or 4.
+:: echo Invalid selection. Please choose 1, 2, 3, or 4.
+echo Invalid selection. Please choose 1, or 2.
 goto CHOICE
 
 :SET1
