@@ -1,0 +1,27 @@
+name: Sync to CNB
+#on: [push]
+on:
+  push:
+    branches:
+      - main   # push 到 main 分支触发
+  workflow_dispatch:  # 手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Sync to CNB Repository
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:${{ github.workspace }} \
+            -w ${{ github.workspace }} \
+            -e PLUGIN_TARGET_URL="https://cnb.cool/github.wakening/WutheringWavesAssistantt.git" \
+            -e PLUGIN_AUTH_TYPE="https" \
+            -e PLUGIN_USERNAME="cnb" \
+            -e PLUGIN_PASSWORD=${{ secrets.SYNC_CNB_TOKEN }} \
+            -e PLUGIN_FORCE="true" \
+            tencentcom/git-sync
