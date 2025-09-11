@@ -6,7 +6,7 @@ import numpy as np
 import onnxruntime
 from onnxruntime import InferenceSession, SessionOptions
 
-from src.util import file_util, img_util
+from src.util import file_util
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ MODEL_BOSS_V10 = Model(
 
 MODEL_BOSS_V20 = Model(
     name="boss_v20.onnx",
-    path=file_util.get_assets_model_boss("boss_v20.onnx"),
+    path=file_util.get_assets_model_boss("boss_v260.onnx"),
     confidence_thres=0.75,
     iou_thres=0.5,
     classes={0: "echo"},
@@ -47,7 +47,7 @@ MODEL_BOSS_V20 = Model(
         "无妄者", "角",
         "异构武装", "赫卡忒", "罗蕾莱", "叹息古龙", "梦魇飞廉之猩", "梦魇无常凶鹭",
         "梦魇云闪之鳞", "梦魇朔雷之鳞", "梦魇无冠者", "梦魇燎照之骑", "梦魇哀声鸷",
-        "梦魇辉萤军势", "芙露德莉斯",
+        "梦魇辉萤军势", "荣耀狮像", "海之女", "伪作的神王",
     ]
 )
 
@@ -118,10 +118,10 @@ def search_echo(session: InferenceSession, img: np.ndarray, confidence_thres=0.5
     input_shape = session.get_inputs()[0].shape
     logger.debug("Input shape: %s", input_shape)  # [1, 3, 640, 640] NCHW
     logger.debug("Image shape: %s", img.shape)  # (720, 1280, 3) HWC
-    img_preprocess, _, _ = preprocess(img)
+    img_preprocess, ratio, pad = preprocess(img)
     outputs = run_ort_session(session, img_preprocess)
     logger.debug("Image shape: %s", img_preprocess.shape)  # (640, 640, 3) HWC
-    boxes, scores, class_ids = postprocess(input_shape, img.shape, outputs, confidence_thres, iou_thres)
+    boxes, scores, class_ids = postprocess(input_shape, img.shape, outputs, confidence_thres, iou_thres, ratio, pad)
     # dump_search_result(img, boxes, scores, class_ids)
     if len(boxes) == 0:
         logger.debug("Echo not found")
@@ -179,7 +179,7 @@ def preprocess(img: np.ndarray, new_shape: tuple = (640, 640)):
     return img_process, ratio, pad
 
 
-def postprocess(input_shape, img_shape, output, confidence_thres, iou_thres) -> tuple[list[Any], list[Any], list[Any]]:
+def postprocess(input_shape, img_shape, output, confidence_thres, iou_thres, ratio, pad) -> tuple[list[Any], list[Any], list[Any]]:
     # Transpose and squeeze the output to match the expected shape
     outputs = np.transpose(np.squeeze(output[0]))
 
@@ -197,9 +197,9 @@ def postprocess(input_shape, img_shape, output, confidence_thres, iou_thres) -> 
     # Get the height and width of the input image
     img_height, img_width = img_shape[:2]
 
-    # Calculate the scaling factors for the bounding box coordinates
-    x_factor = img_width / input_width
-    y_factor = img_height / input_height
+    # Extract the scale ratio and padding values
+    scale_ratio = ratio[0]  # ratio is the same for width and height
+    pad_w, pad_h = pad
 
     # Iterate over each row in the outputs array
     for i in range(rows):
@@ -217,11 +217,17 @@ def postprocess(input_shape, img_shape, output, confidence_thres, iou_thres) -> 
             # Extract the bounding box coordinates from the current row
             x, y, w, h = outputs[i][0], outputs[i][1], outputs[i][2], outputs[i][3]
 
+            # Adjust the coordinates by removing padding and scaling back to original image
+            x_adj = (x - pad_w) / scale_ratio
+            y_adj = (y - pad_h) / scale_ratio
+            w_adj = w / scale_ratio
+            h_adj = h / scale_ratio
+
             # Calculate the scaled coordinates of the bounding box
-            left = int((x - w / 2) * x_factor)
-            top = int((y - h / 2) * y_factor)
-            width = int(w * x_factor)
-            height = int(h * y_factor)
+            left = int(x_adj - w_adj / 2)
+            top = int(y_adj - h_adj / 2)
+            width = int(w_adj)
+            height = int(h_adj)
 
             # Add the class ID, score, and box coordinates to the respective lists
             class_ids.append(class_id)

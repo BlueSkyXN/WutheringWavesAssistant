@@ -1473,6 +1473,9 @@ class PageEventAbstractService(PageEventService, ABC):
             case "芙露德莉斯":
                 time.sleep(0.3)
                 self._control_service.forward_run(2.1)
+            case BossNameEnum.LadyOfTheSea.value:
+                time.sleep(0.3)
+                self._control_service.forward_run(1.0)
             case _:
                 pass
 
@@ -2018,9 +2021,18 @@ class PageEventAbstractService(PageEventService, ABC):
         self._control_service.activate()
         time.sleep(0.2)
 
-        # if self._context.param_config.autoCombatBeta is True and self.combat_system.resonators is None:
-        #     time.sleep(1)
-        #     self.team_members_ocr()
+        if len(self._config.TargetBoss) == 1 and bossName == BossNameEnum.LadyOfTheSea.value:
+            if self._ocr_service.find_text(r"^(进入.*最终章.*)$"):
+                self._control_service.pick_up()
+                self._info.in_dungeon = True
+
+                now = datetime.now()
+                self._info.idleTime = now  # 重置空闲时间
+                self._info.lastFightTime = now  # 重置最近检测到战斗时间
+                self._info.fightTime = now  # 重置战斗时间
+                self._info.lastBossName = bossName
+                self._info.waitBoss = True
+                return True
 
         self._control_service.guide_book()
         time.sleep(1)
@@ -2358,7 +2370,7 @@ class PageEventAbstractService(PageEventService, ABC):
             elif bossName == BossNameEnum.LadyOfTheSea.value:
                 time.sleep(0.3)
                 i = 0
-                while i < 5 and not self._ocr_service.find_text("^进入.*最终章.*$"):
+                while i < 8 and not self._ocr_service.find_text("^进入.*最终章.*$"):
                     self._control_service.forward_walk(1)
                     i += 1
             elif bossName == BossNameEnum.TheFalseSovereign.value:
