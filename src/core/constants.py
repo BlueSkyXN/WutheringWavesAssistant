@@ -37,3 +37,4 @@ class BossNameEnum(Enum):
     Fenrico = "芬莱克"
     LadyOfTheSea = "海之女"
     TheFalseSovereign = "伪作的神王"
+    ThrenodianLeviathan = "鸣式利维亚坦"

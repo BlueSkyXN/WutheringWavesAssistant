@@ -1137,6 +1137,8 @@ class PageEventAbstractService(PageEventService, ABC):
                         self._info.lastBossName = BossNameEnum.LadyOfTheSea.value
                     elif BossNameEnum.TheFalseSovereign.value in self._config.TargetBoss:
                         self._info.lastBossName = BossNameEnum.TheFalseSovereign.value
+                    elif BossNameEnum.ThrenodianLeviathan.value in self._config.TargetBoss:
+                        self._info.lastBossName = BossNameEnum.ThrenodianLeviathan.value
                     else:
                         self._info.lastBossName = BossNameEnum.Hecate.value
                 return True
@@ -1250,10 +1252,15 @@ class PageEventAbstractService(PageEventService, ABC):
                     name="单人挑战",
                     text="单人挑战",
                 ),
+                # TextMatch(
+                #     name="结晶波片",
+                #     text="结晶波片",
+                # ),
                 TextMatch(
-                    name="结晶波片",
-                    text="结晶波片",
+                    name="可收取次数",
+                    text="可收取次数",
                 ),
+
             ],
             action=action if action else Page.error_action
         )
@@ -1495,7 +1502,7 @@ class PageEventAbstractService(PageEventService, ABC):
             #     time.sleep(1)
             return
 
-        if self._info.lastBossName == BossNameEnum.Fleurdelys.value:
+        if self._info.lastBossName in [BossNameEnum.Fleurdelys.value, BossNameEnum.ThrenodianLeviathan.value]:
             self.absorption_action_fleurdelys()
             return
         elif self._info.lastBossName == BossNameEnum.Fenrico.value:
@@ -2196,6 +2203,7 @@ class PageEventAbstractService(PageEventService, ABC):
         forward_walk_times_mapping = {
             "无妄者": 5, "角": 4, "赫卡忒": 4, "梦魇赫卡忒": 4,
             BossNameEnum.LadyOfTheSea.value: 7,
+            BossNameEnum.ThrenodianLeviathan.value: 3,
         }
         # 传送后向前奔跑时间，秒，适合长距离
         forward_run_seconds_mapping = {
@@ -2252,11 +2260,12 @@ class PageEventAbstractService(PageEventService, ABC):
             "梦魇辉萤军势": "梦.*辉萤军势",
             "梦魇凯尔匹": "梦.*凯尔匹",
             "梦魇赫卡忒": "梦.*赫卡.?",
+            "鸣式利维亚坦": "鸣式.*利维亚坦",
         }
         find_boss_name_reg = boss_name_reg_mapping.get(bossName, bossName)
         # findBoss = None
         search_boss_name = bossName
-        if self._boss_info_service.is_nightmare(bossName):
+        if self._boss_info_service.is_nightmare(bossName) or bossName in [BossNameEnum.ThrenodianLeviathan.value]:
             search_boss_name = bossName[:2] + "." + bossName[2:]
 
         search_tips_pos = self._ocr_service.wait_text("输入搜索内容")
@@ -2478,7 +2487,7 @@ class PageEventAbstractService(PageEventService, ABC):
         self._control_service.click(*position.center)
 
     def _need_retry(self):
-        return len(self._config.TargetBoss) == 1 and self._config.TargetBoss[0] in ["无妄者", "角", "赫卡忒", "芙露德莉斯"]
+        return len(self._config.TargetBoss) == 1 and self._config.TargetBoss[0] in ["无妄者", "角", "赫卡忒", "芙露德莉斯", "鸣式利维亚坦"]
 
     def wait_home(self, timeout=120) -> bool:
         """
