@@ -53,7 +53,7 @@ class PageEventAbstractService(PageEventService, ABC):
         self.combat_system.is_async = True
 
         # param
-        self._echo_hunting_pos_1280_list = [(50, 385), (50, 475)]
+        self._echo_hunting_pos_1280_list = [(50, 475), (50, 565), (50, 385)]
 
     def execute(self,
                 src_img: np.ndarray | None = None,
@@ -2043,7 +2043,7 @@ class PageEventAbstractService(PageEventService, ABC):
 
         self._control_service.guide_book()
         time.sleep(1)
-        if not self._ocr_service.wait_text(["日志", "活跃", "挑战", "强者", "残象", "周期", "探寻", "漂泊"], timeout=7):
+        if not self._ocr_service.wait_text(["日志", "活跃", "挑战", "强者", "残象", "周期", "探寻", "漂泊", "素材获取"], timeout=7):
             logger.warning("未进入索拉指南")
             self._control_service.esc()
             self._info.lastFightTime = datetime.now()

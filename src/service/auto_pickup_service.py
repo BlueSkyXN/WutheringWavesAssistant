@@ -165,6 +165,8 @@ class AutoPickupServiceImpl(PageEventAbstractService):
             "辉光金盏": "辉光金盏",
             # v2.7
             "石蔷薇": "石蔷薇",
+            # v2.8
+            "长夏花": "长夏花",
             # 补充药材
             "银环蜥": "银环蜥",
             "蓝棘蜥": "蓝棘蜥",
