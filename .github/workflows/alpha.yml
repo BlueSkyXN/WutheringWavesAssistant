@@ -69,7 +69,7 @@ jobs:
           Remove-Item -Path "src/gui/resource" -Recurse -Force -ErrorAction SilentlyContinue
           Remove-Item -Path ".pre-commit-config.yaml" -Recurse -Force -ErrorAction SilentlyContinue
           # 7z a -mx=9 "wwa-${{ env.VERSION }}-alpha.7z" .
-          7z a "wwa-${{ env.VERSION }}-alpha.7z" . -m0=lzma -mx=9 -ms=on -md=128m
+          7z a "wwa-${{ env.VERSION }}-alpha.7z" . -m0=lzma -mx=9 -md=128m -ms=64m -mmt=off
 
       - name: 📂 上传 7z 文件作为 Workflow 产物
         uses: actions/upload-artifact@v4

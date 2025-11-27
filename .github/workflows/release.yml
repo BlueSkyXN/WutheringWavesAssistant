@@ -81,7 +81,7 @@ jobs:
           
           # 打包到上一级目录
           # 7z a -mx=9 "..\wwa-${{ env.VERSION }}.7z" "*"
-          7z a "..\wwa-${{ env.VERSION }}.7z" "*" -m0=lzma -mx=9 -ms=on -md=128m
+          7z a "..\wwa-${{ env.VERSION }}.7z" "*" -m0=lzma -mx=9 -md=128m -ms=64m -mmt=off
           
           # 清理临时 Python
           Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
@@ -113,7 +113,7 @@ jobs:
 
           # 打包到上一级目录
           # 7z a -mx=9 "..\wwa-gpu-cu126-${{ env.VERSION }}.7z" "*"
-          7z a "..\wwa-gpu-cu126-${{ env.VERSION }}.7z" "*" -m0=lzma -mx=9 -ms=on -md=128m
+          7z a "..\wwa-gpu-cu126-${{ env.VERSION }}.7z" "*" -m0=lzma -mx=9 -md=128m -ms=64m -mmt=off
 
           # 清理临时 Python
           Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
@@ -145,7 +145,7 @@ jobs:
 
           # 打包到上一级目录
           # 7z a -mx=9 "..\wwa-gpu-cu118-${{ env.VERSION }}.7z" "*"
-          7z a "..\wwa-gpu-cu118-${{ env.VERSION }}.7z" "*" -m0=lzma -mx=9 -ms=on -md=128m
+          7z a "..\wwa-gpu-cu118-${{ env.VERSION }}.7z" "*" -m0=lzma -mx=9 -md=128m -ms=64m -mmt=off
 
           # 清理临时 Python
           Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
