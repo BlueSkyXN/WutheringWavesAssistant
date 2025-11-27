@@ -38,17 +38,17 @@ class BaseVerina(BaseResonator):
         self._energy4_checker = ColorChecker(self._energy4_point, self._energy4_color)
 
         # 共鸣技能
-        self._resonance_skill_point = [(1071, 658), (1073, 656)]
+        self._resonance_skill_point = [(1089, 655)]
         self._resonance_skill_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_checker = ColorChecker(self._resonance_skill_point, self._resonance_skill_color)
 
         # 声骸技能
-        self._echo_skill_point = [(1137, 634), (1122, 657), (1149, 655)]
+        self._echo_skill_point = [(1135, 652), (1156, 652)]
         self._echo_skill_color = [(255, 255, 255)]  # BGR
         self._echo_skill_checker = ColorChecker(self._echo_skill_point, self._echo_skill_color)
 
         # 共鸣解放
-        self._resonance_liberation_point = [(1205, 660), (1208, 631), (1209, 631)]
+        self._resonance_liberation_point = [(1208, 658), (1210, 631), (1211, 631)]
         self._resonance_liberation_color = [(253, 253, 253), (219, 218, 215)]  # BGR
         self._resonance_liberation_checker = ColorChecker(
             self._resonance_liberation_point, self._resonance_liberation_color)
@@ -124,12 +124,13 @@ class Verina(BaseVerina):
     def __init__(self, control_service: ControlService, img_service: ImgService):
         super().__init__(control_service, img_service)
 
-    def a2EQ(self):
-        logger.debug("a2EQ")
+    def a3EQ(self):
+        logger.debug("a3EQ")
         return [
             ["a", 0.05, 0.35],
             ["a", 0.05, 0.32],
-            ["a", 0.05, 0.00],  # 多打一个a，若EQ没cd还可以出普攻
+            ["a", 0.05, 0.32],
+            ["a", 0.05, 0.20],  # 多打一个a，若EQ没cd还可以出普攻
             ["E", 0.05, 0.10],
             ["Q", 0.05, 0.10],
         ]
@@ -140,7 +141,11 @@ class Verina(BaseVerina):
             ["j", 0.05, 0.10],
             ["a", 0.05, 0.20],
             ["a", 0.05, 0.20],
-            ["a", 0.05, 1.17],
+
+            # ["a", 0.05, 1.17],  # 拆分
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.20],
+            ["a", 0.05, 0.80],
         ]
 
     # def a5(self):
@@ -206,13 +211,15 @@ class Verina(BaseVerina):
         is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
 
         # 不管条件，入场就打aaEQ
-        self.combo_action(self.a2EQ(), False)
+        self.combo_action(self.a3EQ(), False)
 
         # 有大开大
-        if is_resonance_liberation_ready:
-            self.combo_action(self.R(), False)
-            time.sleep(0.05)
-            return
+        # if is_resonance_liberation_ready:
+        #     self.combo_action(self.R(), False)
+        #     time.sleep(0.05)
+        #     return
+        # 大招不易识别，直接按
+        self.combo_action(self.R(), False)
 
         # 有能量就跳a
         if energy_count > 0:
@@ -220,6 +227,8 @@ class Verina(BaseVerina):
             time.sleep(0.05)
             return
 
-        # # 兜底，打完剩下的普攻段数
-        # self.combo_action(self.a3(), False)
-        # self.combo_action(self.EQR(), False)
+        time.sleep(0.1)
+        img = self.img_service.screenshot()
+        energy_count = self.energy_count(img)
+        if energy_count > 1:
+            self.combo_action(self.ja3(), False)

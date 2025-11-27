@@ -2695,7 +2695,12 @@ class PageEventAbstractService(PageEventService, ABC):
                         continue
                     members_info[member_index][1] = ocr_position
                     for name_zh in member_names_zh:
-                        if ocr_position.text and name_zh == ocr_position.text.strip():
+                        if not ocr_position.text:
+                            continue
+                        ocr_name_text = ocr_position.text.strip()
+                        if len(ocr_name_text) == 2 and ocr_name_text.startswith(ResonatorNameEnum.chisa.value[0]):
+                            ocr_name_text = ResonatorNameEnum.chisa.value
+                        if name_zh == ocr_name_text:
                             members_info[member_index][0] = name_zh
                             break
                 # logger.info(f"members_info: {members_info}")

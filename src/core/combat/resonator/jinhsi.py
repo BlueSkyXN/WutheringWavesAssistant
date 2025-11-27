@@ -18,13 +18,13 @@ class BaseJinhsi(BaseResonator):
         self._concerto_energy_checker = ColorChecker.concerto_spectro()
 
         # 共鸣技能 E1 流光夕影
-        self._resonance_skill_point = [(1045, 651), (1059, 664)]
+        self._resonance_skill_point = [(1064, 650), (1077, 662)]
         self._resonance_skill_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_checker = ColorChecker(
             self._resonance_skill_point, self._resonance_skill_color, logic=LogicEnum.AND)
 
         # 共鸣技能 E2 神霓飞芒 进入乘岁凌霄
-        self._resonance_skill_2_point = [(1064, 634), (1070, 636), (1061, 650)]
+        self._resonance_skill_2_point = [(1081, 635), (1086, 636), (1079, 649)]
         self._resonance_skill_2_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_2_checker = ColorChecker(
             self._resonance_skill_2_point, self._resonance_skill_2_color, logic=LogicEnum.AND)
@@ -32,16 +32,16 @@ class BaseJinhsi(BaseResonator):
         # 共鸣技能 E2 神霓飞芒 入场黄色
         self._resonance_skill_2_incoming_color = [(173, 238, 249)]  # BGR
         self._resonance_skill_2_incoming_checker = ColorChecker(
-            self._resonance_skill_2_point, self._resonance_skill_2_incoming_color, logic=LogicEnum.AND)
+            self._resonance_skill_2_point, self._resonance_skill_2_incoming_color, tolerance=50, logic=LogicEnum.AND)
 
         # 共鸣技能 E3 逐天取月
-        self._resonance_skill_3_point = [(1061, 630), (1059, 635), (1069, 663)]
+        self._resonance_skill_3_point = [(1082, 630), (1077, 634), (1085, 662)]
         self._resonance_skill_3_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_3_checker = ColorChecker(
             self._resonance_skill_3_point, self._resonance_skill_3_color, logic=LogicEnum.AND)
 
         # 共鸣技能 E4 惊龙破空
-        self._resonance_skill_4_point = [(1063, 642), (1069, 655), (1078, 653), (1072, 643)]
+        self._resonance_skill_4_point = [(1080, 641), (1086, 654), (1094, 652), (1085, 648)]
         self._resonance_skill_4_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_4_checker = ColorChecker(
             self._resonance_skill_4_point, self._resonance_skill_4_color, logic=LogicEnum.AND)
@@ -52,12 +52,12 @@ class BaseJinhsi(BaseResonator):
             self._resonance_skill_4_point, self._resonance_skill_4_incoming_color, logic=LogicEnum.AND)
 
         # 声骸技能
-        self._echo_skill_point = [(1135, 654), (1136, 659)]
+        self._echo_skill_point = [(1146, 654), (1146, 657)]
         self._echo_skill_color = [(255, 255, 255)]  # BGR
         self._echo_skill_checker = ColorChecker(self._echo_skill_point, self._echo_skill_color)
 
         # 共鸣解放
-        self._resonance_liberation_point = [(1205, 632), (1208, 662), (1223, 656)]
+        self._resonance_liberation_point = [(1208, 633), (1211, 660), (1224, 654)]
         self._resonance_liberation_color = [(255, 255, 255), (173, 238, 249)]  # BGR
         self._resonance_liberation_checker = ColorChecker(
             self._resonance_liberation_point, self._resonance_liberation_color)

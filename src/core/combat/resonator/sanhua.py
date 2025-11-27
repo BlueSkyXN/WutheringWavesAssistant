@@ -19,18 +19,18 @@ class BaseSanhua(BaseResonator):
         self._concerto_energy_checker = ColorChecker.concerto_glacio()
 
         # 共鸣技能
-        self._resonance_skill_point = [(1065, 630), (1062, 661)]
+        self._resonance_skill_point = [(1082, 631), (1080, 659)]
         self._resonance_skill_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_checker = ColorChecker(
             self._resonance_skill_point, self._resonance_skill_color, logic=LogicEnum.AND)
 
         # 声骸技能
-        self._echo_skill_point = [(1129, 655), (1136, 654)]
+        self._echo_skill_point = [(1140, 654), (1146, 652)]
         self._echo_skill_color = [(255, 255, 255)]  # BGR
         self._echo_skill_checker = ColorChecker(self._echo_skill_point, self._echo_skill_color)
 
         # 共鸣解放
-        self._resonance_liberation_point = [(1159, 637), (1202, 654)]
+        self._resonance_liberation_point = [(1206, 654)]
         self._resonance_liberation_color = [(255, 255, 255), (255, 193, 142), (255, 193, 142), (255, 214, 181)]  # BGR
         self._resonance_liberation_checker = ColorChecker(
             self._resonance_liberation_point, self._resonance_liberation_color)

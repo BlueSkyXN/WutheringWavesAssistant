@@ -28,21 +28,21 @@ class BaseCamellya(BaseResonator):
         self._energy_full_checker = ColorChecker(self._energy_full_point, self._energy_full_color)
 
         # 共鸣技能 E 红椿盛绽 进入盛绽状态
-        self._resonance_skill_crimson_blossom_point = [(1072, 654)]
+        self._resonance_skill_crimson_blossom_point = [(1088, 652)]
         self._resonance_skill_crimson_blossom_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_crimson_blossom_checker = ColorChecker(
             self._resonance_skill_crimson_blossom_point, self._resonance_skill_crimson_blossom_color,
             logic=LogicEnum.AND)
 
         # 共鸣技能 E 黯蕊猎心 退出盛绽状态
-        self._resonance_skill_floral_ravage_point = [(1058, 654)]
+        self._resonance_skill_floral_ravage_point = [(1075, 652), (1078, 652)]
         self._resonance_skill_floral_ravage_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_floral_ravage_checker = ColorChecker(
             self._resonance_skill_floral_ravage_point, self._resonance_skill_floral_ravage_color,
             logic=LogicEnum.AND)
 
         # 共鸣技能 E 一日花
-        self._resonance_skill_ephemeral_point = [(1072, 635), (1073, 634)]
+        self._resonance_skill_ephemeral_point = [(1087, 636), (1089, 634)]
         self._resonance_skill_ephemeral_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_ephemeral_checker = ColorChecker(
             self._resonance_skill_ephemeral_point,
@@ -59,12 +59,12 @@ class BaseCamellya(BaseResonator):
         )
 
         # 声骸技能
-        self._echo_skill_point = [(1124, 658), (1127, 655)]
+        self._echo_skill_point = [(1136, 655), (1139, 653)]
         self._echo_skill_color = [(255, 255, 255)]  # BGR
         self._echo_skill_checker = ColorChecker(self._echo_skill_point, self._echo_skill_color)
 
         # 共鸣解放
-        self._resonance_liberation_point = [(1206, 627), (1196, 660), (1218, 660)]
+        self._resonance_liberation_point = [(1209, 628), (1200, 658), (1219, 658)]
         self._resonance_liberation_color = [(255, 255, 255), (153, 66, 212)]  # BGR
         self._resonance_liberation_checker = ColorChecker(
             self._resonance_liberation_point, self._resonance_liberation_color)

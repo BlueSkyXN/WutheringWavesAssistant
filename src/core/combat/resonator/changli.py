@@ -38,17 +38,17 @@ class BaseChangli(BaseResonator):
         self._energy4_checker = ColorChecker(self._energy4_point, self._energy4_color)
 
         # 共鸣技能
-        self._resonance_skill_point = [(1051, 632), (1077, 630), (1065, 665)]
+        self._resonance_skill_point = [(1071, 634), (1093, 631), (1082, 662)]
         self._resonance_skill_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_checker = ColorChecker(self._resonance_skill_point, self._resonance_skill_color)
 
         # 声骸技能
-        self._echo_skill_point = [(1135, 632), (1130, 654), (1150, 658)]
+        self._echo_skill_point = [(1146, 632), (1141, 652), (1160, 656)]
         self._echo_skill_color = [(255, 255, 255)]  # BGR
         self._echo_skill_checker = ColorChecker(self._echo_skill_point, self._echo_skill_color)
 
         # 共鸣解放
-        self._resonance_liberation_point = [(1203, 654), (1210, 654)]
+        self._resonance_liberation_point = [(1207, 653), (1213, 652)]
         self._resonance_liberation_color = [(255, 255, 255)]  # BGR
         self._resonance_liberation_checker = ColorChecker(
             self._resonance_liberation_point, self._resonance_liberation_color)

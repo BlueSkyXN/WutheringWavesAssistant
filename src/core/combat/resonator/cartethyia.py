@@ -20,19 +20,19 @@ class BaseCartethyia(BaseResonator):
         ### 常态 小卡技能
 
         # 共鸣技能 E 卡提希娅
-        self._resonance_skill_cartethyia_point = [(1050, 631), (1065, 635), (1079, 631)]
+        self._resonance_skill_cartethyia_point = [(1082, 635)]
         self._resonance_skill_cartethyia_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_cartethyia_checker = ColorChecker(
             self._resonance_skill_cartethyia_point, self._resonance_skill_cartethyia_color,
             logic=LogicEnum.AND)
 
         # 声骸技能
-        self._echo_skill_point = [(1132, 654), (1138, 655)]
+        self._echo_skill_point = [(1148, 653), (1148, 654)]
         self._echo_skill_color = [(255, 255, 255)]  # BGR
         self._echo_skill_checker = ColorChecker(self._echo_skill_point, self._echo_skill_color)
 
         # 共鸣解放 R 听骑士从心祈愿
-        self._resonance_liberation_point = [(1195, 655), (1201, 662), (1210, 664), (1216, 656)]
+        self._resonance_liberation_point = [(1200, 654), (1205, 660), (1213, 661), (1218, 654)]
         self._resonance_liberation_color = [(255, 255, 255)]  # BGR
         self._resonance_liberation_checker = ColorChecker(
             self._resonance_liberation_point, self._resonance_liberation_color, logic=LogicEnum.AND)
@@ -40,14 +40,14 @@ class BaseCartethyia(BaseResonator):
         ### 大卡技能
 
         # 共鸣技能 E1 芙露德莉斯 此剑为潮浪之意
-        self._resonance_skill_fleurdelys_point = [(1064, 624), (1055, 657), (1075, 656)]
+        self._resonance_skill_fleurdelys_point = [(1083, 625), (1075, 656), (1089, 656)]
         self._resonance_skill_fleurdelys_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_fleurdelys_checker = ColorChecker(
             self._resonance_skill_fleurdelys_point, self._resonance_skill_fleurdelys_color,
             logic=LogicEnum.AND)
 
         # 共鸣技能 E2 芙露德莉斯 凭风斩浪破敌
-        self._resonance_skill_fleurdelys_2_point = [(1071, 655), (1074, 661), (1076, 663)]
+        self._resonance_skill_fleurdelys_2_point = [(1088, 653), (1091, 659), (1092, 661)]
         self._resonance_skill_fleurdelys_2_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_fleurdelys_2_checker = ColorChecker(
             self._resonance_skill_fleurdelys_2_point, self._resonance_skill_fleurdelys_2_color,
@@ -56,21 +56,21 @@ class BaseCartethyia(BaseResonator):
         # 化身显示的是当前形态，切换有1.5秒冷却
 
         # 共鸣解放 R 化身·芙露德莉斯
-        self._resonance_liberation_avatar_fleurdelys_point = [(1206, 631), (1207, 661), (1208, 663), (1193, 639)]
+        self._resonance_liberation_avatar_fleurdelys_point = [(1209, 631), (1210, 660), (1210, 662), (1197, 639)]
         self._resonance_liberation_avatar_fleurdelys_color = [(255, 255, 255)]  # BGR
         self._resonance_liberation_avatar_fleurdelys_checker = ColorChecker(
             self._resonance_liberation_avatar_fleurdelys_point, self._resonance_liberation_avatar_fleurdelys_color,
             logic=LogicEnum.AND)
 
         # 共鸣解放 R 化身·卡提希娅
-        self._resonance_liberation_avatar_cartethyia_point = [(1207, 661), (1208, 663), (1203, 661)]
+        self._resonance_liberation_avatar_cartethyia_point = [(1210, 658), (1211, 669), (1206, 658)]
         self._resonance_liberation_avatar_cartethyia_color = [(255, 255, 255)]  # BGR
         self._resonance_liberation_avatar_cartethyia_checker = ColorChecker(
             self._resonance_liberation_avatar_cartethyia_point, self._resonance_liberation_avatar_cartethyia_color,
             logic=LogicEnum.AND)
 
         # 共鸣解放 R 看潮怒风哮之刃
-        self._resonance_liberation_blade_of_howling_squall_point = [(1198, 641), (1206, 636), (1211, 644), (1194, 634)]
+        self._resonance_liberation_blade_of_howling_squall_point = [(1203, 641), (1209, 636), (1213, 643), (1199, 636)]
         self._resonance_liberation_blade_of_howling_squall_color = [(255, 255, 255)]  # BGR
         self._resonance_liberation_blade_of_howling_squall_checker = ColorChecker(
             self._resonance_liberation_blade_of_howling_squall_point,
@@ -929,8 +929,10 @@ class Cartethyia(BaseCartethyia):
         # 常态 卡提希娅
         if is_resonance_skill_cartethyia_ready or is_resonance_liberation_ready:
             need_cartethyia_ja = False
+            is_cartethyia_a4_attack_done = False
             # 有大，补满三剑
             if is_resonance_liberation_ready:
+                is_cartethyia_a4_attack_done = True
                 if not is_sword_of_divinity_existing:
                     self.combo_action(self.cartethyia_a4(), False)
                 if not is_sword_of_virtue_existing and is_resonance_skill_cartethyia_ready:
@@ -939,7 +941,9 @@ class Cartethyia(BaseCartethyia):
                     self.combo_action(self.cartethyia_z(), True)
                     self.combo_action(self.cartethyia_ja(), True)
             else:  # 没大，打一套普攻连
-                self.combo_action(self.cartethyia_a4(), False)
+                if not is_sword_of_divinity_existing:
+                    self.combo_action(self.cartethyia_a4(), False)
+                    is_cartethyia_a4_attack_done = True
                 # 检查E
                 img = self.img_service.screenshot()
                 boss_hp = self.boss_hp(img)
@@ -950,6 +954,9 @@ class Cartethyia(BaseCartethyia):
                 if is_resonance_skill_cartethyia_ready:
                     self.combo_action(self.cartethyia_Eza(), True)
                 else:
+                    if not is_sword_of_divinity_existing:
+                        self.combo_action(self.cartethyia_a4(), False)
+                        is_cartethyia_a4_attack_done = True
                     if not is_sword_of_discord_existing:
                         self.combo_action(self.cartethyia_z(), False)
                     # self.combo_action(self.cartethyia_ja(), True)
@@ -968,6 +975,9 @@ class Cartethyia(BaseCartethyia):
 
             # 大招还没好，结束
             if not is_resonance_liberation_ready:
+                # 来都来了，什么技能都没有，就打一套普通吧
+                if not is_cartethyia_a4_attack_done:
+                    self.combo_action(self.cartethyia_a4(), False)
                 return
             elif need_cartethyia_ja:
                 self.combo_action(self.cartethyia_ja(), True)
@@ -976,7 +986,7 @@ class Cartethyia(BaseCartethyia):
             self.combo_action(self.cartethyia_R(), True)
 
             # 显化爆发
-            self.combo_action(self.fleurdelys_a5(), True)
+            self.combo_action(self.fleurdelys_a5(), False)
             img = self.img_service.screenshot()
             boss_hp = self.boss_hp(img)
             if boss_hp <= 0.1:

@@ -83,13 +83,19 @@ class ResonatorNameEnum(Enum):
     iuno = "尤诺"
 
     # v2.7
-    qiuyuan = "仇远"
     galbrena = "嘉贝莉娜"
+    qiuyuan = "仇远"
 
     # v2.8
     chisa = "千咲"
+    buling = "卜灵"
 
     # v3.0
+    mornye = "莫宁"
+    lucilla = "洛瑟菈"
+    sigrika = "西格莉卡"
+    luukherssen = "陆赫斯"
+    lynae = "琳奈"
 
     # 缓存
     __value_map = None
@@ -566,8 +572,28 @@ class BaseResonator(BaseCombo):
     @classmethod
     def is_avatar_grey(cls, img: np.ndarray, member: int) -> bool:
         dpt = DynamicPointTransformer(img)
+        # 多点采样，有些角色带灰色，会误判灰度
+        # 0: 头像中心
+        # 1: 头像中心偏左下，脸部
+        member1_points = [(1195, 168), (1193, 177)]
+        alive_count = 0
+        for member1_point in member1_points:
+            if not cls._is_avatar_grey(img, member, dpt, member1_point):
+                alive_count += 1
+        # 所有点都是灰才认定为阵亡
+        is_avatar_grey = alive_count == 0
+        # logger.debug("is_avatar_grey: %s", is_avatar_grey)
+        return is_avatar_grey
+
+    @classmethod
+    def _is_avatar_grey(cls, img: np.ndarray, member: int, dpt, member1_point: tuple[int, int]) -> bool:
+        # dpt = DynamicPointTransformer(img)
         # team_member_health_points = [(1170, 192), (1170, 280), (1170, 368)]  # 右侧123号位角色血条起始点，用于定位，计算相对位置
-        team_member_points = [(1195, 168), (1195, 168 + 280 - 192), (1195, 168 + 368 - 192)]
+        team_member_points = [
+            member1_point,
+            (member1_point[0], member1_point[1] + 280 - 192),
+            (member1_point[0], member1_point[1] + 368 - 192)
+        ]
         point = team_member_points[member - 1]
         point = dpt.transform(point, AlignEnum.TOP_RIGHT)
         b, g, r = img[point[1], point[0]]

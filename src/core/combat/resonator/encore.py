@@ -23,17 +23,17 @@ class BaseEncore(BaseResonator):
         self._energy_full_checker = ColorChecker(self._energy_full_point, self._energy_full_color)
 
         # 共鸣技能
-        self._resonance_skill_point = [(1056, 635), (1074, 635), (1065, 665)]
+        self._resonance_skill_point = [(1074, 635), (1091, 634), (1082, 658)]
         self._resonance_skill_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_checker = ColorChecker(self._resonance_skill_point, self._resonance_skill_color)
 
         # 声骸技能
-        self._echo_skill_point = [(1135, 632), (1130, 654), (1150, 658)]
+        self._echo_skill_point = [(1146, 632), (1141, 652), (1160, 656)]
         self._echo_skill_color = [(255, 255, 255)]  # BGR
         self._echo_skill_checker = ColorChecker(self._echo_skill_point, self._echo_skill_color)
 
         # 共鸣解放
-        self._resonance_liberation_point = [(1097, 659), (1217, 658)]
+        self._resonance_liberation_point = [(1202, 657), (1219, 656)]
         self._resonance_liberation_color = [(255, 255, 255)]  # BGR
         self._resonance_liberation_checker = ColorChecker(
             self._resonance_liberation_point, self._resonance_liberation_color)

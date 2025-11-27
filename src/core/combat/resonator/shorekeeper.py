@@ -44,17 +44,17 @@ class BaseShorekeeper(BaseResonator):
         self._energy5_checker = ColorChecker(self._energy5_point, self._energy5_color)
 
         # 共鸣技能
-        self._resonance_skill_point = [(1061, 629), (1060, 660), (1080, 657)]
+        self._resonance_skill_point = [(1079, 630), (1078, 658), (1096, 655)]
         self._resonance_skill_color = [(255, 255, 255)]  # BGR
         self._resonance_skill_checker = ColorChecker(self._resonance_skill_point, self._resonance_skill_color)
 
         # 声骸技能
-        self._echo_skill_point = [(1136, 632), (1143, 656), (1136, 660)]
+        self._echo_skill_point = [(1146, 633), (1152, 654), (1145, 658)]
         self._echo_skill_color = [(255, 255, 255)]  # BGR
         self._echo_skill_checker = ColorChecker(self._echo_skill_point, self._echo_skill_color)
 
         # 共鸣解放
-        self._resonance_liberation_point = [(1208, 632), (1205, 655)]
+        self._resonance_liberation_point = [(1211, 633), (1208, 653)]
         self._resonance_liberation_color = [(255, 255, 255)]  # BGR
         self._resonance_liberation_checker = ColorChecker(
             self._resonance_liberation_point, self._resonance_liberation_color)

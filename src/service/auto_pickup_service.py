@@ -160,6 +160,7 @@ class AutoPickupServiceImpl(PageEventAbstractService):
             # v2.5
             "暗渊引灯": "暗渊引灯",
             "来生": ".?来生.?",
+            "虾肉": "彩饰螳螂虾",  # 彩饰螳螂虾拾取后是虾肉
             # v2.6
             "见月花": "见月花",
             "辉光金盏": "辉光金盏",
