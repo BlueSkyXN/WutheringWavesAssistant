@@ -38,3 +38,5 @@ class BossNameEnum(Enum):
     LadyOfTheSea = "海之女"
     TheFalseSovereign = "伪作的神王"
     ThrenodianLeviathan = "鸣式利维亚坦"
+    Hyvatia = "海维夏"
+    # ReactorHusk = "炉芯机骸"

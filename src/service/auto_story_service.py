@@ -146,18 +146,25 @@ class AutoStoryServiceImpl(PageEventAbstractService):
                 self.skip_btn_is_clicked_start_time = time.time()
                 return
             self.page_action(self._dialogue_page, src_img, img, ocr_results)
+            self.page_action(self._dialogue2_page, src_img, img, ocr_results)
         else:
             if not self._is_auto_play_enabled:
                 # 打开自动播放
                 self.page_action(self._auto_play_page, src_img, img, ocr_results)
+                self.page_action(self._auto_play2_page, src_img, img, ocr_results)
                 time.sleep(0.005)
                 if self.page_action(self._auto_play_open_page, src_img, img, ocr_results):
+                    # self._is_auto_play_enabled = True
+                    pass
+                if self.page_action(self._auto_play_open2_page, src_img, img, ocr_results):
                     # self._is_auto_play_enabled = True
                     pass
                 time.sleep(0.005)
 
             # 剧情对话框，不跳过，一句一句自动过剧情
             if self.page_action(self._dialogue_page, src_img, img, ocr_results):
+                time.sleep(2)
+            elif self.page_action(self._dialogue2_page, src_img, img, ocr_results):
                 time.sleep(2)
 
         # NPC交互框
@@ -237,7 +244,7 @@ class AutoStoryServiceImpl(PageEventAbstractService):
                             0.0,
                             0.0,
                             200 / 1280,
-                            100 / 720,
+                            150 / 720,
                         ),
                     ),
                 ),
@@ -335,8 +342,39 @@ class AutoStoryServiceImpl(PageEventAbstractService):
             ],
             action=auto_play_page_action,
         )
+
+        auto_play_2_page = Page(
+            name="自动播放|AutoPlay-2-电影黑边",
+            screenshot={
+                Languages.ZH: [
+                    "Dialogue_001.png",
+                ],
+                Languages.EN: [
+                ],
+            },
+            targetImages=[
+                ImageMatch(
+                    name="自动播放|AutoPlay",
+                    image="AutoPlay2.png",
+                    position=DynamicPosition(
+                        rate=(
+                            1070 / 1280,
+                            0.0,
+                            1.0,
+                            150 / 720
+                        ),
+                    ),
+                    open_roi_cache=True,
+                    confidence=0.8,
+                ),
+            ],
+            action=auto_play_page_action,
+        )
+
         self._story_pages.append(auto_play_page)
+        self._story_pages.append(auto_play_2_page)
         self._auto_play_page = auto_play_page
+        self._auto_play2_page = auto_play_2_page
 
         def auto_play_open_page_action(positions: dict[str, Position]) -> bool:
             return True
@@ -359,7 +397,7 @@ class AutoStoryServiceImpl(PageEventAbstractService):
                             1070 / 1280,
                             0.0,
                             1.0,
-                            90 / 720
+                            150 / 720
                         ),
                     ),
                     open_roi_cache=False,
@@ -368,8 +406,39 @@ class AutoStoryServiceImpl(PageEventAbstractService):
             ],
             action=auto_play_open_page_action,
         )
+
+        auto_play_open2_page = Page(
+            name="自动播放已开启|AutoPlayEnabled-2-电影黑边",
+            screenshot={
+                Languages.ZH: [
+                    "",
+                ],
+                Languages.EN: [
+                ],
+            },
+            targetImages=[
+                ImageMatch(
+                    name="自动播放已开启|AutoPlayEnabled",
+                    image="AutoPlayEnabled2.png",
+                    position=DynamicPosition(
+                        rate=(
+                            1070 / 1280,
+                            0.0,
+                            1.0,
+                            150 / 720
+                        ),
+                    ),
+                    open_roi_cache=False,
+                    confidence=0.8,
+                ),
+            ],
+            action=auto_play_open_page_action,
+        )
+
         self._story_pages.append(auto_play_open_page)
+        self._story_pages.append(auto_play_open2_page)
         self._auto_play_open_page = auto_play_open_page
+        self._auto_play_open2_page = auto_play_open2_page
 
         def dialogue_page_action(positions: dict[str, Position]) -> bool:
             if not self.skip_is_open:
@@ -406,8 +475,38 @@ class AutoStoryServiceImpl(PageEventAbstractService):
             ],
             action=dialogue_page_action,
         )
+
+        dialogue2_page = Page(
+            name="对话框|Dialogue-2-电影黑边",
+            screenshot={
+                Languages.ZH: [
+                    "Dialogue_001.png",
+                ],
+                Languages.EN: [
+                ],
+            },
+            targetImages=[
+                ImageMatch(
+                    name="Dialogue",
+                    image="Dialogue2.png",
+                    position=DynamicPosition(
+                        rate=(
+                            768 / 1280,
+                            275 / 720,
+                            1060 / 1280,
+                            600 / 720,
+                        ),
+                    ),
+                    open_roi_cache=False,
+                ),
+            ],
+            action=dialogue_page_action,
+        )
+
         self._story_pages.append(dialogue_page)
+        self._story_pages.append(dialogue2_page)
         self._dialogue_page = dialogue_page
+        self._dialogue2_page = dialogue2_page
 
         def npc_interact_action(positions: dict[str, Position]) -> bool:
             time.sleep(0.5)
@@ -426,7 +525,7 @@ class AutoStoryServiceImpl(PageEventAbstractService):
                             768 / 1280,
                             275 / 720,
                             1.0,
-                            560 / 720,
+                            600 / 720,
                         ),
                     ),
                     open_roi_cache=False,

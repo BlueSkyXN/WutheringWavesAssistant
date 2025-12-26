@@ -2215,6 +2215,8 @@ class PageEventAbstractService(PageEventService, ABC):
             "梦魇辉萤军势": 2.6, "梦魇凯尔匹": 5.2, "荣耀狮像": 2.6,
             "芬莱克": 0.85,  # 3.4
             BossNameEnum.TheFalseSovereign.value: 2.5,
+            BossNameEnum.Hyvatia.value: 4.5,  # 8
+            # BossNameEnum.TheFalseSovereign.value: 2.5,
         }
 
         # 暂停自动战斗，否则会把按键打在输入框里
@@ -2401,6 +2403,27 @@ class PageEventAbstractService(PageEventService, ABC):
                         self._control_service.pick_up()
                         time.sleep(3.0)
                     break
+            elif bossName == BossNameEnum.Hyvatia.value:
+                if not self._ocr_service.find_text(r"击败|海维夏$"):
+                    search_region = self.get_dialogue_region()
+                    i = 0
+                    while i < 20:
+                        restart = self._ocr_service.find_text(r"^(重新挑战|Restart)$", None, search_region)
+                        if not restart:
+                            self._control_service.forward_walk(2)
+                            i += 1
+                            continue
+                        else:
+                            time.sleep(0.3)
+                            self._control_service.scroll_mouse(-1)
+                            time.sleep(0.5)
+                            logger.info("重新挑战")
+                            self._control_service.pick_up()
+                            time.sleep(3.0)
+                        break
+                else:
+                    # 跑去打boss
+                    self._control_service.forward_run(8.0 - forward_run_seconds)
 
             now = datetime.now()
             self._info.idleTime = now  # 重置空闲时间
@@ -2698,7 +2721,7 @@ class PageEventAbstractService(PageEventService, ABC):
                         if not ocr_position.text:
                             continue
                         ocr_name_text = ocr_position.text.strip()
-                        if len(ocr_name_text) == 2 and ocr_name_text.startswith(ResonatorNameEnum.chisa.value[0]):
+                        if 1 <= len(ocr_name_text) <= 2 and ocr_name_text.startswith(ResonatorNameEnum.chisa.value[0]):
                             ocr_name_text = ResonatorNameEnum.chisa.value
                         if name_zh == ocr_name_text:
                             members_info[member_index][0] = name_zh

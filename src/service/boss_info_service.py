@@ -27,7 +27,7 @@ class BossInfoServiceImpl(BossInfoService):
         """
         if not boss_name:
             return False
-        if boss_name in [BossNameEnum.Fenrico.value, BossNameEnum.LadyOfTheSea.value, BossNameEnum.TheFalseSovereign.value]:
+        if boss_name in [BossNameEnum.Fenrico.value, BossNameEnum.LadyOfTheSea.value, BossNameEnum.TheFalseSovereign.value, BossNameEnum.Hyvatia.value]:
             return True
         if boss_name.startswith("梦魇"):
             return True

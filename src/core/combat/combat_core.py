@@ -503,30 +503,29 @@ class BaseResonator(BaseCombo):
     ## is_boss_health_bar_exist
     _tolerance = 20
     # 血条为黄到红的渐变色
-    _a_health_01_point = [(449, 41)]
-    _a_health_01_color = [(68, 179, 255), (68, 168, 240), (68, 155, 219)]  # BGR
+    _a_health_01_point = [(453, 40)]
+    _a_health_01_color = [(69, 178, 253), (71, 134, 180)]  # BGR
     _a_health_01_checker = ColorChecker(
         _a_health_01_point, _a_health_01_color, tolerance=_tolerance, align=AlignEnum.TOP_CENTER)
 
-    _a_health_02_point = [(452, 41), (451, 41), (450, 41)]
-    # health_02_color = [(68, 179, 255), (47, 20, 37)]  # BGR
-    _a_health_02_color = [(69, 138, 194), (68, 179, 255)]  # BGR
+    _a_health_02_point = [(454, 40), (454, 41), (450, 39)]
+    _a_health_02_color = [(68, 179, 255)]  # BGR
     _a_health_02_checker = ColorChecker(
         _a_health_02_point, _a_health_02_color, tolerance=_tolerance, align=AlignEnum.TOP_CENTER)
 
-    _a_health_20_point = [(528, 41)]
+    _a_health_20_point = [(528, 40)]
     # health_20_color = [(62, 164, 255), (47, 18, 28)]  # BGR
     _a_health_20_color = [(62, 164, 255)]  # BGR
     _a_health_20_checker = ColorChecker(
         _a_health_20_point, _a_health_20_color, tolerance=_tolerance, align=AlignEnum.TOP_CENTER)
 
-    _a_health_30_point = [(565, 41)]
+    _a_health_30_point = [(566, 40)]
     # health_30_color = [(55, 148, 255), (47, 17, 27)]  # BGR
     _a_health_30_color = [(55, 148, 255)]  # BGR
     _a_health_30_checker = ColorChecker(
         _a_health_30_point, _a_health_30_color, tolerance=_tolerance, align=AlignEnum.TOP_CENTER)
 
-    _a_health_50_point = [(641, 41)]
+    _a_health_50_point = [(642, 40)]
     # health_50_color = [(38, 109, 255), (51, 19, 29)]  # BGR
     _a_health_50_color = [(38, 109, 255)]  # BGR
     _a_health_50_checker = ColorChecker(

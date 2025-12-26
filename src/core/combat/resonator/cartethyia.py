@@ -63,7 +63,7 @@ class BaseCartethyia(BaseResonator):
             logic=LogicEnum.AND)
 
         # 共鸣解放 R 化身·卡提希娅
-        self._resonance_liberation_avatar_cartethyia_point = [(1210, 658), (1211, 669), (1206, 658)]
+        self._resonance_liberation_avatar_cartethyia_point = [(1210, 658), (1206, 658), (1196, 657)]
         self._resonance_liberation_avatar_cartethyia_color = [(255, 255, 255)]  # BGR
         self._resonance_liberation_avatar_cartethyia_checker = ColorChecker(
             self._resonance_liberation_avatar_cartethyia_point, self._resonance_liberation_avatar_cartethyia_color,
@@ -843,7 +843,7 @@ class Cartethyia(BaseCartethyia):
                 self.combo_action(self.cartethyia_a4(), False)
                 if boss_hp <= 0.01:
                     return
-                time.sleep(0.2)
+                time.sleep(0.3)
                 self.combo_action(self.cartethyia_Eza(), self.is_avatar_cartethyia_attack_done)
             else:
                 self.combo_action(self.cartethyia_a4(), self.is_avatar_cartethyia_attack_done)
