@@ -237,6 +237,9 @@ class Win32ExtendedControlServiceImpl(ExtendedControlService, BaseControlService
     def left_forward_walk(self, forward_walk_times: int, sleep_seconds: float = None):
         self._forward_walk(forward_walk_times, sleep_seconds, key="a")
 
+    def right_forward_walk(self, forward_walk_times: int, sleep_seconds: float = None):
+        self._forward_walk(forward_walk_times, sleep_seconds, key="d")
+
     def get_mouse_position(self):
         pos = keymouse_util.get_mouse_position()
         logger.debug("当前鼠标坐标: %s", pos)

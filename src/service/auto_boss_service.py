@@ -2,7 +2,7 @@ import logging
 import time
 from datetime import datetime
 
-from src.core.constants import BossNameEnum
+from src.core.boss import BossNameEnum
 from src.core.contexts import Status, Context
 from src.core.interface import ControlService, OCRService, ODService, ImgService, WindowService, BossInfoService
 from src.core.pages import Page, Position, TextMatch, ConditionalAction
@@ -92,6 +92,9 @@ class AutoBossServiceImpl(PageEventAbstractService):
         # )
         voice_string_interaction_page = self.build_Boss_Crownless_ResonanceCord()
         self._boss_pages.append(voice_string_interaction_page)
+
+        self._boss_pages.append(self._build_Reward_ClaimRewards_Boss)
+
 
     def _build_general_pages(self):
 

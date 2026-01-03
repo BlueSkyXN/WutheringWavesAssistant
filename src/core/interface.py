@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
-from asyncio import Task
+# from asyncio import Task
 from enum import Enum
 
 import numpy as np
 
+from src.core.boss import RouteStep, RestartParam
 from src.core.pages import Page, ConditionalAction
 from src.core.regions import Position, TextPosition, DynamicPosition
 
@@ -336,6 +337,10 @@ class ExtendedControlService(ABC):
         pass
 
     @abstractmethod
+    def right_forward_walk(self, forward_walk_times: int, sleep_seconds: float = None):
+        pass
+
+    @abstractmethod
     def get_mouse_position(self):
         pass
 
@@ -411,5 +416,13 @@ class BossInfoService(ABC):
 
     @abstractmethod
     def is_auto_pickup(self, boss_name: str) -> bool:
+        pass
+
+    @abstractmethod
+    def get_fast_travel_routes(self) -> dict[str, list[RouteStep]]:
+        pass
+
+    @abstractmethod
+    def get_restart_params(self) -> dict[str, RestartParam]:
         pass
 

@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field, ConfigDict
 
-from src.core.constants import BossNameEnum
+from src.core.boss import BossNameEnum
 from src.util import winreg_util
 
 logger = logging.getLogger(__name__)
