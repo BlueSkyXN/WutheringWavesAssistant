@@ -485,7 +485,7 @@ class AutoBossServiceImpl(PageEventAbstractService):
             targetTexts=[
                 TextMatch(
                     name="点击连接",
-                    text="点击连接",
+                    text=r"^点击连接$",
                 ),
             ],
             action=login_action,
@@ -609,11 +609,11 @@ class AutoBossServiceImpl(PageEventAbstractService):
             targetTexts=[
                 TextMatch(
                     name="退出",
-                    text="退出",
+                    text=r"^退出$",
                 ),
                 TextMatch(
                     name="登入",
-                    text="登入",
+                    text=r"^登入$",
                 ),
             ],
             excludeTexts=[

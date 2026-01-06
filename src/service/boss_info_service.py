@@ -68,7 +68,7 @@ FAST_TRAVEL_ROUTES: dict[str, list[RouteStep]] = {
     BossNameEnum.Fleurdelys.value: [],
     BossNameEnum.NightmareKelpie.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=5.2)],
     BossNameEnum.LionessOfGlory.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=1.8)],  # 2.6
-    BossNameEnum.NightmareHecate.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=4)],
+    BossNameEnum.NightmareHecate.value: [RouteStep(direction=Direction.LEFT, mode=MoveMode.WALK, steps=4)],
     BossNameEnum.Fenrico.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=0.85)],  # 3.4
     BossNameEnum.LadyOfTheSea.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=7)],
     BossNameEnum.TheFalseSovereign.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=2.5)],
