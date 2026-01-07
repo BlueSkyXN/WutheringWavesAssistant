@@ -230,77 +230,80 @@ def mouse_reset_task_run(event: Event, **kwargs):
 
 
 def auto_boss_task_run(event: Event, **kwargs):
-    from src.core.injector import Container
-
-    for k, v in kwargs.items():
-        if isinstance(v, str):
-            os.environ[k] = v
-    logging_config.setup_logging(kwargs.get("LOG_QUEUE"))
-    # logging_config.setup_logging_test(kwargs.get("LOG_QUEUE"))
-    logger.debug("kwargs: %s", kwargs)
-    logger.debug(os.environ)
-    logger.info("刷boss任务进程开始运行")
-
-    context = Context()
-    # 从快照还原配置
-    if param_config_snapshot := kwargs.get("PARAM_CONFIG_SNAPSHOT"):
-        context.param_config = ParamConfig.build(content=param_config_snapshot)
-    if game_path := kwargs.get("GAME_PATH"):
-        context.param_config.gamePath = game_path
-    # 新旧配置兼容
-    context.app_config.TargetBoss = context.param_config.get_boss_name_list()
-    logger.info("Boss Rush: %s", context.app_config.TargetBoss)
-    context.app_config.DungeonWeeklyBossLevel = context.param_config.get_boss_level_int()
-
-    container = Container.build(context)
-    logger.debug("Create application context")
-    window_service: WindowService = container.window_service()
-    img_service: ImgService = container.img_service()
-    ocr_service: OCRService = container.ocr_service()
-    control_service: ControlService = container.control_service()
-
-    hwnd_util.set_hwnd_left_top(window_service.window)
-    time.sleep(0.2)
-    logger.debug(game_path)
-    parent_pid = kwargs.get("PARENT_PID")
-    create_parent_monitor(event, parent_pid)
-    create_mouse_reset_monitor(event, parent_pid, **kwargs)
-    clock_action = ClockAction(control_service.activate, 3.0)
-
-    logger.debug("-------- run ----------")
-    count = 0
-
-    page_event_service: PageEventService = container.auto_boss_service()
-
     try:
-        while event.is_set():
-            try:
-                count += 1
-                # logger.info("count %s", count)
-                clock_action.action()
+        from src.core.injector import Container
 
-                src_img = img_service.screenshot()
-                img = img_service.resize(src_img)
-                result = ocr_service.ocr(img)
-                page_event_service.execute(src_img=src_img, img=img, ocr_results=result)
-            except ScreenshotError:
+        for k, v in kwargs.items():
+            if isinstance(v, str):
+                os.environ[k] = v
+        logging_config.setup_logging(kwargs.get("LOG_QUEUE"))
+        # logging_config.setup_logging_test(kwargs.get("LOG_QUEUE"))
+        logger.debug("kwargs: %s", kwargs)
+        logger.debug(os.environ)
+        logger.info("刷boss任务进程开始运行")
+
+        context = Context()
+        # 从快照还原配置
+        if param_config_snapshot := kwargs.get("PARAM_CONFIG_SNAPSHOT"):
+            context.param_config = ParamConfig.build(content=param_config_snapshot)
+        if game_path := kwargs.get("GAME_PATH"):
+            context.param_config.gamePath = game_path
+        # 新旧配置兼容
+        context.app_config.TargetBoss = context.param_config.get_boss_name_list()
+        logger.info("Boss Rush: %s", context.app_config.TargetBoss)
+        context.app_config.DungeonWeeklyBossLevel = context.param_config.get_boss_level_int()
+
+        container = Container.build(context)
+        logger.debug("Create application context")
+        window_service: WindowService = container.window_service()
+        img_service: ImgService = container.img_service()
+        ocr_service: OCRService = container.ocr_service()
+        control_service: ControlService = container.control_service()
+
+        hwnd_util.set_hwnd_left_top(window_service.window)
+        time.sleep(0.2)
+        logger.debug(game_path)
+        parent_pid = kwargs.get("PARENT_PID")
+        create_parent_monitor(event, parent_pid)
+        create_mouse_reset_monitor(event, parent_pid, **kwargs)
+        clock_action = ClockAction(control_service.activate, 3.0)
+
+        logger.debug("-------- run ----------")
+        count = 0
+
+        page_event_service: PageEventService = container.auto_boss_service()
+
+        try:
+            while event.is_set():
                 try:
-                    logger.warning("截图异常，关闭游戏")
-                    hwnd_util.force_close_process(window_service.window)
-                except Exception:
-                    logger.error("关闭游戏时异常")
-                raise
-    except KeyboardInterrupt:
-        logger.warning("KeyboardInterrupt")
+                    count += 1
+                    # logger.info("count %s", count)
+                    clock_action.action()
+
+                    src_img = img_service.screenshot()
+                    img = img_service.resize(src_img)
+                    result = ocr_service.ocr(img)
+                    page_event_service.execute(src_img=src_img, img=img, ocr_results=result)
+                except ScreenshotError:
+                    try:
+                        logger.warning("截图异常，关闭游戏")
+                        hwnd_util.force_close_process(window_service.window)
+                    except Exception:
+                        logger.error("关闭游戏时异常")
+                    raise
+        except KeyboardInterrupt:
+            logger.warning("KeyboardInterrupt")
+        except Exception as e:
+            logger.exception(e)
+        finally:
+            try:
+                keymouse_util.key_up(window_service.window, "W")
+                keymouse_util.key_up(window_service.window, "LSHIFT")
+            except Exception:
+                pass
+            logger.info("刷boss任务进程结束")
     except Exception as e:
         logger.exception(e)
-    finally:
-        try:
-            keymouse_util.key_up(window_service.window, "W")
-            keymouse_util.key_up(window_service.window, "LSHIFT")
-        except Exception:
-            pass
-        logger.info("刷boss任务进程结束")
 
 
 def auto_pickup_task_run(event: Event, **kwargs):

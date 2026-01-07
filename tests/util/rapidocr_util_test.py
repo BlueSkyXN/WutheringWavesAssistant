@@ -6,7 +6,18 @@ import cv2
 import numpy as np
 import onnxruntime
 from rapidocr import RapidOCR
-from rapidocr.utils import RapidOCROutput
+
+from importlib.metadata import version
+from packaging.version import Version
+
+try:
+    _rapidocr_version = Version(version("rapidocr"))
+    if _rapidocr_version < Version("3.0.0"):
+        from rapidocr.utils import RapidOCROutput  # v2.0.6
+    else:
+        from rapidocr.utils.output import RapidOCROutput  # v3.5.0
+except Exception as e:
+    raise e
 
 from src.util import file_util, img_util, hwnd_util, rapidocr_util, screenshot_util, yolo_util
 from src.util.wrap_util import timeit

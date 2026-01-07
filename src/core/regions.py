@@ -4,7 +4,18 @@ from typing import Tuple, Sequence, TypeVar, Type
 
 import numpy as np
 from pydantic import BaseModel, Field
-from rapidocr.utils import RapidOCROutput
+
+from importlib.metadata import version
+from packaging.version import Version
+
+try:
+    _rapidocr_version = Version(version("rapidocr"))
+    if _rapidocr_version < Version("3.0.0"):
+        from rapidocr.utils import RapidOCROutput  # v2.0.6
+    else:
+        from rapidocr.utils.output import RapidOCROutput  # v3.5.0
+except Exception as e:
+    raise e
 
 logger = logging.getLogger(__name__)
 

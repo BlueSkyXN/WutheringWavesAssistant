@@ -1,10 +1,7 @@
 import logging
 
 import numpy as np
-from rapidocr import RapidOCR, VisRes
-from rapidocr.utils import RapidOCROutput
 from tqdm import tqdm
-
 from src.util import file_util, img_util
 
 logger = logging.getLogger(__name__)
@@ -12,30 +9,65 @@ logger = logging.getLogger(__name__)
 # https://github.com/RapidAI/RapidOCR
 # https://paddlepaddle.github.io/PaddleOCR/latest/model/index.html
 
-_COMMON_PARAMS = {
-    "Global.use_cls": False,
-    "Global.width_height_ratio": -1,
-    "Det.limit_type": "min",
-    "Det.limit_side_len": 0,
-}
-_CPU_PARAMS = {
-    **_COMMON_PARAMS,
-}
-_DML_PARAMS = {
-    **_COMMON_PARAMS,
-    "Global.with_onnx": True,
-    "EngineConfig.onnxruntime.use_dml": True,
-}
-# _GPU_ONNXRUNTIME_PARAMS = {
-#     **_COMMON_PARAMS,
-#     "Global.with_onnx": True,
-#     "EngineConfig.onnxruntime.use_cuda": True,
-# }
-_GPU_PADDLEPADDLE_PARAMS = {
-    **_COMMON_PARAMS,
-    "Global.with_paddle": True,
-    "EngineConfig.paddle.use_cuda": True,
-}
+from importlib.metadata import version
+from packaging.version import Version
+
+_rapidocr_version = Version(version("rapidocr"))
+if _rapidocr_version < Version("3.0.0"):
+    from rapidocr import RapidOCR, VisRes
+    from rapidocr.utils import RapidOCROutput  # v2.0.6
+
+    _COMMON_PARAMS = {
+        "Global.use_cls": False,
+        "Global.width_height_ratio": -1,
+        "Det.limit_type": "min",
+        "Det.limit_side_len": 0,
+    }
+    _CPU_PARAMS = {
+        **_COMMON_PARAMS,
+    }
+    _DML_PARAMS = {
+        **_COMMON_PARAMS,
+        "Global.with_onnx": True,
+        "EngineConfig.onnxruntime.use_dml": True,
+    }
+    # _GPU_ONNXRUNTIME_PARAMS = {
+    #     **_COMMON_PARAMS,
+    #     "Global.with_onnx": True,
+    #     "EngineConfig.onnxruntime.use_cuda": True,
+    # }
+    _GPU_PADDLEPADDLE_PARAMS = {
+        **_COMMON_PARAMS,
+        "Global.with_paddle": True,
+        "EngineConfig.paddle.use_cuda": True,
+    }
+else:
+    from rapidocr import RapidOCR, VisRes, EngineType
+    from rapidocr.utils.output import RapidOCROutput  # v3.5.0
+
+    _COMMON_PARAMS = {
+        "Global.use_cls": False,
+        "Global.width_height_ratio": -1,
+        "Global.log_level": "info",  # debug / info / warning / error / critical
+        "Det.limit_type": "min",
+        "Det.limit_side_len": 0,
+    }
+    _CPU_PARAMS = {
+        **_COMMON_PARAMS,
+    }
+    _DML_PARAMS = {
+        **_COMMON_PARAMS,
+        "EngineConfig.onnxruntime.use_dml": True,
+    }
+    # _GPU_ONNXRUNTIME_PARAMS = {
+    #     **_COMMON_PARAMS,
+    #     "EngineConfig.onnxruntime.use_cuda": True,
+    # }
+    _GPU_PADDLEPADDLE_PARAMS = {
+        **_COMMON_PARAMS,
+        "EngineConfig.paddle.use_cuda": True,
+        "Det.engine_type": EngineType.PADDLE,
+    }
 
 
 def create_ocr(*, use_gpu: bool = False, use_dml=False) -> RapidOCR:

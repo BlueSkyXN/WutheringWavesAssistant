@@ -6548,19 +6548,20 @@ all = ["numpy"]
 
 [[package]]
 name = "rapidocr"
-version = "2.0.6"
+version = "3.5.0"
 description = "Awesome OCR Library"
 optional = false
 python-versions = "<4,>=3.6"
 groups = ["main"]
 files = [
-    {file = "rapidocr-2.0.6-py3-none-any.whl", hash = "sha256:21c11b1741bcce6d2577cafa43941c3836a75ba09cd21481afcd4ce18179873b"},
+    {file = "rapidocr-3.5.0-py3-none-any.whl", hash = "sha256:c0e361ffd0a26d2f27827361b0c563a87ee311e62b8c56ad52472c0fc6f1d78a"},
 ]
 
 [package.dependencies]
+colorlog = "*"
 numpy = ">=1.19.5,<3.0.0"
 omegaconf = "*"
-opencv-python = ">=4.5.1.48"
+opencv_python = ">=4.5.1.48"
 Pillow = "*"
 pyclipper = ">=1.2.0"
 PyYAML = "*"
@@ -7256,4 +7257,4 @@ paddleocr = ["paddleocr"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "701e709fde153cfeb5603284bfe2dee143766307f726c13893b55bc78d9f2eb1"
+content-hash = "1aa36e32a82652fb0fdcc5b1ebdacbeb34a940b0f1b971826811a053e875caba"
