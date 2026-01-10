@@ -142,10 +142,13 @@ jobs:
           & "py312\python.exe" -m pip list
 
           # 打包到上一级目录
-          7z a "..\wwa-gpu-cu129-${{ env.VERSION }}.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on -v1500m
+          7z a "..\wwa-gpu-cu129-${{ env.VERSION }}-original.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on
+          # 分割
+          7z a -v1500m "..\wwa-gpu-cu129-${{ env.VERSION }}.7z" "..\wwa-gpu-cu129-${{ env.VERSION }}-original.7z"
 
           # 清理临时 Python
           Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item "..\wwa-gpu-cu129-${{ env.VERSION }}-original.7z" -Recurse -Force -ErrorAction SilentlyContinue
 
           # 回到原目录
           Pop-Location
