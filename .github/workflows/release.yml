@@ -142,7 +142,7 @@ jobs:
           & "py312\python.exe" -m pip list
 
           # 打包到上一级目录
-          7z a "..\wwa-gpu-cu129-${{ env.VERSION }}.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on -v1.5g
+          7z a "..\wwa-gpu-cu129-${{ env.VERSION }}.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on -v1500m
 
           # 清理临时 Python
           Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
@@ -154,7 +154,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wwa-gpu-cu129
-          path: "wwa-gpu-cu129-${{ env.VERSION }}.7z"
+          path: "wwa-gpu-cu129-${{ env.VERSION }}.7z.*"
 
       - name: 🧑‍💻 wwa gpu cuda11.8版本 安装依赖并打包
         run: |
@@ -283,9 +283,9 @@ jobs:
           name: "Release ${{ env.VERSION }}"
           files: |
             wwa-${{ env.VERSION }}.7z
-            wwa-gpu-cu126-${{ env.VERSION }}.7z
-            wwa-gpu-cu129-${{ env.VERSION }}.7z
             wwa-gpu-cu118-${{ env.VERSION }}.7z
+            wwa-gpu-cu126-${{ env.VERSION }}.7z
+            wwa-gpu-cu129-${{ env.VERSION }}.7z.*
 #          body: |
 #            🎉 这是由 GitHub Actions 自动发布的版本！
 #            ${{ steps.changelog.outputs.changelog }}
