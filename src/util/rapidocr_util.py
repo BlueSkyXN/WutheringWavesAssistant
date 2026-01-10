@@ -48,7 +48,7 @@ else:
     _COMMON_PARAMS = {
         "Global.use_cls": False,
         "Global.width_height_ratio": -1,
-        "Global.log_level": "info",  # debug / info / warning / error / critical
+        "Global.log_level": "error",  # debug / info / warning / error / critical
         "Det.limit_type": "min",
         "Det.limit_side_len": 0,
     }

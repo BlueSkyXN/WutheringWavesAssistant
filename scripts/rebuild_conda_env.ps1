@@ -12,17 +12,18 @@ try {
 if (-not $poetryExtra) {
     Write-Host "Please select an option:"
 #    nvidia-smi
-    Write-Host "1: cuda, NVIDIA gpu RTX 40/30 Series, cuda12.6"
+    Write-Host "1: cu126, NVIDIA gpu RTX 40 Series, cuda12.6"
 #    Write-Host "2: dml, AMD gpu or intel gpu"
     Write-Host "3: cpu"
-    Write-Host "4: cuda11, NVIDIA gpu RTX 10/20/30/40 Series, cuda11.8"
+    Write-Host "4: cu118, NVIDIA gpu RTX 10/20/30 Series, cuda11.8"
+    Write-Host "5: cu129, NVIDIA gpu RTX 50 Series, cuda12.9"
     Write-Host "0: exit..."
 
-    $selectPoetryExtra = Read-Host "Enter your choice (1, 2, 3, 4, or 0)"
+    $selectPoetryExtra = Read-Host "Enter your choice (1, 2, 3, 4, 5, or 0)"
 
-    while ($selectPoetryExtra -notin "1", "2", "3", "4", "0") {
-        Write-Host "Invalid selection. Please choose 1, 2, 3, or 0."
-        $selectPoetryExtra = Read-Host "Enter your choice (1, 2, 3, or 0)"
+    while ($selectPoetryExtra -notin "1", "2", "3", "4", "5", "0") {
+        Write-Host "Invalid selection. Please choose 1, 2, 3, 4, 5, or 0."
+        $selectPoetryExtra = Read-Host "Enter your choice (1, 2, 3, 4, 5, or 0)"
     }
     if ($selectPoetryExtra -in "2") {
         Write-Host "Unsupport..."
@@ -33,25 +34,25 @@ if (-not $poetryExtra) {
         exit
     }
     switch ($selectPoetryExtra) {
-        "1" { $poetryExtra = "cuda" } # cuda12
+        "1" { $poetryExtra = "cu126" }
         "2" { $poetryExtra = "dml" }
         "3" { $poetryExtra = "cpu" }
-        "4" { $poetryExtra = "cuda11" }
+        "4" { $poetryExtra = "cu118" }
+        "5" { $poetryExtra = "cu129" }
     }
 }
 
 Write-Host "Poetry group: $poetryExtra"
 
-#$condaEnvNamePrefix = 'WutheringWavesAssistant'
 $condaEnvNamePrefix = 'wwa'
-$poetryExtraAll = "cuda", "dml", "cpu", "cuda11"
+$poetryExtraAll = "cu126", "dml", "cpu", "cu118", "cu129"
 if ($poetryExtra -notin $poetryExtraAll) {
     Write-Host "$poetryExtra is not in valid values: $poetryExtraAll" -ForegroundColor Red
     exit
 }
 
 $condaEnvNameSubfix = $poetryExtra
-if ($poetryExtra -eq "cuda11") {
+if ($poetryExtra -in "cu126", "cu118", "cu129") {
     $condaEnvNameSubfix = "cuda"
 }
 $condaEnvName = $condaEnvNamePrefix + "-" + $condaEnvNameSubfix
@@ -112,7 +113,7 @@ conda install poetry=$poetryVersion -y -c conda-forge -c https://mirrors.tuna.ts
 poetry config virtualenvs.create false
 Write-Host "Set poetry config virtualenvs.create to false."
 
-if ($poetryExtra -eq "cuda") {
+if ($poetryExtra -eq "cu126") {
     #Write-Output "cuda12.4 + cudnn9.1"
     #$cudatoolkitVersion = "12.4.1"
     #Write-Host "Conda is installing cuda-toolkit version $cudatoolkitVersion..."
@@ -142,8 +143,10 @@ if ($poetryExtra -eq "cuda") {
 #    Write-Host "`nListing installed versions of CUDA:"
 #    conda list | Select-String -Pattern "cuda-toolkit|cudnn|poetry"
 
-    poetry install -E cuda
-} elseif ($poetryExtra -eq "cuda11") {
+    poetry install -E cu126
+} elseif ($poetryExtra -eq "cu129") {
+    poetry install -E cu129
+} elseif ($poetryExtra -eq "cu118") {
 #    Write-Output "cuda11.8 + cudnn8.9"
 #    $cudatoolkitVersion = "11.8.0"
 #    Write-Host "Conda is installing cudatoolkit version $cudatoolkitVersion..."
@@ -162,7 +165,7 @@ if ($poetryExtra -eq "cuda") {
 #    Write-Host "`nListing installed versions of CUDA:"
 #    conda list | Select-String -Pattern "cudatoolkit|cudnn|poetry"
 
-    poetry install -E cuda11
+    poetry install -E cu118
 } elseif ($poetryExtra -eq "dml") {
     poetry install -E dml
 } elseif ($poetryExtra -eq "cpu") {

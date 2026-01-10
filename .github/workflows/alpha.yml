@@ -10,82 +10,286 @@ jobs:
     steps:
       - name: 📥 检出代码
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0  # 获取所有分支和标签的完整历史记录
 
-#      - name: 🛠️ 安装 Python 3.10
-#        uses: actions/setup-python@v4
-#        with:
-#          python-version: '3.10'
-#
-#      - name: 🛠️ 安装 Poetry
-#        run: |
-#          # 使用 pip 安装指定版本的 Poetry（适用于 Windows）
-#          python -m pip install --upgrade poetry==2.1.1
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-#      - name: 📦 安装 7z
-#        run: |
-#          choco install 7zip  # 使用 Chocolatey 安装 7zip
-
-      - name: 📖 获取 pyproject.toml 中的版本号
+      - name: 📖 获取WWA版本号
         id: get_version
         run: |
-          # 使用 PowerShell 正确设置环境变量
-          #$version = (Select-String -Path "pyproject.toml" -Pattern 'version = "(.*)"').Matches.Groups[1].Value
           $line = (Select-String -Path "src/__init__.py" -Pattern '__version__\s*=\s*"(.*?)"').Matches.Groups[1].Value
           $version = $line.Trim() -split ' ' | Select-Object -First 1
           Write-Output "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          Write-Host "WWA version: $version"
 
-
-#      - name: 🧑‍💻 创建并激活虚拟环境，并安装依赖
-#        run: |
-#          # 创建名为 venv 的虚拟环境，位于项目根目录
-#          python -m venv venv
-#          # 激活虚拟环境
-#          .\venv\Scripts\activate
-#          # 安装 Poetry 依赖
-#          poetry install
-
-#      - name: 🛠️ 创建便携式虚拟环境
-#        run: |
-#          # 使用 --copies 参数避免符号链接
-#          python -m venv venv --copies
-#
-#          # 激活时使用相对路径
-#          .\venv\Scripts\activate
-#
-#          # 修复激活脚本的路径
-#          (Get-Content .\venv\Scripts\activate) -replace 'VIRTUAL_ENV=.*', 'VIRTUAL_ENV="$(dirname "$(dirname "$(realpath "$0")")")"' | Set-Content .\venv\Scripts\activate
-#
-#          poetry install
-
-      - name: 🗜️ 创建 7z 压缩包（包含虚拟环境）
+      - name: 🗜️ 清理不用打包的项目文件
         run: |
-          Remove-Item -Path ".git" -Recurse -Force -ErrorAction SilentlyContinue
+          # Remove-Item -Path ".git" -Recurse -Force -ErrorAction SilentlyContinue
           Remove-Item -Path ".github" -Recurse -Force -ErrorAction SilentlyContinue
           Remove-Item -Path "assets/screenshot" -Recurse -Force -ErrorAction SilentlyContinue
           Remove-Item -Path "docs" -Recurse -Force -ErrorAction SilentlyContinue
           Remove-Item -Path "logs" -Recurse -Force -ErrorAction SilentlyContinue
-          Remove-Item -Path "tests" -Recurse -Force -ErrorAction SilentlyContinue
+          # Remove-Item -Path "tests" -Recurse -Force -ErrorAction SilentlyContinue
           Remove-Item -Path "src/c" -Recurse -Force -ErrorAction SilentlyContinue
           Remove-Item -Path "src/gui/resource" -Recurse -Force -ErrorAction SilentlyContinue
           Remove-Item -Path ".pre-commit-config.yaml" -Recurse -Force -ErrorAction SilentlyContinue
-          # 7z a -mx=9 "wwa-${{ env.VERSION }}-alpha.7z" .
-          7z a "wwa-${{ env.VERSION }}-alpha.7z" . -m0=lzma -mx=9 -md=128m -ms=64m -mmt=off
+          Remove-Item -Path "WWA_updater.exe" -Recurse -Force -ErrorAction SilentlyContinue
+          
+          $tempWorkspace = "temp-workspace"
+          mkdir $tempWorkspace -Force
+          Write-Output "TEMP_WORKSPACE=$tempWorkspace" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          
+          # 复制当前目录内容，排除 temp-workspace
+          Get-ChildItem -Path . -Force | Where-Object { $_.Name -ne $tempWorkspace } | ForEach-Object {
+              Copy-Item -Path $_.FullName -Destination $tempWorkspace -Recurse -Force
+          }
 
-      - name: 📂 上传 7z 文件作为 Workflow 产物
+      - name: 🐍 下载 Python 3.12 完整 ZIP
+        run: |
+          $pyZipName = "python-3.12.6-amd64.zip"
+          $url = "https://www.python.org/ftp/python/3.12.6/$pyZipName"
+          Invoke-WebRequest -Uri $url -OutFile $pyZipName
+          Write-Output "PY_ZIP_NAME=$pyZipName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: ⬇️ 下载最小 MinGit
+        run: |
+          $gitUrl = "https://github.com/git-for-windows/git/releases/download/v2.51.0.windows.1/MinGit-2.51.0-64-bit.zip"
+          $gitFile = "MinGit.zip"
+          Invoke-WebRequest -Uri $gitUrl -OutFile $gitFile
+          Expand-Archive -Path $gitFile -DestinationPath "$env:TEMP_WORKSPACE\git"
+
+      - name: 🧑‍💻 wwa cpu版本 安装依赖并打包
+        run: |
+          # 解压 Python 到临时目录
+          Expand-Archive -Path $env:PY_ZIP_NAME -DestinationPath "$env:TEMP_WORKSPACE\py312"
+          
+          # 切入临时目录
+          Push-Location "$env:TEMP_WORKSPACE"
+          
+          # 安装依赖到便携 Python
+          & "py312\python.exe" -m pip install --upgrade pip
+          & "py312\python.exe" -m pip install setuptools wheel
+          & "py312\python.exe" -m pip install poetry==2.1.1
+          & "py312\python.exe" -m poetry config virtualenvs.create false
+          & "py312\python.exe" -m poetry install -E cpu --no-root -v
+          & "py312\python.exe" -m pip list
+          
+          # 打包到上一级目录
+          # 7z a -mx=9 "..\wwa-${{ env.VERSION }}.7z" "*"
+          7z a "..\wwa-${{ env.VERSION }}.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on
+          
+          # 清理临时 Python
+          Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
+          
+          # 回到原目录
+          Pop-Location
+
+      - name: 📂 上传 7z 文件作为 workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-7z
-          path: "wwa-${{ env.VERSION }}-alpha.7z"
+          name: wwa
+          path: "wwa-${{ env.VERSION }}.7z"
 
-      - name: 🚀 发布 GitHub Release
-        uses: softprops/action-gh-release@v2
+      - name: 🧑‍💻 wwa gpu cuda12.6版本 安装依赖并打包
+        run: |
+          # 解压 Python 到临时目录
+          Expand-Archive -Path $env:PY_ZIP_NAME -DestinationPath "$env:TEMP_WORKSPACE\py312"
+
+          # 切入临时目录
+          Push-Location "$env:TEMP_WORKSPACE"
+
+          # 安装依赖到便携 Python
+          & "py312\python.exe" -m pip install --upgrade pip
+          & "py312\python.exe" -m pip install setuptools wheel
+          & "py312\python.exe" -m pip install poetry==2.1.1
+          & "py312\python.exe" -m poetry config virtualenvs.create false
+          & "py312\python.exe" -m poetry install -E cu126 --no-root -v
+          & "py312\python.exe" -m pip list
+
+          # 打包到上一级目录
+          # 7z a -mx=9 "..\wwa-gpu-cu126-${{ env.VERSION }}.7z" "*"
+          7z a "..\wwa-gpu-cu126-${{ env.VERSION }}.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on
+
+          # 清理临时 Python
+          Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
+
+          # 回到原目录
+          Pop-Location
+
+      - name: 📂 上传 7z 文件作为 workflow artifact
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: "v${{ env.VERSION }}"
-          name: "Pre Release ${{ env.VERSION }} Alpha"
-          files: "wwa-${{ env.VERSION }}-alpha.7z"
-          body: |
-            Wuthering Waves Assistant Alpha
-          draft: false  # 是否为草稿
-          prerelease: true  # 设置为 Pre-release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: wwa-gpu-cu126
+          path: "wwa-gpu-cu126-${{ env.VERSION }}.7z"
+
+      - name: 🧑‍💻 wwa gpu cuda12.9版本 安装依赖并打包
+        run: |
+          # 解压 Python 到临时目录
+          Expand-Archive -Path $env:PY_ZIP_NAME -DestinationPath "$env:TEMP_WORKSPACE\py312"
+
+          # 切入临时目录
+          Push-Location "$env:TEMP_WORKSPACE"
+
+          # 安装依赖到便携 Python
+          & "py312\python.exe" -m pip install --upgrade pip
+          & "py312\python.exe" -m pip install setuptools wheel
+          & "py312\python.exe" -m pip install poetry==2.1.1
+          & "py312\python.exe" -m poetry config virtualenvs.create false
+          & "py312\python.exe" -m poetry install -E cu129 --no-root -v
+          & "py312\python.exe" -m pip list
+
+          # 打包到上一级目录
+          # 7z a -mx=9 "..\wwa-gpu-cu129-${{ env.VERSION }}.7z" "*"
+          7z a "..\wwa-gpu-cu129-${{ env.VERSION }}.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on
+
+          # 清理临时 Python
+          Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
+
+          # 回到原目录
+          Pop-Location
+
+      - name: 📂 上传 7z 文件作为 workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wwa-gpu-cu129
+          path: "wwa-gpu-cu129-${{ env.VERSION }}.7z"
+
+      - name: 🧑‍💻 wwa gpu cuda11.8版本 安装依赖并打包
+        run: |
+          # 解压 Python 到临时目录
+          Expand-Archive -Path $env:PY_ZIP_NAME -DestinationPath "$env:TEMP_WORKSPACE\py312"
+
+          # 切入临时目录
+          Push-Location "$env:TEMP_WORKSPACE"
+
+          # 安装依赖到便携 Python
+          & "py312\python.exe" -m pip install --upgrade pip
+          & "py312\python.exe" -m pip install setuptools wheel
+          & "py312\python.exe" -m pip install poetry==2.1.1
+          & "py312\python.exe" -m poetry config virtualenvs.create false
+          & "py312\python.exe" -m poetry install -E cu118 --no-root -v
+          & "py312\python.exe" -m pip list
+
+          # 打包到上一级目录
+          # 7z a -mx=9 "..\wwa-gpu-cu118-${{ env.VERSION }}.7z" "*"
+          7z a "..\wwa-gpu-cu118-${{ env.VERSION }}.7z" "*" -m0=lzma -mx=9 -md=128m -ms=64m -mmt=off
+
+          # 清理临时 Python
+          Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
+
+          # 回到原目录
+          Pop-Location
+
+      - name: 📂 上传 7z 文件作为 workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wwa-gpu-cu118
+          path: "wwa-gpu-cu118-${{ env.VERSION }}.7z"
+
+#      - name: 提取最新版本变更记录
+#        id: extract_changelog
+#        shell: pwsh
+#        run: |
+#          # 检查文件是否存在
+#          if (-not (Test-Path "CHANGELOG.md")) {
+#              Write-Output "CHANGELOG.md 文件不存在"
+#              "" | Out-File -FilePath "release_body.txt"
+#              exit 0
+#          }
+#
+#          # 读取文件内容
+#          $content = Get-Content -Path "CHANGELOG.md" -Raw
+#
+#          # 逐行处理，提取第一个版本块
+#          $lines = $content -split "`n"
+#          $firstBlock = @()
+#          $foundFirst = $false
+#          $collecting = $false
+#
+#          foreach ($line in $lines) {
+#              if ($line -match '^[vV]\d+\.\d+\.\d+') {
+#                  if (-not $foundFirst) {
+#                      $foundFirst = $true
+#                      $collecting = $true
+#                      $firstBlock += $line
+#                  } else {
+#                      # 遇到第二个版本号，停止收集
+#                      break
+#                  }
+#              } elseif ($collecting) {
+#                  $firstBlock += $line
+#              }
+#          }
+#
+#          # 处理结果
+#          if ($firstBlock.Count -gt 0) {
+#              $result = ($firstBlock -join "`n").Trim()
+#              Write-Output "提取变更记录："
+#              Write-Output $result
+#              # 保存到文件
+#              $result | Out-File -FilePath "release_body.txt"
+#          } else {
+#              Write-Output "未提取到版本信息"
+#              "" | Out-File -FilePath "release_body.txt"
+#          }
+#
+#          # 组合固定话术和动态版本记录
+#          $fixedText = @"
+#          🎉 **新版本发布！**
+#
+#          ⚡ 本次更新包含以下内容：
+#          ```
+#          "@
+#
+#          $fixedDownloadText = @"
+#          ```
+#
+#          📦 **下载说明：**
+#          - `wwa-${{ env.VERSION }}.7z` - 标准通用版本，适合所有windows电脑，如AMD显卡的用户
+#          - `wwa-gpu-cu129-${{ env.VERSION }}.7z` - NVIDIA显卡专属，GPU加速新版，50系列显卡，5090太新还不支持，请使用标准版
+#          - `wwa-gpu-cu126-${{ env.VERSION }}.7z` - NVIDIA显卡专属，GPU加速新版，40系列显卡
+#          - `wwa-gpu-cu118-${{ env.VERSION }}.7z` - NVIDIA显卡专属，GPU加速通用版，适合旧N卡
+#          建议使用gpu版，作者4070使用gpu-cu126版
+#
+#          ▶️ **使用说明：**
+#          脚本免安装解压即可运行
+#          - 下载后解压，剪切到一个路径没有中文的目录。若无法解压，[点击下载7z](https://www.7-zip.org/)
+#          - 双击一键更新并选择合适的更新渠道（无梯子建议选国内加速）升级到最新，双击WWA.exe启动脚本
+#          - Windows系统设置：关闭HDR（默认关闭），关闭英伟达显卡滤镜（默认关闭），关闭微星小飞机（不认识这个就不用管）
+#          - 游戏内设置：
+#            - 简体中文，重置按键，重置滤镜，重置亮度
+#            - 控制 镜头设置：
+#              - 镜头重置：开
+#              - 移动镜头修正：开
+#              - 战斗镜头修正：开
+#          - MOD在刷boss时需要关闭，在游戏内按F6，F6在下面就Fn + F6
+#
+#          "@
+#
+#          $fullContent = $fixedText + "`n`n" + $result + "`n`n" + $fixedDownloadText + "`n`n" + "感谢使用！如有问题请提交 Issue。"
+#
+#          # 保存到文件
+#          $fullContent | Out-File -FilePath "release_body.txt"
+#
+#      - name: 🚀 发布 GitHub Release（仅 main 分支）
+#        if: github.ref == 'refs/heads/main'
+#        uses: softprops/action-gh-release@v2
+#        with:
+#          tag_name: "v${{ env.VERSION }}"
+#          name: "Release ${{ env.VERSION }}"
+#          files: |
+#            wwa-${{ env.VERSION }}.7z
+#            wwa-gpu-cu126-${{ env.VERSION }}.7z
+#            wwa-gpu-cu129-${{ env.VERSION }}.7z
+#            wwa-gpu-cu118-${{ env.VERSION }}.7z
+##          body: |
+##            🎉 这是由 GitHub Actions 自动发布的版本！
+##            ${{ steps.changelog.outputs.changelog }}
+#          body_path: release_body.txt
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
