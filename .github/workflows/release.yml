@@ -80,7 +80,6 @@ jobs:
           & "py312\python.exe" -m pip list
           
           # 打包到上一级目录
-          # 7z a -mx=9 "..\wwa-${{ env.VERSION }}.7z" "*"
           7z a "..\wwa-${{ env.VERSION }}.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on
           
           # 清理临时 Python
@@ -112,7 +111,6 @@ jobs:
           & "py312\python.exe" -m pip list
 
           # 打包到上一级目录
-          # 7z a -mx=9 "..\wwa-gpu-cu126-${{ env.VERSION }}.7z" "*"
           7z a "..\wwa-gpu-cu126-${{ env.VERSION }}.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on
 
           # 清理临时 Python
@@ -144,8 +142,7 @@ jobs:
           & "py312\python.exe" -m pip list
 
           # 打包到上一级目录
-          # 7z a -mx=9 "..\wwa-gpu-cu129-${{ env.VERSION }}.7z" "*"
-          7z a "..\wwa-gpu-cu129-${{ env.VERSION }}.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on
+          7z a "..\wwa-gpu-cu129-${{ env.VERSION }}.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on -v1.5g
 
           # 清理临时 Python
           Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
@@ -176,8 +173,7 @@ jobs:
           & "py312\python.exe" -m pip list
 
           # 打包到上一级目录
-          # 7z a -mx=9 "..\wwa-gpu-cu118-${{ env.VERSION }}.7z" "*"
-          7z a "..\wwa-gpu-cu118-${{ env.VERSION }}.7z" "*" -m0=lzma -mx=9 -md=128m -ms=64m -mmt=off
+          7z a "..\wwa-gpu-cu118-${{ env.VERSION }}.7z" "*" -m0=lzma2 -mx=9 -md=128m -ms=64m -mmt=on
 
           # 清理临时 Python
           Remove-Item "py312" -Recurse -Force -ErrorAction SilentlyContinue
@@ -250,10 +246,13 @@ jobs:
           ```
           
           📦 **下载说明：**
-          - `wwa-${{ env.VERSION }}.7z` - 标准通用版本，适合所有windows电脑，如AMD显卡的用户
-          - `wwa-gpu-cu129-${{ env.VERSION }}.7z` - NVIDIA显卡专属，GPU加速新版，50系列显卡，5090太新还不支持，请使用标准版
-          - `wwa-gpu-cu126-${{ env.VERSION }}.7z` - NVIDIA显卡专属，GPU加速新版，40系列显卡
-          - `wwa-gpu-cu118-${{ env.VERSION }}.7z` - NVIDIA显卡专属，GPU加速通用版，适合旧N卡
+          - `wwa-${{ env.VERSION }}.7z` - 标准通用版本，适合所有windows电脑，如AMD显卡的用户  
+          - `wwa-gpu-cu118-${{ env.VERSION }}.7z` - NVIDIA显卡专属，GPU加速通用版，适合旧N卡  
+          - `wwa-gpu-cu126-${{ env.VERSION }}.7z` - NVIDIA显卡专属，GPU加速新版，40系列显卡  
+          - `wwa-gpu-cu129-${{ env.VERSION }}.7z` - NVIDIA显卡专属，GPU加速新版，50系列显卡  
+            - 压缩包已分割为001、002两个文件，都要下载，放在同一个目录，对001进行解压即可  
+            - 5090太新还不支持，请使用标准版  
+          
           建议使用gpu版，作者4070使用gpu-cu126版  
           
           ▶️ **使用说明：**
