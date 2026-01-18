@@ -67,6 +67,8 @@ else:
         **_COMMON_PARAMS,
         "EngineConfig.paddle.use_cuda": True,
         "Det.engine_type": EngineType.PADDLE,
+        "Cls.engine_type": EngineType.PADDLE,
+        "Rec.engine_type": EngineType.PADDLE,
     }
 
 
