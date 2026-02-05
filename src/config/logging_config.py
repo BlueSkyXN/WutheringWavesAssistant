@@ -96,20 +96,22 @@ def rotate_log(max_size=5 * 1024 * 1024, is_test: bool = False):
         return log_file
     log_path = Path(log_file)
     if not log_path.exists():
+        log_path.touch(exist_ok=True)
         return log_file
     # 滚动日志，防止单文件过大
     if log_path.stat().st_size > max_size:
         backup_name = f"{log_file}.{datetime.now().strftime("%Y%m%d")}"
+        backup_name_new = backup_name
         count = 1
         while True:
-            backup_path = Path(backup_name)
+            backup_path = Path(backup_name_new)
             if backup_path.exists():
-                backup_name = backup_name + "." + str(count)
+                backup_name_new = backup_name + "." + str(count)
                 count += 1
                 continue
             # logger.info("Backing up log file: %s", backup_path) # 此时日志还未初始化
             log_path.rename(backup_path)  # 重命名日志文件
-            log_path.touch()  # 重新创建一个空的日志文件
+            log_path.touch(exist_ok=True)  # 重新创建一个空的日志文件
             break
     return log_file
 

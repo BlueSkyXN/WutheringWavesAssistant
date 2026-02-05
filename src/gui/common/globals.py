@@ -7,6 +7,7 @@ class GlobalSignal(QObject):
     guiExistSignal = Signal()  # 有同路径的gui启动了，不允许，发送信号通知并退出
     executeTaskSignal = Signal(str, str)  # 提交运行任务，任务名 和 启动/停止
     paramConfigPathSignal = Signal(str)  # 参数配置文件的路径
+    guiWinId = Signal(int)  # gui主窗口hwnd
 
 
 class GlobalParam:

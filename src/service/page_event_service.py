@@ -819,6 +819,32 @@ class PageEventAbstractService(PageEventService, ABC):
             action=action if action else Page.error_action
         )
 
+    def build_Login_Confirm_UpdateFinished(self, action: Callable = None) -> Page:
+
+        if action is None:
+            def default_action(positions: dict[str, Position]) -> bool:
+                position = positions["确认"]
+                self._control_service.click(*position.center)
+                time.sleep(2)
+                return True
+
+            action = default_action
+
+        return Page(
+            name="更新完成，游戏即将重启",
+            targetTexts=[
+                TextMatch(
+                    name="更新完成",
+                    text=r"^更新完成.*游戏即将重启",
+                ),
+                TextMatch(
+                    name="确认|Confirm",
+                    text=r"^(确认|Confirm)$",
+                ),
+            ],
+            action=action if action else Page.error_action
+        )
+
     def build_Fight_Absorption(self, action: Callable = None) -> Page:
 
         if action is None:
@@ -1174,6 +1200,8 @@ class PageEventAbstractService(PageEventService, ABC):
                         self._info.lastBossName = BossNameEnum.TheFalseSovereign.value
                     elif BossNameEnum.ThrenodianLeviathan.value in self._config.TargetBoss:
                         self._info.lastBossName = BossNameEnum.ThrenodianLeviathan.value
+                    elif BossNameEnum.Sigillum.value in self._config.TargetBoss:
+                        self._info.lastBossName = BossNameEnum.Sigillum.value
                     else:
                         self._info.lastBossName = BossNameEnum.Hecate.value
                 return True
@@ -1534,7 +1562,7 @@ class PageEventAbstractService(PageEventService, ABC):
             #     time.sleep(1)
             return
 
-        if self._info.lastBossName in [BossNameEnum.Fleurdelys.value, BossNameEnum.ThrenodianLeviathan.value]:
+        if self._info.lastBossName in [BossNameEnum.Fleurdelys.value, BossNameEnum.ThrenodianLeviathan.value, BossNameEnum.Sigillum.value]:
             self.absorption_action_fleurdelys()
             return
         elif self._info.lastBossName == BossNameEnum.Fenrico.value:
@@ -1582,17 +1610,17 @@ class PageEventAbstractService(PageEventService, ABC):
                     self._control_service.camera_reset()
                     time.sleep(0.8)
                     if i == max_range - 1:
-                        # 可能掉在正前方被人物挡住，前进一下再最后看一次
-                        for _ in range(4):
-                            self._control_service.up(0.1)
-                            time.sleep(0.1)
-                        for _ in range(2):
-                            self._control_service.left(0.1)
-                        time.sleep(0.3)
-                        img = self._img_service.screenshot()
-                        echo_box = self._od_service.search_echo(img)
-                        if echo_box is not None:
-                            break
+                        # # 可能掉在正前方被人物挡住，前进一下再最后看一次
+                        # for _ in range(4):
+                        #     self._control_service.up(0.1)
+                        #     time.sleep(0.1)
+                        # for _ in range(2):
+                        #     self._control_service.left(0.1)
+                        # time.sleep(0.3)
+                        # img = self._img_service.screenshot()
+                        # echo_box = self._od_service.search_echo(img)
+                        # if echo_box is not None:
+                        #     break
                         stop_search = True
                         break
                     # else:
@@ -2551,8 +2579,16 @@ class PageEventAbstractService(PageEventService, ABC):
         self._control_service.click(*position.center)
 
     def _need_retry(self):
-        return len(self._config.TargetBoss) == 1 and self._config.TargetBoss[0] in ["无妄者", "角", "赫卡忒",
-                                                                                    "芙露德莉斯", "鸣式利维亚坦"]
+        return (len(self._config.TargetBoss) == 1 and
+                self._config.TargetBoss[0] in [
+                    BossNameEnum.Dreamless.value,
+                    BossNameEnum.Jue.value,
+                    BossNameEnum.Hecate.value,
+                    BossNameEnum.Fleurdelys.value,
+                    BossNameEnum.ThrenodianLeviathan.value,
+                    BossNameEnum.Sigillum.value,
+                ]
+                )
 
     def wait_home(self, timeout=120) -> bool:
         """

@@ -477,6 +477,8 @@ class AutoBossServiceImpl(PageEventAbstractService):
         def login_action(positions: dict[str, Position]) -> bool:
             position = positions.get("点击连接")
             self._control_service.click(*position.center)
+            time.sleep(0.2)
+            self._control_service.click(*position.random)
             time.sleep(0.5)
             return True
 
@@ -608,8 +610,8 @@ class AutoBossServiceImpl(PageEventAbstractService):
             name="账户登录",
             targetTexts=[
                 TextMatch(
-                    name="退出",
-                    text=r"^退出$",
+                    name="退出|公告|修复",
+                    text=r"^(退出|公告|修复)$",
                 ),
                 TextMatch(
                     name="登入",

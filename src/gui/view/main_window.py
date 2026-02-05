@@ -59,6 +59,8 @@ class MainWindow(FluentWindow):
         # start theme listener
         self.themeListener.start()
 
+        globalSignal.guiWinId.emit(self.winId())
+
         self.remoteVersion = RemoteVersion(VERSION_URLS, self.remoteVersionFinishedSignal.emit, self)
         if cfg.checkUpdateAtStartUpV2.value is True:
             self.remoteVersion.request()

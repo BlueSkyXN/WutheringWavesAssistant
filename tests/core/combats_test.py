@@ -36,30 +36,58 @@ def control_service(container):
 def combo_action(control_service, seq, after_time, cycle=50):
     for i in range(cycle):
         for keys in seq:
-            key, press_time, wait_time = keys[:3]
-            if key == "a":
-                if press_time > 0.2:
-                    raise ValueError("普攻按压时间不可大于0.2，默认统一填写0.05")
-                control_service.player().fight_click(seconds=press_time)
-            elif key == "z":
-                if press_time < 0.3:
-                    raise ValueError("重击按压时间不可小于0.3，默认统一写0.5")
-                control_service.player().fight_click(seconds=press_time)
-            elif key == "w":
-                pass
-            elif key == "j":
-                control_service.player().fight_tap("SPACE", press_time)
-            elif key == "d":
-                # control_service.player().fight_tap("LSHIFT", press_time)
-                control_service.player().fight_right_click(seconds=press_time)
-            else:
-                key_action = keys[3] if len(keys) >= 4 else None
-                if key_action == "down":
-                    control_service.player().key_down(key, press_time)
-                elif key_action == "up":
-                    control_service.player().key_up(key, press_time)
+            key_src, press_time, wait_time = keys[:3]
+            key = key_src  # a a_down a_up
+            key_action = None  # down up
+            if "_" in key_src:
+                key, key_action = key_src.strip().split("_", 1)
+            if not key_action:
+                if key == "a":
+                    if press_time > 0.2:
+                        raise ValueError("普攻按压时间不可大于0.2，默认统一填写0.05")
+                    control_service.fight_click(seconds=press_time)
+                elif key == "z":
+                    if press_time < 0.3:
+                        raise ValueError("重击按压时间不可小于0.3，默认统一写0.5")
+                    control_service.fight_click(seconds=press_time)
+                elif key == "w":
+                    pass
+                elif key == "j":
+                    control_service.fight_tap("SPACE", press_time)
+                elif key == "d":
+                    # control_service.fight_tap("LSHIFT", press_time)
+                    control_service.fight_right_click(seconds=press_time)
                 else:
-                    control_service.player().fight_tap(key, press_time)
+                    control_service.fight_tap(key, press_time)
+            else:
+                if key_action == "down":
+                    if key in ["a", "z"]:
+                        control_service.mouse_left_down(seconds=press_time)
+                    elif key == "w":
+                        pass
+                    elif key == "j":
+                        control_service.key_down("SPACE", press_time)
+                    elif key == "d":
+                        # control_service.fight_tap("LSHIFT", press_time)
+                        control_service.mouse_right_down(seconds=press_time)
+                    else:
+                        control_service.key_down(key, press_time)
+                    # key_down_caches.add(key)
+                elif key_action == "up":
+                    if key in ["a", "z"]:
+                        control_service.mouse_left_up(seconds=press_time)
+                    elif key == "w":
+                        pass
+                    elif key == "j":
+                        control_service.key_up("SPACE", press_time)
+                    elif key == "d":
+                        # control_service.fight_tap("LSHIFT", press_time)
+                        control_service.mouse_right_up(seconds=press_time)
+                    else:
+                        control_service.key_up(key, press_time)
+                    # key_down_caches.discard(key)
+                else:
+                    logger.warning("Unknown key action '{}'".format(key_action))
             if wait_time <= 0:
                 continue
             time.sleep(wait_time)
@@ -115,10 +143,10 @@ def test_combo_Jinhsi_AdvancedCombo(control_service):
         ["a", 0.05, 0.05],
         ["j", 0.05, 0.01],
 
-        ["W", 0.00, 0.00, "down"],
+        ["W_down", 0.00, 0.00],
         ["a", 0.05, 0.05],
         ["d", 0.05, 0.30],
-        ["W", 0.00, 0.00, "up"],
+        ["W_up", 0.00, 0.00],
         ["a", 0.05, 0.05],
         ["d", 0.05, 0.30],
 
@@ -229,13 +257,13 @@ def test_combo_Shorekeeper(control_service):
     # 守岸人 BnB combo
     # seq = [
     #     # 3a 闪 az
-    #     ["W", 0.01, 0.01, "down"],
+    #     ["W_down", 0.01, 0.01],
     #     ["a", 0.05, 0.31],
     #     ["a", 0.05, 0.42],
     #     ["a", 0.05, 0.40],
     #     ["d", 0.01, 0.00],
     #     # ["E", 0.05, 0.00],
-    #     ["W", 0.01, 0.00, "up"],
+    #     ["W_up", 0.01, 0.00],
     #     ["a", 0.05, 0.30],
     #     ["z", 0.50, 0.45],
     #     # 间隔
@@ -958,10 +986,175 @@ def test_combo_phoebe_AdvancedCombo(control_service):
         ["z", 0.92, 0.20],
         ["j", 0.05, 1.20],
 
+    ]
+    combo_action(control_service, seq, 6)
 
+
+def test_combo_lynae_AdvancedCombo(control_service):
+    # 琳奈
+    seq = [
+        # E2a
+        ["E", 0.05, 0.88],
+        # ["a", 0.05, 0.33],
+        ["a", 0.05, 0.82],
+        ["a", 0.05, 1.02],
+        ["j", 0.05, 1.50],
+
+        # 3a
+        ["a", 0.05, 0.33],
+        ["a", 0.05, 0.82],
+        ["a", 0.05, 1.02],
+        ["j", 0.05, 1.50],
+
+        # z
+        ["z", 2.26, 0.70],
+        # ["j", 0.05, 1.20],
+
+        # # 3jza
+        # ["j", 0.05, 0.50],
+        # ["j", 0.05, 0.50],
+        # ["j", 0.05, 0.50],
+        # ["z", 1.50, 0.10],
+        # ["a", 0.05, 1.22],
+        # ["j", 0.05, 1.20],
+
+        # 2jzja
+        ["j", 0.05, 0.50],
+        ["j", 0.05, 0.50],
+        ["z", 1.50, 0.10],
+        ["j", 0.05, 0.50],
+        ["a", 0.05, 1.22],
+        ["j", 0.05, 1.20],
+
+        # 5a
+        ["a", 0.05, 0.45],
+        ["a", 0.05, 0.55],
+        ["a", 0.05, 0.58],
+        ["a", 0.05, 0.65],
+        ["a", 0.05, 0.80],  # 扔罐子
+        ["w", 0.00, 0.85],  # 爆炸
+        ["j", 0.05, 1.20],
+
+        # E4a
+        ["E", 0.05, 0.88],
+        # ["a", 0.05, 0.45],
+        ["a", 0.05, 0.55],
+        ["a", 0.05, 0.58],
+        ["a", 0.05, 0.65],
+        ["a", 0.05, 0.80],  # 扔罐子
+        ["w", 0.00, 0.85],  # 爆炸
+        ["j", 0.05, 1.20],
+
+        # R
+        ["R", 0.05, 4.88],
+        ["j", 0.05, 1.20],
 
     ]
     combo_action(control_service, seq, 6)
+
+
+def test_combo_mornye_AdvancedCombo(control_service):
+    # 莫宁
+    seq = [
+        ## 基准模式
+        # # 4a
+        # ["a", 0.05, 0.42],
+        # ["a", 0.05, 0.70],
+        # ["a", 0.05, 0.86],
+        # ["a", 0.05, 1.20],
+        # ["j", 0.05, 1.50],
+
+        # # E
+        # ["E", 0.05, 1.45],
+        # ["j", 0.05, 1.50],
+
+        # # 3az
+        # ["a", 0.05, 0.42],
+        # ["a", 0.05, 0.70],
+        # ["a", 0.05, 0.30],
+        # ["z", 0.80, 1.00],
+        # # ["d", 0.05, 0.30],
+        # ["j", 0.05, 1.80],
+        # ["j", 0.05, 1.50],
+
+        # 2aEaz
+        ["a", 0.05, 0.42],
+        ["a", 0.05, 0.10],
+        ["E", 0.05, 0.10],
+        ["a", 0.05, 0.30],
+        ["z", 0.80, 1.00],
+        # ["j", 0.05, 2.00],
+        # ["j", 0.05, 1.50],
+
+        # ## 广域观测模式
+        # ["a", 0.05, 0.50],
+        # ["a", 0.05, 0.70],
+        # ["a", 0.05, 0.72],
+        # ["a", 0.05, 0.86],
+        #
+        # ["d", 0.05, 0.30],
+
+    ]
+    combo_action(control_service, seq, 0.5, cycle=1)
+
+    # seq = [
+    #     ## 广域观测模式
+    #     ["a", 0.05, 0.50],
+    #     ["a", 0.05, 0.70],
+    #     ["a", 0.05, 0.75],
+    #     ["a", 0.05, 0.88],
+    #
+    #     ["A_down", 0.00, 0.00],
+    #     ["d", 0.05, 0.30],
+    #     ["A_up", 0.00, 0.00],
+    #
+    # ]
+    # combo_action(control_service, seq, 1, 2)
+    #
+    # time.sleep(0.5)
+    # seq = [
+    #     ## 广域观测模式
+    #     ["z", 0.50, 1.70],
+    #     ["d", 0.05, 0.30],
+    #     ["j", 0.05, 1.80],
+    #     ["j", 0.05, 1.50],
+    # ]
+    # combo_action(control_service, seq, 1, 1)
+
+    seq = [
+        ## 广域观测模式
+        # ["a", 0.05, 0.42],
+        # ["a", 0.05, 0.78],
+        # ["a", 0.05, 0.80],
+        #
+        # ["a", 0.05, 0.42],
+        # ["a", 0.05, 0.78],
+        # ["a", 0.05, 0.80],
+        #
+        # ["a", 0.05, 0.42],
+        # ["a", 0.05, 0.70],
+        # ["z", 0.50, 1.70],
+
+        # ["z", 6.00, 1.18],
+        # ["d", 0.05, 1.00],
+
+        # ["z", 5.55, 1.50],
+        ["a_down", 0.00, 0.00],
+        ["w", 0.00, 5.55],
+        ["a_up", 0.00, 0.00],
+        ["d", 0.05, 1.00],
+
+
+
+    ]
+    combo_action(control_service, seq, 1, 1)
+
+    seq = [
+        ["j", 0.05, 2.00],
+    ]
+    combo_action(control_service, seq, 1, 2)
+
+
 
 
 def test_combat(container, control_service):
@@ -995,6 +1188,23 @@ def test_combat(container, control_service):
 
 def test_CombatSystem(container, control_service):
     img_service: ImgService = container.img_service()
+    # 试用关卡
     combat_system = CombatSystem(control_service, img_service)
-    # combat_system.resonators = [combat_system.cartethyia]
+    # 单角色测试
+    combat_system.resonators = [None, combat_system.lynae, None]
+    # 多角色测试
+    # combat_system.resonators = [combat_system.generic_resonator, combat_system.lynae, combat_system.generic_resonator]
+    # 单角色时切换角色
+    resonator_index = None
+    empty_counter = 0
+    for i in range(len(combat_system.resonators)):
+        if combat_system.resonators[i]:
+            resonator_index = i
+            continue
+        empty_counter += 1
+    if empty_counter == 2 and resonator_index is not None:
+        control_service.toggle_team_member(resonator_index + 1)
+        time.sleep(0.15)
+    # 开启挑战
+    control_service.pick_up()
     combat_system.start()

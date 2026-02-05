@@ -35,7 +35,7 @@ def test_absorption_action():
 
     os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
     logger.info("任务进程开始运行")
-    hwnd_util.set_hwnd_left_top()
+    hwnd_util.set_window_left_top()
 
     context = Context()
     container = Container.build(context)

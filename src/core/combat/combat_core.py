@@ -91,11 +91,16 @@ class ResonatorNameEnum(Enum):
     buling = "卜灵"
 
     # v3.0
+    lynae = "琳奈"
     mornye = "莫宁"
+
+    # v3.1
+    aemeath = "爱弥斯"
+    luukherssen = "陆赫斯"
+
+    # v3.x
     lucilla = "洛瑟菈"
     sigrika = "西格莉卡"
-    luukherssen = "陆赫斯"
-    lynae = "琳奈"
 
     # 缓存
     __value_map = None
@@ -422,7 +427,16 @@ class BaseCombo:
             if not ignore_event and self.event is not None and not self.event.is_set():
                 # 退出前释放按压的按键
                 for key_down_cache in key_down_caches:
-                    self.control_service.key_up(key_down_cache, 0.001)
+                    if key_down_cache in ["a", "z"]:
+                        self.control_service.mouse_left_up(0.001)
+                    elif key_down_cache == "w":
+                        pass
+                    elif key_down_cache == "j":
+                        self.control_service.key_up("SPACE", 0.001)
+                    elif key_down_cache == "d":
+                        self.control_service.mouse_right_up(0.001)
+                    else:
+                        self.control_service.key_up(key_down_cache, 0.001)
                 raise StopError()
             if self.auto_pickup:
                 tap_f_cur_time = time.monotonic()
@@ -430,32 +444,58 @@ class BaseCombo:
                 if tap_f_cur_time - tap_f_time > 0.25 or (i > 0 and i == max_size - 1):
                     tap_f_time = tap_f_cur_time
                     self.control_service.fight_tap("F", 0.001)
-            key, press_time, wait_time = keys[:3]
-            if key == "a":
-                if press_time > 0.2:
-                    raise ValueError("普攻按压时间不可大于0.2，默认统一填写0.05")
-                self.control_service.fight_click(seconds=press_time)
-            elif key == "z":
-                if press_time < 0.3:
-                    raise ValueError("重击按压时间不可小于0.3，默认统一写0.5")
-                self.control_service.fight_click(seconds=press_time)
-            elif key == "w":
-                pass
-            elif key == "j":
-                self.control_service.fight_tap("SPACE", press_time)
-            elif key == "d":
-                # self.control_service.fight_tap("LSHIFT", press_time)
-                self.control_service.fight_right_click(seconds=press_time)
-            else:
-                key_action = keys[3] if len(keys) >= 4 else None
-                if key_action == "down":
-                    self.control_service.key_down(key, press_time)
-                    key_down_caches.add(key)
-                elif key_action == "up":
-                    self.control_service.key_up(key, press_time)
-                    key_down_caches.discard(key)
+            key_src, press_time, wait_time = keys[:3]
+            key = key_src  # a a_down a_up
+            key_action = None  # down up
+            if "_" in key_src:
+                key, key_action = key_src.strip().split("_", 1)
+            if not key_action:
+                if key == "a":
+                    if press_time > 0.2:
+                        raise ValueError("普攻按压时间不可大于0.2，默认统一填写0.05")
+                    self.control_service.fight_click(seconds=press_time)
+                elif key == "z":
+                    if press_time < 0.3:
+                        raise ValueError("重击按压时间不可小于0.3，默认统一写0.5")
+                    self.control_service.fight_click(seconds=press_time)
+                elif key == "w":
+                    pass
+                elif key == "j":
+                    self.control_service.fight_tap("SPACE", press_time)
+                elif key == "d":
+                    # self.control_service.fight_tap("LSHIFT", press_time)
+                    self.control_service.fight_right_click(seconds=press_time)
                 else:
                     self.control_service.fight_tap(key, press_time)
+            else:
+                if key_action == "down":
+                    if key in ["a", "z"]:
+                        self.control_service.mouse_left_down(seconds=press_time)
+                    elif key == "w":
+                        pass
+                    elif key == "j":
+                        self.control_service.key_down("SPACE", press_time)
+                    elif key == "d":
+                        # self.control_service.fight_tap("LSHIFT", press_time)
+                        self.control_service.mouse_right_down(seconds=press_time)
+                    else:
+                        self.control_service.key_down(key, press_time)
+                    key_down_caches.add(key)
+                elif key_action == "up":
+                    if key in ["a", "z"]:
+                        self.control_service.mouse_left_up(seconds=press_time)
+                    elif key == "w":
+                        pass
+                    elif key == "j":
+                        self.control_service.key_up("SPACE", press_time)
+                    elif key == "d":
+                        # self.control_service.fight_tap("LSHIFT", press_time)
+                        self.control_service.mouse_right_up(seconds=press_time)
+                    else:
+                        self.control_service.key_up(key, press_time)
+                    key_down_caches.discard(key)
+                else:
+                    logger.warning("Unknown key action '{}'".format(key_action))
             if wait_time <= 0:
                 continue
             # 最后一下可合轴，显示传入False表示无需等待后摇结束
@@ -468,10 +508,13 @@ class BaseCombo:
 
 
 class CharClassEnum(Enum):
-    MainDPS = "MainDPS"
-    SubDPS = "SubDPS"
-    Support = "Support"
-    Healer = "Healer"
+    """
+    角色分类，用于给编队内角色的出场顺序做排序
+    """
+    MainDPS = "MainDPS"  # 主c
+    SubDPS = "SubDPS"  # 副c，暂时无用，若需要在主c前出场，应标为辅助而非副c，这样才一定能排在前面
+    Support = "Support"  # 辅助，排序先于主副c
+    Healer = "Healer"  # 奶，排序后于主副c
 
 
 class BaseResonator(BaseCombo):
@@ -827,6 +870,11 @@ class TeamMemberSelector:
         return False
 
     def get_cur_member_number(self, resonators: list[BaseResonator]) -> int | None:
+        """
+        获取当前角色编队位置，几号位
+        :param resonators:
+        :return: 返回1或2或3
+        """
         img = self.img_service.screenshot()
         is_exists = [
             self._team_member_1_checker.check(img),

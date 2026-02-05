@@ -10,6 +10,8 @@ from src.core.combat.resonator.ciaccona import Ciaccona
 from src.core.combat.resonator.encore import Encore
 from src.core.combat.resonator.generic import GenericResonator
 from src.core.combat.resonator.jinhsi import Jinhsi
+from src.core.combat.resonator.lynae import Lynae
+from src.core.combat.resonator.mornye import Mornye
 from src.core.combat.resonator.phoebe import Phoebe
 from src.core.combat.resonator.phrolova import Phrolova
 from src.core.combat.resonator.rover import Rover
@@ -53,6 +55,8 @@ class CombatSystem:
         self.ciaccona = Ciaccona(self.control_service, self.img_service)
         self.phoebe = Phoebe(self.control_service, self.img_service)
         self.phrolova = Phrolova(self.control_service, self.img_service)
+        self.lynae = Lynae(self.control_service, self.img_service)
+        self.mornye = Mornye(self.control_service, self.img_service)
 
         self.resonator_map: dict[ResonatorNameEnum, BaseResonator] = {
             ResonatorNameEnum.jinhsi: self.jinhsi,
@@ -64,8 +68,9 @@ class CombatSystem:
             ResonatorNameEnum.sanhua: self.sanhua,
             ResonatorNameEnum.cartethyia: self.cartethyia,
             ResonatorNameEnum.ciaccona: self.ciaccona,
-            ResonatorNameEnum.phoebe: self.phoebe,
-            # ResonatorNameEnum.phrolova: self.phrolova,
+            # ResonatorNameEnum.phoebe: self.phoebe,
+            ResonatorNameEnum.phrolova: self.phrolova,
+            ResonatorNameEnum.lynae: self.lynae,
         }
         self.resonators: list[BaseResonator] | None = None
         self._sorted_resonators: list[tuple[BaseResonator, int]] | None = None
@@ -189,6 +194,7 @@ class CombatSystem:
                 pass
             finally:
                 self.control_service.mouse_left_up()
+                self.control_service.mouse_right_up()
 
     def _next_index(self, index, seq_length) -> int:
         next_index = index + 1
@@ -264,11 +270,21 @@ class CombatSystem:
             if cur_member_number is None:
                 return
             resonator = self.resonators[cur_member_number - 1]
+            # 检查当前角色
             if isinstance(resonator, Camellya):
                 resonator.quit_blossom()
                 # 椿落地会前移，后闪复位
                 if camellya_reset:
                     self.control_service.dash_dodge()
                     time.sleep(0.3)
+                return
+            elif isinstance(resonator, Phrolova):
+                resonator.quit_R()
+
+            # 检查编队中其他角色
+            # for i in range(len(self.resonators)):
+            #     if isinstance(resonator, Phrolova) and i == cur_member_number:
+            #         # self.resonators[i]
+            #         break
         except IndexError as e:
             logger.exception(e)

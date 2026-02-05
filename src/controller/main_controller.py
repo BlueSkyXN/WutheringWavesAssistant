@@ -23,9 +23,10 @@ class TaskOpsEnum(Enum):
 
 class TaskMonitor:
 
-    def __init__(self, running_tasks: dict[str, tuple[ProcessTask, Event]], param_config_path: str):
+    def __init__(self, running_tasks: dict[str, tuple[ProcessTask, Event]], param_config_path: str, gui_win_id: int):
         self.running_tasks: dict[str, tuple[ProcessTask, Event]] = running_tasks
         self.param_config_path = param_config_path
+        self.gui_win_id = gui_win_id
 
         self.context = Context()
 
@@ -168,6 +169,17 @@ class TaskMonitor:
                     if hwnd:
                         logger.info("游戏已重启")
                         self._sleep(10)
+                        try:
+                            from src.util import keymouse_util
+                            # 1. 先获取当前鼠标位置
+                            original_x, original_y = keymouse_util.get_mouse_position()
+                            # 2. 释放鼠标限制（如果有）
+                            keymouse_util.set_mouse_unlocked()
+                            hwnd_util.set_window_left_top_and_below_another(hwnd, self.gui_win_id)
+                            # 5. 将鼠标移回原位
+                            keymouse_util.set_mouse_position(original_x, original_y)
+                        except Exception:
+                            pass
                         return True
                 except KeyboardInterrupt:
                     logger.warning("KeyboardInterrupt")
@@ -266,6 +278,7 @@ class MainController:
         self.task_monitor = None
 
         self.param_config_path = None
+        self.gui_win_id = None
 
     def execute(self, task_name: str, task_ops: str):
         logger.debug("task_name: %s, task_ops: %s", task_name, task_ops)
@@ -284,6 +297,7 @@ class MainController:
                 # TODO Manager
                 kwargs = {}
                 kwargs["PARENT_PID"] = str(os.getpid())
+                kwargs["GUI_WIN_ID"] = str(self.gui_win_id)
                 kwargs["LOG_QUEUE"] = logging_config.get_log_queue()
                 if task_name == "AutoStorySkipProcessTask":
                     kwargs["SKIP_IS_OPEN"] = "True"
@@ -298,7 +312,7 @@ class MainController:
                 task = task_builder.build(args=(event,), kwargs=kwargs, daemon=True)
                 self.running_tasks[task_name] = (task, event)
 
-                self.task_monitor = TaskMonitor(self.running_tasks.copy(), self.param_config_path)
+                self.task_monitor = TaskMonitor(self.running_tasks.copy(), self.param_config_path, self.gui_win_id)
                 kwargs["GAME_PATH"] = self.task_monitor.game_path
                 kwargs["PARAM_CONFIG_SNAPSHOT"] = self.task_monitor.param_config_snapshot
 
@@ -354,6 +368,10 @@ class MainController:
         logger.debug("param_config_path: %s", path)
         self.param_config_path = path
         environs.set_param_config_path(path)
+
+    def set_gui_win_id(self, gui_win_id: int):
+        logger.debug("gui_win_id: %s", gui_win_id)
+        self.gui_win_id = gui_win_id
 
 
 if __name__ == '__main__':

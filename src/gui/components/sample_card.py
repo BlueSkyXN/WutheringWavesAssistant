@@ -8,6 +8,7 @@ from PySide6.QtWidgets import QWidget, QFrame, QLabel, QVBoxLayout, QHBoxLayout,
 from qfluentwidgets import IconWidget, TextWrap, FlowLayout, CardWidget, SwitchButton, IndicatorPosition, \
     ToggleToolButton, FluentIcon, ProgressRing, IndeterminateProgressRing, InfoBar, InfoBarPosition
 
+from ..common.config import paramConfig
 from ..common.globals import globalSignal
 from ..common.signal_bus import signalBus
 from ..common.style_sheet import StyleSheet
@@ -146,6 +147,15 @@ class RunCard(CardWidget):
         if self.button.isChecked():
             if self.checked_task_name:
                 logger.info("任务名: %s", self.checked_task_name)
+
+                if self.checked_task_name == "AutoBossProcessTask" and paramConfig and paramConfig.bossName:
+                    try:
+                        boss_name_list = [item.value for item in paramConfig.bossName.value]
+                        msg = self.tr("{boss_name}").format(boss_name=str(boss_name_list))
+                        self.createTopRightInfoBarTask(msg)
+                    except Exception:
+                        pass
+
                 self.button.setIcon(FluentIcon.PAUSE_BOLD)
                 self.spinner.start()
                 self.running_task_name = self.checked_task_name
@@ -176,6 +186,17 @@ class RunCard(CardWidget):
             isClosable=True,
             position=InfoBarPosition.TOP_RIGHT,
             duration=2500,
+            parent=self.parent().parent().parent()
+        )
+
+    def createTopRightInfoBarTask(self, content: str):
+        InfoBar.success(
+            title=self.tr('Boss Rush: '),
+            content=content,
+            orient=Qt.Horizontal,
+            isClosable=True,
+            position=InfoBarPosition.TOP_RIGHT,
+            duration=8000,
             parent=self.parent().parent().parent()
         )
 

@@ -411,6 +411,10 @@ class ControlService(GameControlService, PlayerControlService, ExtendedControlSe
 class BossInfoService(ABC):
 
     @abstractmethod
+    def get_boss_name_zh_en(self, boss_name_zh: str) -> str:
+        pass
+
+    @abstractmethod
     def is_nightmare(self, boss_name: str) -> bool:
         pass
 

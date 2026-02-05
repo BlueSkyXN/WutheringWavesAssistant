@@ -75,9 +75,10 @@ FAST_TRAVEL_ROUTES: dict[str, list[RouteStep]] = {
     BossNameEnum.ThrenodianLeviathan.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=3)],
     BossNameEnum.Hyvatia.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=4.5)],  # 8
     BossNameEnum.ReactorHusk.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=4.8)],
+    BossNameEnum.Sigillum.value: [RouteStep(direction=Direction.LEFT, mode=MoveMode.WALK, steps=3)],
 }
 
-# RouteStep后的移动方式配置
+# RouteStep后的移动方式配置，没有的也留痕注释掉，方便后续排查
 RESTART_PARAMS: dict[str, RestartParam] = {
     # BossNameEnum.Dreamless.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
     BossNameEnum.FallacyOfNoReturn.value: RestartParam(
@@ -126,13 +127,18 @@ RESTART_PARAMS: dict[str, RestartParam] = {
         check_text=r"击败|海维夏$", run_seconds=(8.0 - 4.5), cycle=20, step=2, check_health_bar=True),
     BossNameEnum.ReactorHusk.value: RestartParam(
         check_text=None, run_seconds=None, cycle=20, step=2, check_health_bar=True),
+    # BossNameEnum.Sigillum.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
 }
 
 
 class BossInfoServiceImpl(BossInfoService):
 
     def __init__(self):
-        pass
+        self._boss_name_map_zh_en: dict[str, str] = {member.value: member.name for member in BossNameEnum}
+
+    def get_boss_name_zh_en(self, boss_name_zh: str) -> str:
+        return self._boss_name_map_zh_en.get(boss_name_zh)
+
 
     def is_nightmare(self, boss_name: str) -> bool:
         """
@@ -156,12 +162,15 @@ class BossInfoServiceImpl(BossInfoService):
             BossNameEnum.TheFalseSovereign.value,
             BossNameEnum.Hyvatia.value,
             BossNameEnum.ReactorHusk.value,
+            BossNameEnum.NamelessExplorer.value,
         ]:
             return True
         return self.is_nightmare(boss_name)
 
     def get_fast_travel_routes(self) -> dict[str, list[RouteStep]]:
+        """ 获取角色快速旅行后需要执行的路径相关参数 """
         return FAST_TRAVEL_ROUTES
 
     def get_restart_params(self) -> dict[str, RestartParam]:
+        """ 获取重新挑战相关移动参数 """
         return RESTART_PARAMS

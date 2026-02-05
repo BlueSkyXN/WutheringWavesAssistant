@@ -42,6 +42,8 @@ class BossNameEnum(Enum):
     ThrenodianLeviathan = "鸣式利维亚坦"
     Hyvatia = "海维夏"
     ReactorHusk = "炉芯机骸"
+    Sigillum = "辛吉勒姆"
+    NamelessExplorer = "无铭探索者"
 
 
 class MoveMode(Enum):
@@ -65,11 +67,11 @@ class RouteStep(BaseModel):
     mode: MoveMode
     steps: int | None = Field(
         default=None,
-        description="移动步数"
+        description="走动步数"
     )
     duration: float | None = Field(
         default=None,
-        description="移动时间，秒"
+        description="跑动时间，秒"
     )
 
 

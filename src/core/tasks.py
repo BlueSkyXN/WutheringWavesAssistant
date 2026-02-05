@@ -260,7 +260,18 @@ def auto_boss_task_run(event: Event, **kwargs):
         ocr_service: OCRService = container.ocr_service()
         control_service: ControlService = container.control_service()
 
-        hwnd_util.set_hwnd_left_top(window_service.window)
+        # 1. 先获取当前鼠标位置
+        original_x, original_y = keymouse_util.get_mouse_position()
+        # 2. 释放鼠标限制（如果有）
+        keymouse_util.set_mouse_unlocked()
+        # 3. 取消游戏窗口的置顶状态
+        hwnd_util.set_window_not_topmost(window_service.window)
+        # 4. 移动窗口
+        gui_win_id = int(kwargs.get("GUI_WIN_ID"))
+        hwnd_util.set_window_left_top_and_below_another(window_service.window, gui_win_id)
+        # 5. 将鼠标移回原位
+        keymouse_util.set_mouse_position(original_x, original_y)
+
         time.sleep(0.2)
         logger.debug(game_path)
         parent_pid = kwargs.get("PARENT_PID")
@@ -335,7 +346,7 @@ def auto_pickup_task_run(event: Event, **kwargs):
     # ocr_service: OCRService = container.ocr_service()
     control_service: ControlService = container.control_service()
 
-    # hwnd_util.set_hwnd_left_top(window_service.window)
+    # hwnd_util.set_window_left_top(window_service.window)
     # time.sleep(0.2)
     logger.debug(game_path)
     parent_pid = kwargs.get("PARENT_PID")
@@ -394,7 +405,7 @@ def auto_story_task_run(event: Event, **kwargs):
     # ocr_service: OCRService = container.ocr_service()
     control_service: ControlService = container.control_service()
 
-    # hwnd_util.set_hwnd_left_top(window_service.window)
+    # hwnd_util.set_window_left_top(window_service.window)
     # time.sleep(0.2)
     logger.debug(game_path)
     parent_pid = kwargs.get("PARENT_PID")
@@ -456,7 +467,7 @@ def daily_activity_task_run(event: Event, **kwargs):
     # ocr_service: OCRService = container.ocr_service()
     control_service: ControlService = container.control_service()
 
-    hwnd_util.set_hwnd_left_top(window_service.window)
+    hwnd_util.set_window_left_top(window_service.window)
     time.sleep(0.2)
     logger.debug(game_path)
     parent_pid = kwargs.get("PARENT_PID")

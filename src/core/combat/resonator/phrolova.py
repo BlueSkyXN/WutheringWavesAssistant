@@ -4,6 +4,7 @@ import time
 import numpy as np
 
 from src.core.combat.combat_core import ColorChecker, BaseResonator, CharClassEnum, ResonatorNameEnum
+from src.core.combat.resonator.generic import GenericResonator
 from src.core.interface import ControlService, ImgService
 
 logger = logging.getLogger(__name__)
@@ -60,7 +61,7 @@ class BasePhrolova(BaseResonator):
         return ResonatorNameEnum.phrolova
 
     def char_class(self) -> list[CharClassEnum]:
-        return [CharClassEnum.SubDPS]
+        return [CharClassEnum.MainDPS]
 
     def energy_count(self, img: np.ndarray) -> int:
         energy_count = 0
@@ -96,96 +97,116 @@ class BasePhrolova(BaseResonator):
         return is_ready
 
 
-class Phrolova(BasePhrolova):
-    # COMBO_SEQ 为训练场单人静态完整连段，后续开发以此为准从中拆分截取
-
-    # 常规轴
-    COMBO_SEQ = [
-        # 声骸技能
-        ["Q", 0.05, 0.30],
-        ["a", 0.05, 0.30],
-        ["a", 0.05, 0.30],
-        ["a", 0.05, 1.60],
-        ["j", 0.05, 1.20],
-        # 共鸣技能 Ea 一离火
-        ["E", 0.05, 1.25],
-        ["a", 0.05, 1.30],
-        # ["E", 0.05, 1.25],
-        # ["a", 0.05, 1.30],
-        # 间隔
-        ["w", 0.00, 1.20],
-        # 普攻 5a 一离火
-        ["a", 0.05, 0.31],
-        ["a", 0.05, 0.50],
-        ["a", 0.05, 0.50],
-        ["a", 0.05, 1.05],
-        ["a", 0.05, 0.00],
-        ["w", 0.05, 0.75],
-        ["j", 0.05, 1.2],
-        # 共鸣技能 Ea 一离火
-        ["E", 0.05, 1.25],
-        ["a", 0.05, 1.30],
-        ["w", 0.00, 1.20],
-        # 普攻 5a 一离火
-        ["a", 0.05, 0.31],
-        ["a", 0.05, 0.50],
-        ["a", 0.05, 0.50],
-        ["a", 0.05, 1.05],
-        ["a", 0.05, 0.00],
-        ["w", 0.05, 0.75],
-        ["j", 0.05, 1.20],
-        # zRz
-        ["z", 0.50, 0.90],
-        ["R", 0.05, 1.65],
-        ["z", 1.90, 0.00],
-        ["w", 0.00, 1.00],
-        ["j", 0.05, 0.00],
-    ]
-
-    def __init__(self, control_service: ControlService, img_service: ImgService):
-        super().__init__(control_service, img_service)
-
-    def Ea(self):
-        logger.debug("Ea")
-        return [
-            # 共鸣技能 Ea 一离火
-            # ["E", 0.05, 1.25],
-            # ["a", 0.05, 1.30],
-
-            ["E", 0.05, 0.30],  # 冗余
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.30],
-
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.40],
-            ["a", 0.05, 0.30],
-        ]
-
-    def E(self):
-        logger.debug("E")
-        return [
-            # 共鸣技能 E
-            ["E", 0.05, 1.25],
-        ]
-
-    def a2(self):
-        logger.debug("a2")
-        return [
-            # 普攻 2a
-            ["a", 0.05, 0.31],
-            # ["a", 0.05, 0.50],
-            ["a", 0.05, 0.30],
-        ]
-
-    # def a5(self):
-    #     logger.debug("a5")
+class Phrolova(GenericResonator):
+# class Phrolova(BasePhrolova):
+    # # COMBO_SEQ 为训练场单人静态完整连段，后续开发以此为准从中拆分截取
+    #
+    # # 常规轴
+    # COMBO_SEQ = [
+    #     # 声骸技能
+    #     ["Q", 0.05, 0.30],
+    #     ["a", 0.05, 0.30],
+    #     ["a", 0.05, 0.30],
+    #     ["a", 0.05, 1.60],
+    #     ["j", 0.05, 1.20],
+    #     # 共鸣技能 Ea 一离火
+    #     ["E", 0.05, 1.25],
+    #     ["a", 0.05, 1.30],
+    #     # ["E", 0.05, 1.25],
+    #     # ["a", 0.05, 1.30],
+    #     # 间隔
+    #     ["w", 0.00, 1.20],
+    #     # 普攻 5a 一离火
+    #     ["a", 0.05, 0.31],
+    #     ["a", 0.05, 0.50],
+    #     ["a", 0.05, 0.50],
+    #     ["a", 0.05, 1.05],
+    #     ["a", 0.05, 0.00],
+    #     ["w", 0.05, 0.75],
+    #     ["j", 0.05, 1.2],
+    #     # 共鸣技能 Ea 一离火
+    #     ["E", 0.05, 1.25],
+    #     ["a", 0.05, 1.30],
+    #     ["w", 0.00, 1.20],
+    #     # 普攻 5a 一离火
+    #     ["a", 0.05, 0.31],
+    #     ["a", 0.05, 0.50],
+    #     ["a", 0.05, 0.50],
+    #     ["a", 0.05, 1.05],
+    #     ["a", 0.05, 0.00],
+    #     ["w", 0.05, 0.75],
+    #     ["j", 0.05, 1.20],
+    #     # zRz
+    #     ["z", 0.50, 0.90],
+    #     ["R", 0.05, 1.65],
+    #     ["z", 1.90, 0.00],
+    #     ["w", 0.00, 1.00],
+    #     ["j", 0.05, 0.00],
+    # ]
+    #
+    # def __init__(self, control_service: ControlService, img_service: ImgService):
+    #     super().__init__(control_service, img_service)
+    #
+    # def Ea(self):
+    #     logger.debug("Ea")
+    #     return [
+    #         # 共鸣技能 Ea 一离火
+    #         # ["E", 0.05, 1.25],
+    #         # ["a", 0.05, 1.30],
+    #
+    #         ["E", 0.05, 0.30],  # 冗余
+    #         ["a", 0.05, 0.30],
+    #         ["a", 0.05, 0.30],
+    #         ["a", 0.05, 0.30],
+    #
+    #         ["a", 0.05, 0.30],
+    #         ["a", 0.05, 0.30],
+    #         ["a", 0.05, 0.40],
+    #         ["a", 0.05, 0.30],
+    #     ]
+    #
+    # def E(self):
+    #     logger.debug("E")
+    #     return [
+    #         # 共鸣技能 E
+    #         ["E", 0.05, 1.25],
+    #     ]
+    #
+    # def a2(self):
+    #     logger.debug("a2")
+    #     return [
+    #         # 普攻 2a
+    #         ["a", 0.05, 0.31],
+    #         # ["a", 0.05, 0.50],
+    #         ["a", 0.05, 0.30],
+    #     ]
+    #
+    # # def a5(self):
+    # #     logger.debug("a5")
+    # #     return [
+    # #         # 普攻 5a 一离火
+    # #         ["a", 0.05, 0.31],
+    # #         ["a", 0.05, 0.50],
+    # #         ["a", 0.05, 0.50],
+    # #
+    # #         # ["a", 0.05, 1.05],
+    # #         ["a", 0.05, 0.35],
+    # #         ["a", 0.05, 0.35],
+    # #         ["a", 0.05, 0.20],
+    # #         ["a", 0.05, 0.10],
+    # #
+    # #         ["a", 0.05, 0.00],
+    # #         ["w", 0.05, 0.75],
+    # #     ]
+    #
+    # def a3(self):
+    #     logger.debug("a3")
     #     return [
     #         # 普攻 5a 一离火
-    #         ["a", 0.05, 0.31],
-    #         ["a", 0.05, 0.50],
-    #         ["a", 0.05, 0.50],
+    #         # ["a", 0.05, 0.31],
+    #         # ["a", 0.05, 0.50],
+    #         ["a", 0.05, 0.25],
+    #         ["a", 0.05, 0.20],
     #
     #         # ["a", 0.05, 1.05],
     #         ["a", 0.05, 0.35],
@@ -196,178 +217,93 @@ class Phrolova(BasePhrolova):
     #         ["a", 0.05, 0.00],
     #         ["w", 0.05, 0.75],
     #     ]
-
-    def a3(self):
-        logger.debug("a3")
-        return [
-            # 普攻 5a 一离火
-            # ["a", 0.05, 0.31],
-            # ["a", 0.05, 0.50],
-            ["a", 0.05, 0.25],
-            ["a", 0.05, 0.20],
-
-            # ["a", 0.05, 1.05],
-            ["a", 0.05, 0.35],
-            ["a", 0.05, 0.35],
-            ["a", 0.05, 0.20],
-            ["a", 0.05, 0.10],
-
-            ["a", 0.05, 0.00],
-            ["w", 0.05, 0.75],
-        ]
-
-    def a(self):
-        logger.debug("a")
-        return [
-            ["a", 0.05, 0.31],
-        ]
-
-    # def zRz(self):
+    #
+    # def a(self):
+    #     logger.debug("a")
     #     return [
-    #         # zRz 实战效果不好，若被打断等情况，会长时间原地发呆
-    #         ["z", 0.60, 0.90],
+    #         ["a", 0.05, 0.31],
+    #     ]
+    #
+    # # def zRz(self):
+    # #     return [
+    # #         # zRz 实战效果不好，若被打断等情况，会长时间原地发呆
+    # #         ["z", 0.60, 0.90],
+    # #         ["R", 0.05, 1.65],
+    # #         ["z", 1.90, 1.00],
+    # #     ]
+    #
+    # def Rz(self):
+    #     logger.debug("Rz")
+    #     return [
+    #         # Rz
     #         ["R", 0.05, 1.65],
-    #         ["z", 1.90, 1.00],
+    #         ["z", 2.00, 1.00],
+    #     ]
+    #
+    # def zR(self):
+    #     logger.debug("zR")
+    #     return [
+    #         # zR
+    #         # ["z", 0.60, 1.10],
+    #         # ["R", 0.05, 1.65],
+    #
+    #         ["z", 0.60, 0.00],
+    #         ["a", 0.05, 0.30],
+    #         ["a", 0.05, 0.30],
+    #         ["a", 0.05, 0.30],
+    #         ["a", 0.05, 0.10],
+    #
+    #         ["R", 0.05, 1.65],
+    #     ]
+    #
+    # def z(self):
+    #     logger.debug("z")
+    #     return [
+    #         # z
+    #         ["z", 0.70, 1.10],
+    #     ]
+    #
+    # def az(self):
+    #     logger.debug("az")
+    #     return [
+    #         # az
+    #         ["a", 0.05, 0.31],
+    #         ["z", 0.70, 1.10],
+    #     ]
+    #
+    # def Qa3(self):
+    #     logger.debug("Qa3")
+    #     return [
+    #         # 声骸技能，梦魇摩托
+    #         ["Q", 0.05, 0.30],
+    #         ["a", 0.05, 0.30],
+    #         ["a", 0.05, 0.30],
+    #         ["a", 0.05, 1.60],
+    #     ]
+    #
+    # def Q(self):
+    #     logger.debug("Q")
+    #     return [
+    #         # 声骸技能，普通摩托
+    #         ["Q", 0.05, 0.30],
+    #     ]
+    #
+    # def R(self):
+    #     logger.debug("R")
+    #     return [
+    #         ["R", 0.05, 1.65],
     #     ]
 
-    def Rz(self):
-        logger.debug("Rz")
-        return [
-            # Rz
-            ["R", 0.05, 1.65],
-            ["z", 2.00, 1.00],
-        ]
-
-    def zR(self):
-        logger.debug("zR")
-        return [
-            # zR
-            # ["z", 0.60, 1.10],
-            # ["R", 0.05, 1.65],
-
-            ["z", 0.60, 0.00],
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.10],
-
-            ["R", 0.05, 1.65],
-        ]
-
-    def z(self):
-        logger.debug("z")
-        return [
-            # z
-            ["z", 0.70, 1.10],
-        ]
-
-    def az(self):
-        logger.debug("az")
-        return [
-            # az
-            ["a", 0.05, 0.31],
-            ["z", 0.70, 1.10],
-        ]
-
-    def Qa3(self):
-        logger.debug("Qa3")
-        return [
-            # 声骸技能，梦魇摩托
-            ["Q", 0.05, 0.30],
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 0.30],
-            ["a", 0.05, 1.60],
-        ]
-
-    def Q(self):
-        logger.debug("Q")
-        return [
-            # 声骸技能，普通摩托
-            ["Q", 0.05, 0.30],
-        ]
-
-    def R(self):
+    def quit_R(self):
         logger.debug("R")
         return [
-            ["R", 0.05, 1.65],
+            ["R", 0.60, 0.30],
         ]
 
-    def full_combo(self):
-        # 测试用，一整套连招
-        return self.COMBO_SEQ
-
-    def combo(self):
-
-        time.sleep(0.1)
-        self.combo_action(self.a2(), False)  # 入场先打两个普攻，触发心眼冲
-        time.sleep(0.2)
-
-        img = self.img_service.screenshot()
-        energy_count = self.energy_count(img)
-
-        # 4离火 z
-        if energy_count == 4:
-            self.combo_action(self.z(), False)
-            time.sleep(0.3)
-            self.combo_action(self.a2(), False)  # 凑够0.9秒后摇时间
-            time.sleep(0.3)
-            # 空中重击会变成下落攻击，再次确认
-            img = self.img_service.screenshot()
-            energy_count = self.energy_count(img)
-            if energy_count == 4:
-                self.combo_action(self.z(), False)
-                time.sleep(0.4)
-                img = self.img_service.screenshot()
-                energy_count = self.energy_count(img)
-                if energy_count != 4:
-                    time.sleep(0.6)
-                    self.combo_action(self.Rz(), False)
-            else:
-                self.combo_action(self.E(), False)
-            return
-
-        # is_concerto_energy_ready = self.is_concerto_energy_ready(img)
-        is_resonance_skill_ready = self.is_resonance_skill_ready(img)
-        is_echo_skill_ready = self.is_echo_skill_ready(img)
-        is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
-
-        # 3离火，打满离火
-        if energy_count == 3 and is_resonance_skill_ready:
-            self.combo_action(self.Ea(), True)
-            img = self.img_service.screenshot()
-            energy_count = self.energy_count(img)
-            is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
-            if energy_count == 4:
-                self.combo_action(self.z(), False)
-                img = self.img_service.screenshot()
-                is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
-                if is_resonance_liberation_ready:
-                    time.sleep(0.9)
-                    self.combo_action(self.Rz(), False)
-            elif is_resonance_liberation_ready:
-                self.combo_action(self.Rz(), False)
-            return
-
-        # 低离火有大直接开
-        if energy_count < 3 and is_resonance_liberation_ready:
-            self.combo_action(self.Rz(), False)
-            return
-
-        # 兜底，打E合轴或普攻
-        if is_resonance_skill_ready:
-            self.combo_action(self.E(), is_echo_skill_ready)
-        else:
-            self.combo_action(self.a3(), False)
-            time.sleep(0.3)
-            img = self.img_service.screenshot()
-            energy_count = self.energy_count(img)
-            if energy_count == 4:
-                self.combo_action(self.z(), False)
-                return
-            self.combo_action(self.a(), False)
-        # 摩托最后放合轴
-        if is_echo_skill_ready:
-            # 随机放梦魇摩托或普通摩托
-            # random_q = self.Qa3() if self.random_float() < 0.33 else self.Q()
-            # self.combo_action(random_q, False)
-            self.combo_action(self.Q(), False)
+    # def full_combo(self):
+    #     # 测试用，一整套连招
+    #     return self.COMBO_SEQ
+    #
+    # def combo(self):
+    #
+    #     pass

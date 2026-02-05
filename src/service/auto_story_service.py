@@ -150,15 +150,15 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         else:
             if not self._is_auto_play_enabled:
                 # 打开自动播放
-                self.page_action(self._auto_play_page, src_img, img, ocr_results)
-                self.page_action(self._auto_play2_page, src_img, img, ocr_results)
+                if not self.page_action(self._auto_play_page, src_img, img, ocr_results):
+                    self.page_action(self._auto_play2_page, src_img, img, ocr_results)
                 time.sleep(0.005)
-                if self.page_action(self._auto_play_open_page, src_img, img, ocr_results):
-                    # self._is_auto_play_enabled = True
-                    pass
-                if self.page_action(self._auto_play_open2_page, src_img, img, ocr_results):
-                    # self._is_auto_play_enabled = True
-                    pass
+                # if self.page_action(self._auto_play_open_page, src_img, img, ocr_results):
+                #     # self._is_auto_play_enabled = True
+                #     pass
+                # if self.page_action(self._auto_play_open2_page, src_img, img, ocr_results):
+                #     # self._is_auto_play_enabled = True
+                #     pass
                 time.sleep(0.005)
 
             # 剧情对话框，不跳过，一句一句自动过剧情
@@ -228,6 +228,8 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         def skip_page_action(positions: dict[str, Position]) -> bool:
             time.sleep(0.1)
             position = positions.get("跳过|SKIP")
+            self._control_service.click(*position.center)
+            time.sleep(0.1)
             self._control_service.click(*position.center)
             time.sleep(0.1)
             return True
@@ -344,7 +346,7 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         )
 
         auto_play_2_page = Page(
-            name="自动播放|AutoPlay-2-电影黑边",
+            name="自动播放|AutoPlay-2",  # 电影黑边
             screenshot={
                 Languages.ZH: [
                     "Dialogue_001.png",
@@ -408,7 +410,7 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         )
 
         auto_play_open2_page = Page(
-            name="自动播放已开启|AutoPlayEnabled-2-电影黑边",
+            name="自动播放已开启|AutoPlayEnabled-2",  # 电影黑边
             screenshot={
                 Languages.ZH: [
                     "",
@@ -477,7 +479,7 @@ class AutoStoryServiceImpl(PageEventAbstractService):
         )
 
         dialogue2_page = Page(
-            name="对话框|Dialogue-2-电影黑边",
+            name="对话框|Dialogue-2",  # 电影黑边
             screenshot={
                 Languages.ZH: [
                     "Dialogue_001.png",

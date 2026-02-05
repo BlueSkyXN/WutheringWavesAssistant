@@ -43,6 +43,7 @@ def run():
     globalSignal.guiExistSignal.connect(gui_is_exist)
     globalSignal.closeMainWindowSignal.connect(server.stop)
     globalSignal.paramConfigPathSignal.connect(server.set_param_config_path)  # 动态告诉后端配置文件的路径，要在emit前绑定好
+    globalSignal.guiWinId.connect(server.set_gui_win_id)
 
     # 启动qt
     from src.gui.gui import wwa

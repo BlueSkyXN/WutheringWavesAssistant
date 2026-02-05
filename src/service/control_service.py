@@ -246,7 +246,7 @@ class Win32ExtendedControlServiceImpl(ExtendedControlService, BaseControlService
         return pos
 
     def set_mouse_position(self, x: int, y: int):
-        keymouse_util.set_mouse_position(self._window_service.window, x, y)
+        keymouse_util.set_mouse_position(x, y)
 
     def get_alt_key_state(self):
         key_state = keymouse_util.get_key_state(win32con.VK_MENU)
@@ -257,9 +257,9 @@ class Win32ExtendedControlServiceImpl(ExtendedControlService, BaseControlService
     def set_mouse_position_to_bottom_right(self):
         x1, y1, x2, y2 = self._window_service.get_client_rect_on_screen()
         x, y = x2 - 1, y2 // 2
-        keymouse_util.set_mouse_position(self._window_service.window, x, y)
+        keymouse_util.set_mouse_position(x, y)
         time.sleep(0.001)
-        keymouse_util.set_mouse_position(self._window_service.window, x, y)
+        keymouse_util.set_mouse_position(x, y)
         time.sleep(0.1)
 
     def mouse_left_down(self, x: int | float = 0, y: int | float = 0, seconds: float = 0.0):

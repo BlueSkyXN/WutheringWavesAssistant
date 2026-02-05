@@ -1,3 +1,4 @@
+import ctypes
 import logging
 import random
 import time
@@ -224,8 +225,13 @@ def get_mouse_position():
 
 
 # noinspection PyUnresolvedReferences
-def set_mouse_position(hwnd, x: int, y: int):
+def set_mouse_position(x: int, y: int):
     win32api.SetCursorPos((x, y))
+
+
+def set_mouse_unlocked():
+    # 解除鼠标限制（如果有）
+    ctypes.windll.user32.ClipCursor(None)
 
 
 def input_char(hwnd, char, seconds: float = 0.0):

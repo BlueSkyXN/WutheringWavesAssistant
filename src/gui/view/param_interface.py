@@ -975,7 +975,7 @@ class ParamInterface(ScrollArea):
             FIF.LABEL,
             # self.tr('选择刷哪些boss'),
             self.tr('Target Boss Names'),
-            self.tr("可任选。建议大世界选三个循环刷，梦魇和副本里的选一个单刷。日常可刷梦魇哀声鸷、无妄者"),
+            self.tr("可任选。日常可刷梦魇哀声鸷来合成1c3c。梦魇或副本内boss建议单刷。"),
             # self.tr("Choose any bosses, suggested: one for instances and nightmare, three for open world"),
             texts=None,
             parent=self.bossGroup
@@ -1022,7 +1022,7 @@ class ParamInterface(ScrollArea):
         self.autoCombatCard = AutoCombatSwitchSettingCard(
             FIF.LABEL,
             self.tr('智能连招Beta'),
-            self.tr('默认开启，推荐角色: 守岸人、长离、今汐、安可、维里奈、椿、散华、卡提希娅'),
+            self.tr('默认开启，支持任意角色，建议带一个奶。'),
             configItem=paramConfig.autoCombat,
             parent=self.bossGroup
         )
