@@ -115,10 +115,6 @@
 3. **性价比优先** - 入场先打 a3 性价比攻击，再判断是否有大招
 4. **Boss 血量判断** - 进阶轴需要 Boss 血量 > 0.01 才执行
 
-## 已知问题
-
-⚠️ `rest_mass_energy_count()` 方法中第 126 行存在 Bug：`self._rest_mass_energy_80_point.check(img)` 应为 `self._rest_mass_energy_80_checker.check(img)`。详见 [ISSUES.md](../ISSUES.md)。
-
 ---
 
-*最后更新: 2026-02-06*
+*最后更新: 2026-02-07*

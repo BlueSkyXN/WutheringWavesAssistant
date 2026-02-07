@@ -155,11 +155,6 @@ is_avatar_cartethyia_attack_done = False  # 化身·小卡是否已打过一套�
 3. **运行时状态变量** - `is_avatar_cartethyia_attack_done` 跟踪化身小卡的攻击状态
 4. **Boss 血量判断** - 多处检查 Boss 血量 ≤ 0.01 提前结束，避免空输出
 
-## 已知问题
-
-- `is_resonance_skill_fleurdelys_2_ready()` 使用了错误的 checker（E1 而非 E2），详见 [ISSUES.md](../ISSUES.md)
-- `fleurdelys_to_avatar_cartethyia_Ra3()` 方法的日志名称与实际功能不符
-
 ---
 
-*最后更新: 2026-02-06*
+*最后更新: 2026-02-07*

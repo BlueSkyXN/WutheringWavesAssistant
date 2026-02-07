@@ -4,11 +4,13 @@
 
 ---
 
-## 🐛 已确认的 Bug
+## ✅ 已修复的 Bug (v3.1.0 Alpha)
 
-### 1. 莫宁 (Mornye) `rest_mass_energy_count` 方法调用错误
+### 1. [已修复] 莫宁 (Mornye) `rest_mass_energy_count` 方法调用错误
 
 **文件**: `src/core/combat/resonator/mornye.py` 第 126 行
+
+**修复状态**: ✅ 已在 commit 1100d78 中修复
 
 **问题**: 对列表对象调用了 `.check()` 方法，而不是对检测器对象调用。
 
@@ -16,8 +18,8 @@
 # 错误代码
 if self._rest_mass_energy_80_point.check(img):   # ← _point 是列表，没有 check 方法
 
-# 正确代码
-if self._rest_mass_energy_80_checker.check(img):  # ← 应该用 _checker
+# 修复后
+if self._rest_mass_energy_80_checker.check(img):  # ← 使用 _checker
 ```
 
 **影响**: 调用 `rest_mass_energy_count()` 时会抛出 `AttributeError`，导致莫宁角色在检测静质量能时崩溃。
@@ -26,9 +28,11 @@ if self._rest_mass_energy_80_checker.check(img):  # ← 应该用 _checker
 
 ---
 
-### 2. 卡提希娅 (Cartethyia) `is_resonance_skill_fleurdelys_2_ready` 使用错误的 checker
+### 2. [已修复] 卡提希娅 (Cartethyia) `is_resonance_skill_fleurdelys_2_ready` 使用错误的 checker
 
-**文件**: `src/core/combat/resonator/cartethyia.py` 第 153-155 行
+**文件**: `src/core/combat/resonator/cartethyia.py` 第 154 行
+
+**修复状态**: ✅ 已在 commit 1100d78 中修复
 
 **问题**: `is_resonance_skill_fleurdelys_2_ready` 方法检查的是 E1 的 checker 而不是 E2 的 checker。
 
@@ -38,19 +42,45 @@ def is_resonance_skill_fleurdelys_2_ready(self, img: np.ndarray) -> bool:
     is_ready = self._resonance_skill_fleurdelys_checker.check(img)  # ← 用了E1的checker
     logger.debug(f"芙露德莉斯-共鸣技能 E2: {is_ready}")
 
-# 正确代码
+# 修复后
 def is_resonance_skill_fleurdelys_2_ready(self, img: np.ndarray) -> bool:
-    is_ready = self._resonance_skill_fleurdelys_2_checker.check(img)  # ← 应该用E2的checker
+    is_ready = self._resonance_skill_fleurdelys_2_checker.check(img)  # ← 使用E2的checker
     logger.debug(f"芙露德莉斯-共鸣技能 E2: {is_ready}")
 ```
 
 **影响**: E2 技能的就绪状态检测始终返回与 E1 相同的结果，无法正确区分两个技能状态。
 
-**严重程度**: 🟡 中 - 逻辑错误（当前 combo() 中未直接调用此方法，但在注释中有引用）
+**严重程度**: 🟡 中 - 逻辑错误
 
 ---
 
-### 3. 菲比 (Phoebe) `combo()` 方法为空实现
+### 3. [已修复] 卡提希娅 (Cartethyia) `fleurdelys_to_avatar_cartethyia_Ra3` 日志名称错误
+
+**文件**: `src/core/combat/resonator/cartethyia.py` 第 718 行
+
+**修复状态**: ✅ 已在 commit 1100d78 中修复
+
+**问题**: 方法名是 `fleurdelys_to_avatar_cartethyia_Ra3`（大卡切小卡），但日志输出的名称是 `avatar_cartethyia_to_fleurdelys_Ra3`（小卡切大卡），方向完全相反。
+
+```python
+# 错误代码
+def fleurdelys_to_avatar_cartethyia_Ra3(self):
+    logger.debug("avatar_cartethyia_to_fleurdelys_Ra3")  # ← 日志名称反了
+
+# 修复后
+def fleurdelys_to_avatar_cartethyia_Ra3(self):
+    logger.debug("fleurdelys_to_avatar_cartethyia_Ra3")  # ← 名称正确
+```
+
+**影响**: 调试时日志信息误导，不影响运行时功能。
+
+**严重程度**: 🟢 低 - 仅影响调试
+
+---
+
+## 🐛 待修复的 Bug
+
+### 1. 菲比 (Phoebe) `combo()` 方法为空实现
 
 **文件**: `src/core/combat/resonator/phoebe.py` 第 516-530 行
 
@@ -65,23 +95,6 @@ def combo(self):
 **影响**: 菲比上场后不会执行任何操作，角色原地站立。不过菲比未注册到 `resonator_map`（第 72 行被注释），所以实际使用时会回退到通用连招。
 
 **严重程度**: 🟢 低 - 未完成功能，已通过注释禁用
-
----
-
-### 4. 卡提希娅 (Cartethyia) `fleurdelys_to_avatar_cartethyia_Ra3` 日志名称错误
-
-**文件**: `src/core/combat/resonator/cartethyia.py` 第 717-718 行
-
-**问题**: 方法名是 `fleurdelys_to_avatar_cartethyia_Ra3`（大卡切小卡），但日志输出的名称是 `avatar_cartethyia_to_fleurdelys_Ra3`（小卡切大卡），方向完全相反。
-
-```python
-def fleurdelys_to_avatar_cartethyia_Ra3(self):
-    logger.debug("avatar_cartethyia_to_fleurdelys_Ra3")  # ← 日志名称反了
-```
-
-**影响**: 调试时日志信息误导，不影响运行时功能。
-
-**严重程度**: 🟢 低 - 仅影响调试
 
 ---
 
@@ -117,4 +130,4 @@ def fleurdelys_to_avatar_cartethyia_Ra3(self):
 
 ---
 
-*最后更新: 2026-02-06*
+*最后更新: 2026-02-07*
