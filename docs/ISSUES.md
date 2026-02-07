@@ -78,17 +78,51 @@ def fleurdelys_to_avatar_cartethyia_Ra3(self):
 
 ---
 
+### 4. [已修复] 莫宁 (Mornye) `energy_count` 方法未实现
+
+**文件**: `src/core/combat/resonator/mornye.py` 第 401 行
+
+**修复状态**: ✅ 已修复
+
+**问题**: `Mornye` 类的 `combo()` 方法在第 401 行调用了 `self.energy_count(img)`，但 `BaseMornye` 没有实现 `energy_count()` 方法。调用的是 `BaseResonator` 中的抽象方法，会抛出 `NotImplementedError`。
+
+```python
+# 错误代码
+def combo(self):
+    energy_count = self.energy_count(img)  # ← BaseMornye 没有实现这个方法
+    if energy_count == 3: ...
+
+# 修复后
+class BaseMornye(BaseResonator):
+    def energy_count(self, img: np.ndarray) -> int:
+        """
+        Convert rest_mass_energy percentage to stack count.
+        Mapping: 0% -> 0, 20% -> 1, 50% -> 3, 80% -> 5
+        """
+        energy_percentage = self.rest_mass_energy_count(img)
+        if energy_percentage >= 80:
+            return 5
+        elif energy_percentage >= 50:
+            return 3
+        elif energy_percentage >= 20:
+            return 1
+        else:
+            return 0
+```
+
+**影响**: 调用 `energy_count()` 时会抛出 `NotImplementedError`，导致莫宁角色在战斗中崩溃。
+
+**严重程度**: 🔴 高 - 运行时错误
+
+---
+
 ## ⚠️ 潜在风险点
 
-### 1. 莫宁 (Mornye) `energy_count` 使用未实现的 `BaseResonator.energy_count`
-
-`Mornye` 类的 `combo()` 方法在第 386 行调用了 `self.energy_count(img)`，但 `Mornye` 没有重写 `energy_count()` 方法，而 `BaseMornye` 中的 `rest_mass_energy_count()` 才是正确的能量检测方法。这里调用的是 `BaseResonator` 中的默认实现，可能返回不正确的结果。
-
-### 2. 硬编码像素坐标
+### 1. 硬编码像素坐标
 
 所有角色的技能检测坐标和颜色值都是基于 1280×720 分辨率硬编码的。虽然 `DynamicPointTransformer` 提供了分辨率适配，但颜色值在不同显示设置（HDR、色彩配置、显卡滤镜）下可能不匹配。
 
-### 3. 夏空 (Ciaccona) 唱歌状态超时硬编码
+### 2. 夏空 (Ciaccona) 唱歌状态超时硬编码
 
 `Ciaccona._singing_timeout_seconds = 34.5` 这个超时时间是硬编码的。如果游戏版本更新改变了大招持续时间，需要手动修改代码。
 

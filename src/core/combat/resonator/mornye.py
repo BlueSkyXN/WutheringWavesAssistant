@@ -128,6 +128,21 @@ class BaseMornye(BaseResonator):
         logger.debug(f"{self.resonator_name().value}-静质量能: {energy_count}格")
         return energy_count
 
+    def energy_count(self, img: np.ndarray) -> int:
+        """
+        Convert rest_mass_energy percentage to stack count.
+        Mapping: 0% -> 0, 20% -> 1, 50% -> 3, 80% -> 5
+        """
+        energy_percentage = self.rest_mass_energy_count(img)
+        if energy_percentage >= 80:
+            return 5
+        elif energy_percentage >= 50:
+            return 3
+        elif energy_percentage >= 20:
+            return 1
+        else:
+            return 0
+
     def is_heavy_attack_geopotential_shift_ready(self, img: np.ndarray) -> bool:
         is_ready = self._heavy_attack_geopotential_shift_checker.check(img)
         logger.debug(f"{self.resonator_name().value}-重击·位势转换: {is_ready}")
