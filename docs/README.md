@@ -41,16 +41,6 @@
 
 ---
 
-### [ISSUES.md](./ISSUES.md) - 发现的程序问题
-
-**代码审查中发现的问题清单**：
-
-- 🐛 已确认的 Bug
-- ⚠️ 潜在风险点
-- 💡 改进建议
-
----
-
 ### [CONTRIBUTING_COMBO.md](./CONTRIBUTING_COMBO.md) - 连招开发贡献指南 ⭐️
 
 **为新角色开发定制连招的完整教程**：
@@ -96,7 +86,6 @@
 2. **配置项目** → 参考 [CONFIG.md](./CONFIG.md) 和 `config.yaml`
 3. **战斗系统** → 阅读 [COMBAT_SYSTEM.md](./COMBAT_SYSTEM.md) 了解连招机制
 4. **角色详情** → 查看 [resonators/](./resonators/) 目录下各角色文档
-5. **已知问题** → 查看 [ISSUES.md](./ISSUES.md) 了解已知 Bug 和改进方向
 
 ### 开发贡献
 
