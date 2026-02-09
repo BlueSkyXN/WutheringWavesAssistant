@@ -181,3 +181,4 @@ config.yaml
 .pre-commit-config.yaml
 tests/test/
 WWA_updater.exe
+CLAUDE.md
