@@ -71,6 +71,7 @@ class CombatSystem:
             # ResonatorNameEnum.phoebe: self.phoebe,
             ResonatorNameEnum.phrolova: self.phrolova,
             ResonatorNameEnum.lynae: self.lynae,
+            ResonatorNameEnum.mornye: self.mornye,
         }
         self.resonators: list[BaseResonator] | None = None
         self._sorted_resonators: list[tuple[BaseResonator, int]] | None = None
