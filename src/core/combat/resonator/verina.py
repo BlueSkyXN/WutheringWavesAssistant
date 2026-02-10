@@ -14,7 +14,7 @@ class BaseVerina(BaseResonator):
     def __init__(self, control_service: ControlService, img_service: ImgService):
         super().__init__(control_service, img_service)
 
-        # 协奏 左下血条旁红圈
+        # 协奏 左下血条旁黄圈
         self._concerto_energy_checker = ColorChecker.concerto_spectro()
 
         # 能量1 血条上方的4格能量
