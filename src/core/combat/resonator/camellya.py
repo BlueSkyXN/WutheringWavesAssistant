@@ -3,7 +3,8 @@ import time
 
 import numpy as np
 
-from src.core.combat.combat_core import ColorChecker, BaseResonator, CharClassEnum, LogicEnum, ResonatorNameEnum
+from src.core.combat.combat_core import ColorChecker, BaseResonator, CharClassEnum, LogicEnum, ResonatorNameEnum, \
+    ScenarioEnum
 from src.core.interface import ControlService, ImgService
 
 logger = logging.getLogger(__name__)
@@ -475,6 +476,13 @@ class Camellya(BaseCamellya):
         # 测试用，一整套连招
         return self.COMBO_SEQ
 
+    def exit_special_state(self, scenario_enum: ScenarioEnum | None = None):
+        logger.debug("quit_blossom")
+        self.combo_action(self.ja(), True, ignore_event=True)
+        # 椿落地会前移，后闪复位
+        self.control_service.dash_dodge()
+        time.sleep(0.3)
+
     def combo(self):
         # 变奏
         self.combo_action(self.a3(), True)
@@ -572,7 +580,3 @@ class Camellya(BaseCamellya):
             return
 
         # self.combo_action(self.Q(), False)
-
-    def quit_blossom(self):
-        logger.debug("quit_blossom")
-        self.combo_action(self.ja(), True, ignore_event=True)

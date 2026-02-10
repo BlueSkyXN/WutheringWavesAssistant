@@ -517,6 +517,14 @@ class CharClassEnum(Enum):
     Healer = "Healer"  # 奶，排序后于主副c
 
 
+class ScenarioEnum(Enum):
+    """
+    退出特殊状态的使用场景
+    """
+    BeforeEchoSearch = "BeforeEchoSearch"  # 战斗结束后，搜索声骸前
+    BeforeGoingToBoss = "BeforeGoingToBoss"  # 传送结束后，去往boss前
+
+
 class BaseResonator(BaseCombo):
     """ 共鸣者 """
 
@@ -603,6 +611,9 @@ class BaseResonator(BaseCombo):
 
     def is_resonance_liberation_ready(self, img: np.ndarray) -> bool:
         raise NotImplementedError()
+
+    def exit_special_state(self, scenario_enum: ScenarioEnum | None = None):
+        pass
 
     def combo(self) -> bool:
         raise NotImplementedError()

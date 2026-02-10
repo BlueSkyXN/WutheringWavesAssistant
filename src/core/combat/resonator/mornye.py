@@ -1,8 +1,11 @@
 import logging
+import random
+import time
 
 import numpy as np
 
-from src.core.combat.combat_core import ColorChecker, BaseResonator, CharClassEnum, ResonatorNameEnum, LogicEnum
+from src.core.combat.combat_core import ColorChecker, BaseResonator, CharClassEnum, ResonatorNameEnum, LogicEnum, \
+    ScenarioEnum
 from src.core.exceptions import StopError
 from src.core.interface import ControlService, ImgService
 
@@ -178,228 +181,85 @@ class BaseMornye(BaseResonator):
 class Mornye(BaseMornye):
     # COMBO_SEQ 为训练场单人静态完整连段，后续开发以此为准从中拆分截取
 
-    # 常规轴
-    COMBO_SEQ_0 = [
-        # 3a E az
-        ["a", 0.05, 0.31],
-        ["a", 0.05, 0.43],
-        ["a", 0.05, 0.40],
-        ["E", 0.05, 0.32],
-        ["a", 0.05, 0.35],
-        # 清空能量
-        ## 常规重击
-        ["z", 0.50, 0.45],
-        ## E跳a
-        # ["E", 0.01, 0.05],
-        # ["j", 0.05, 0.05],
-        # ["a", 0.05, 0.00],
-        # 间隔
-        ["w", 0.00, 0.70],
-        ["j", 0.05, 1.20],
-    ]
-
-    # 进阶轴
     COMBO_SEQ = [
-        # 3a 四格能量
-        ["a", 0.05, 0.31],
-        ["a", 0.05, 0.43],
-        ["a", 0.05, 0.40],
-        # 进入蝴蝶 有连击则四格能量起手，无连击三格能量起手（重击会先a一下变四格能量）
-        ["z", 0.50, 0.30],
-        # 退出蝴蝶 五格能量
-        ["a", 0.01, 0.01],
-        ["E", 0.01, 0.10],
-        # 清空能量
-        ["j", 0.05, 0.15],
-        ["a", 0.05, 0.10],
-        ["Q", 0.05, 0.10],
-        # 间隔
-        ["w", 0.00, 0.35],
-        # ["j", 0.05, 1.20],
-        # 开大
-        ["R", 0.05, 1.20],
+        ["a", 0.05, 0.30],
+        ["a", 0.05, 0.30],
+        ["a", 0.05, 0.30],
+        ["a", 0.05, 0.30],
+
+        ["z", 0.50, 0.50],
+        ["R", 0.05, 0.50],
+        ["Q", 0.05, 0.50],
     ]
 
     def __init__(self, control_service: ControlService, img_service: ImgService):
         super().__init__(control_service, img_service)
 
+    def a4(self):
+        logger.debug("a4")
+        return [
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.30],
+        ]
+
+    def Eaa(self):
+        logger.debug("Eaa")
+        return [
+            ["E", 0.05, 0.50],
+            ["a", 0.05, 0.30],
+            ["a", 0.05, 0.30],
+        ]
+
     def E(self):
         logger.debug("E")
         return [
-            ["E", 0.05, 0.10],
+            # 共鸣技能 E
+            ["E", 0.05, 0.50],
         ]
 
-    def zE(self):
-        logger.debug("zE")
+    def z(self):
+        logger.debug("z")
         return [
-            ["z", 0.50, 0.30],
-            ["E", 0.01, 0.10],
-            ["a", 0.05, 0.05],  # 多一个普攻打断z防止一直飞
-            ["a", 0.05, 0.05],  # 多一个普攻打断z防止一直飞
-        ]
-
-    def Eja(self):
-        logger.debug("Eja")
-        return [
-            ["E", 0.01, 0.10],
-            # 清空能量
-            ["j", 0.05, 0.17],
-            ["a", 0.05, 0.10],
-        ]
-
-    def ja(self):
-        logger.debug("ja")
-        return [
-            # 清空能量
-            ["j", 0.05, 0.17],
-            ["a", 0.05, 0.10],
-        ]
-
-    def zaEja(self):
-        logger.debug("zaEja")
-        return [
-            # 进入蝴蝶 有连击则四格能量起手，无连击三格能量起手（重击会先a一下变四格能量）
-            ["z", 0.50, 0.30],
-            # 退出蝴蝶 五格能量
-            ["a", 0.01, 0.01],
-            ["E", 0.01, 0.10],
-            # 清空能量
-            ["j", 0.05, 0.17],
-            ["a", 0.05, 0.10],
-            ["a", 0.05, 0.00],  # 多一个普攻
-            # ["Q", 0.05, 0],
-            # 间隔
-            ["w", 0.00, 0.55],
-        ]
-
-    # def a3Eaz(self):
-    #     logger.debug("a3Eaz")
-    #     return [
-    #         # 3a E az
-    #         ["a", 0.05, 0.31],
-    #         ["a", 0.05, 0.43],
-    #         ["a", 0.05, 0.40],
-    #         # ["E", 0.05, 0.32],
-    #         ["E", 0.05, 0.00],
-    #         ["a", 0.05, 0.32],
-    #
-    #         ["a", 0.05, 0.35],
-    #         # 清空能量
-    #         ## 常规重击
-    #         # ["z", 0.50, 0.45],
-    #         ["z", 0.50, 0.05],
-    #         ["a", 0.05, 0.05],  # 多一个普攻打断z防止一直飞
-    #         ["a", 0.05, 0.05],  # 多一个普攻打断z防止一直飞
-    #     ]
-
-    def a3Ea(self):
-        logger.debug("a3Ea")
-        return [
-            # 3a E az
-            ["a", 0.05, 0.31],
-            # ["a", 0.05, 0.43],  # 拆分
-            ["a", 0.05, 0.18],
-            ["a", 0.05, 0.20],
-            # ["a", 0.05, 0.40],  # 拆分
-            ["a", 0.05, 0.20],
-            ["a", 0.05, 0.15],
-            # ["E", 0.05, 0.32],
-            ["E", 0.05, 0.00],
-            ["a", 0.05, 0.32],  # E后接a，防止E没好原地发呆
-
-            ["a", 0.05, 0.35],
-        ]
-
-    def a2(self):
-        logger.debug("a2")
-        return [
-            # 2a
-            ["a", 0.05, 0.31],
-            # ["a", 0.05, 0.43],  # 拆分
-            ["a", 0.05, 0.18],
-            ["a", 0.05, 0.20],
-        ]
-
-    def a3(self):
-        logger.debug("a3")
-        return [
-            # 3a
-            ["a", 0.05, 0.31],
-            # ["a", 0.05, 0.43],  # 拆分
-            ["a", 0.05, 0.18],
-            ["a", 0.05, 0.20],
-            # ["a", 0.05, 0.40],  # 拆分
-            ["a", 0.05, 0.20],
-            ["a", 0.05, 0.15],
-        ]
-
-    def za(self):
-        logger.debug("za")
-        return [
-            # 清空能量
-            ## 常规重击
-            # ["z", 0.50, 0.45],
-            ["z", 0.50, 0.05],
-            ["a", 0.05, 0.05],  # 多一个普攻打断z防止一直飞
-            ["a", 0.05, 0.05],  # 多一个普攻打断z防止一直飞
+            ["z", 0.50, 0.50],
         ]
 
     def Q(self):
         logger.debug("Q")
         return [
-            ["Q", 0.05, 0.10],
+            ["Q", 0.05, 0.50],
         ]
 
     def R(self):
         logger.debug("R")
         return [
-            ["R", 0.05, 3.08],
+            ["R", 0.05, 0.50],
         ]
 
     def full_combo(self):
         # 测试用，一整套连招
-        # return self.COMBO_SEQ_0
         return self.COMBO_SEQ
 
+    def exit_special_state(self, scenario_enum: ScenarioEnum | None = None):
+        if scenario_enum != ScenarioEnum.BeforeEchoSearch:
+            return
+        img = self.img_service.screenshot()
+        if not self.is_wide_field_observation_mode_ready(img):
+            return
+        logger.debug("quit_wide_field_observation_mode")
+        quit_seq = [
+            ["j", 0.05, 2.00],
+        ]
+        self.combo_action(quit_seq, True, ignore_event=True)
+
     def combo(self):
-        try:
-            img = self.img_service.screenshot()
-            # energy_count = self.energy_count(img)
-            # is_concerto_energy_ready = self.is_concerto_energy_ready(img)
-            # is_resonance_skill_ready = self.is_resonance_skill_ready(img)
-            # is_echo_skill_ready = self.is_echo_skill_ready(img)
-            is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
-            # boss_hp = self.boss_hp(img)
+        self.combo_action(self.a4(), False)
 
-            # 性价比a3
-            self.combo_action(self.a3(), True)
+        combo_list = [self.Eaa(), self.R(), self.z()]
+        random.shuffle(combo_list)
+        for i in combo_list:
+            self.combo_action(i, False)
+            time.sleep(0.15)
 
-            # 协星调律
-            if is_resonance_liberation_ready:
-                self.combo_action(self.E(), False)
-                self.combo_action(self.R(), True)
-                return
-
-            ## 打满能量
-
-            img = self.img_service.screenshot()
-            energy_count = self.energy_count(img)
-            is_resonance_skill_ready = self.is_resonance_skill_ready(img)
-            is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
-            boss_hp = self.boss_hp(img)
-
-            if energy_count == 3 and is_resonance_skill_ready and boss_hp > 0.01:
-                self.combo_action(self.zaEja(), False)
-                self.combo_action(self.Q(), False)
-                return
-
-            self.combo_action(self.E(), not is_resonance_liberation_ready)
-            self.combo_action(self.R(), is_resonance_liberation_ready)
-            # 不打z，改成ja。防止击败boss时停卡掉按键，导致变成蝴蝶飞出场外
-            if energy_count == 5:
-                self.combo_action(self.ja(), False)
-
-            self.combo_action(self.Q(), False)
-        except StopError as e:
-            self.control_service.jump()  # 打断守岸人变身蝴蝶
-            raise e
+        self.combo_action(self.Q(), False)

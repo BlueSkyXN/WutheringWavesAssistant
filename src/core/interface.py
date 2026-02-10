@@ -329,15 +329,7 @@ class ExtendedControlService(ABC):
         pass
 
     @abstractmethod
-    def forward_walk(self, forward_walk_times: int, sleep_seconds: float = None):
-        pass
-
-    @abstractmethod
-    def left_forward_walk(self, forward_walk_times: int, sleep_seconds: float = None):
-        pass
-
-    @abstractmethod
-    def right_forward_walk(self, forward_walk_times: int, sleep_seconds: float = None):
+    def forward_walk(self, forward_walk_times: int, key: str | None = None, sleep_seconds: float = None):
         pass
 
     @abstractmethod
@@ -428,5 +420,9 @@ class BossInfoService(ABC):
 
     @abstractmethod
     def get_restart_params(self) -> dict[str, RestartParam]:
+        pass
+
+    @abstractmethod
+    def get_after_restart_routes(self) -> dict[str, list[RouteStep]]:
         pass
 

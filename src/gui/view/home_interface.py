@@ -121,7 +121,7 @@ class HomeInterface(ScrollArea):
         basicInputView.addSampleCard(
             icon=":/gallery/images/controls/Checkbox.png",
             title="自动拾取",
-            content=self.tr("自动拾取路过的声骸、草药、食材、宝箱\n任意分辨率，建议低画质（窗口化），60fps，开DLSS"),
+            content=self.tr("自动拾取路过的声骸、草药、食材、宝箱\n任意分辨率"),
             routeKey="basicInputInterface",
             index=8,
             task_name="AutoPickupProcessTask",
@@ -130,7 +130,7 @@ class HomeInterface(ScrollArea):
             icon=":/gallery/images/controls/Checkbox.png",
             title="沉浸式剧情",
             content=self.tr(
-                "剧情党使用，自动选择对话\n解放双手，体验完整人生，任意分辨率，建议全屏最高画质"),
+                "剧情党使用，自动选择对话\n解放双手，体验完整人生，任意分辨率"),
             routeKey="basicInputInterface",
             index=9,
             task_name="AutoStoryEnjoyProcessTask",

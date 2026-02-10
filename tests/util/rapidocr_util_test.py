@@ -26,9 +26,9 @@ logger = logging.getLogger(__name__)
 
 hwnd_util.enable_dpi_awareness()
 
-def test_warm():
-    engine: RapidOCR = rapidocr_util.create_ocr()
-    rapidocr_util.model_warmup(engine)
+# def test_warm():
+#     engine: RapidOCR = rapidocr_util.create_ocr()
+#     rapidocr_util.model_warmup(engine)
 
 
 def test_ocr_from_game():

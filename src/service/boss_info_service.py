@@ -76,58 +76,72 @@ FAST_TRAVEL_ROUTES: dict[str, list[RouteStep]] = {
     BossNameEnum.Hyvatia.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=4.5)],  # 8
     BossNameEnum.ReactorHusk.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=4.8)],
     BossNameEnum.Sigillum.value: [RouteStep(direction=Direction.LEFT, mode=MoveMode.WALK, steps=3)],
+    BossNameEnum.NamelessExplorer.value: [
+        RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=5),
+        RouteStep(direction=Direction.LEFT, mode=MoveMode.RUN, duration=1.4)],  # 3.2
 }
 
 # RouteStep后的移动方式配置，没有的也留痕注释掉，方便后续排查
 RESTART_PARAMS: dict[str, RestartParam] = {
-    # BossNameEnum.Dreamless.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
+    # BossNameEnum.Dreamless.value: RestartParam(check_text=None, direction=None, routes=None, cycle=20, step=2),
     BossNameEnum.FallacyOfNoReturn.value: RestartParam(
-        check_text=None, run_seconds=None, cycle=20, step=2, check_health_bar=True),
-    BossNameEnum.LampylumenMyriad.value: RestartParam(check_text=r"击败", run_seconds=(3.6 - 2.6), cycle=14, step=2),
-    BossNameEnum.BellBorneGeochelone.value: RestartParam(check_text=r"击败", run_seconds=(3.6 - 3.0), cycle=20, step=2),
-    BossNameEnum.InfernoRider.value: RestartParam(check_text=r"击败", run_seconds=(4.2 - 3.5), cycle=20, step=2),
+        check_text=None, direction=None, cycle=20, step=2, check_health_bar=True),
+    BossNameEnum.LampylumenMyriad.value: RestartParam(check_text=r"击败", direction=None, cycle=14, step=2),
+    BossNameEnum.BellBorneGeochelone.value: RestartParam(check_text=r"击败", direction=None, cycle=20, step=2),
+    BossNameEnum.InfernoRider.value: RestartParam(check_text=r"击败", direction=None, cycle=20, step=2),
     BossNameEnum.ImpermanenceHeron.value: RestartParam(
-        check_text=r"击败", run_seconds=(4.0 - 3.0), cycle=14, step=2, check_health_bar=True),
-    # BossNameEnum.MechAbomination.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
-    BossNameEnum.MourningAix.value: RestartParam(check_text=r"击败", run_seconds=(4.8 - 4.0), cycle=14, step=2),
+        check_text=r"击败", direction=None, cycle=14, step=2, check_health_bar=True),
+    # BossNameEnum.MechAbomination.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    BossNameEnum.MourningAix.value: RestartParam(check_text=r"击败", direction=None, cycle=14, step=2),
     BossNameEnum.ThunderingMephis.value: RestartParam(
-        check_text=r"击败", run_seconds=(3.2 - 2.5), cycle=14, step=2, check_health_bar=True),
-    BossNameEnum.TempestMephis.value: RestartParam(check_text=r"击败", run_seconds=(3.0 - 2.4), cycle=14, step=2),
-    # BossNameEnum.FeilianBeringal.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
+        check_text=r"击败", direction=None, cycle=14, step=2, check_health_bar=True),
+    BossNameEnum.TempestMephis.value: RestartParam(check_text=r"击败", direction=None, cycle=14, step=2),
+    # BossNameEnum.FeilianBeringal.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
     BossNameEnum.Crownless.value: RestartParam(
-        check_text=None, run_seconds=None, cycle=14, step=2,
+        check_text=None, direction=None, cycle=14, step=2,
         restart_text=r"^(声弦|Resonance\s*Cord|重新挑战|Restart)$"),
-    # BossNameEnum.Jue.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
+    # BossNameEnum.Jue.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
     BossNameEnum.SentryConstruct.value: RestartParam(
-        check_text=r"击败", run_seconds=(4.0 - 3.2), cycle=14, step=2, check_health_bar=True),
-    # BossNameEnum.Hecate.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
+        check_text=r"击败", direction=None, cycle=14, step=2, check_health_bar=True),
+    # BossNameEnum.Hecate.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
     BossNameEnum.Lorelei.value: RestartParam(
-        check_text=r"击败", run_seconds=(4.5 - 3.7), cycle=14, step=2, check_health_bar=True),
+        check_text=r"击败", direction=None, cycle=14, step=2, check_health_bar=True),
     BossNameEnum.DragonOfDirge.value: RestartParam(
-        check_text=None, run_seconds=None, cycle=20, step=2, check_health_bar=True),
-    # BossNameEnum.NightmareFeilianBeringal.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
-    # BossNameEnum.NightmareImpermanenceHeron.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
-    # BossNameEnum.NightmareTempestMephis.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
-    # BossNameEnum.NightmareThunderingMephis.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
-    # BossNameEnum.NightmareCrownless.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
-    # BossNameEnum.NightmareInfernoRider.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
-    # BossNameEnum.NightmareMourningAix.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
-    # BossNameEnum.NightmareLampylumenMyriad.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
-    # BossNameEnum.Fleurdelys.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
-    # BossNameEnum.NightmareKelpie.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
+        check_text=None, direction=None, cycle=20, step=2, check_health_bar=True),
+    # BossNameEnum.NightmareFeilianBeringal.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    # BossNameEnum.NightmareImpermanenceHeron.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    # BossNameEnum.NightmareTempestMephis.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    # BossNameEnum.NightmareThunderingMephis.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    # BossNameEnum.NightmareCrownless.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    # BossNameEnum.NightmareInfernoRider.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    # BossNameEnum.NightmareMourningAix.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    # BossNameEnum.NightmareLampylumenMyriad.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    # BossNameEnum.Fleurdelys.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    # BossNameEnum.NightmareKelpie.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
     BossNameEnum.LionessOfGlory.value: RestartParam(
-        check_text=None, run_seconds=None, cycle=14, step=2, check_health_bar=True),
-    # BossNameEnum.NightmareHecate.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
-    BossNameEnum.Fenrico.value: RestartParam(check_text=None, run_seconds=(3.4 - 1.5), cycle=14, step=2),
-    BossNameEnum.LadyOfTheSea.value: RestartParam(check_text=r"^进入.*最终章.*$", run_seconds=None, cycle=8, step=1),
+        check_text=None, direction=None, cycle=14, step=2, check_health_bar=True),
+    # BossNameEnum.NightmareHecate.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    BossNameEnum.Fenrico.value: RestartParam(check_text=None, direction=None, cycle=14, step=2),
+    BossNameEnum.LadyOfTheSea.value: RestartParam(check_text=r"^进入.*最终章.*$", direction=None, cycle=8, step=1),
     BossNameEnum.TheFalseSovereign.value: RestartParam(
-        check_text=None, run_seconds=None, cycle=12, step=2, check_health_bar=True),
-    # BossNameEnum.ThrenodianLeviathan.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
+        check_text=None, direction=None, cycle=12, step=2, check_health_bar=True),
+    # BossNameEnum.ThrenodianLeviathan.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
     BossNameEnum.Hyvatia.value: RestartParam(
-        check_text=r"击败|海维夏$", run_seconds=(8.0 - 4.5), cycle=20, step=2, check_health_bar=True),
+        check_text=r"击败|海维夏$", direction=None, cycle=20, step=2, check_health_bar=True),
     BossNameEnum.ReactorHusk.value: RestartParam(
-        check_text=None, run_seconds=None, cycle=20, step=2, check_health_bar=True),
-    # BossNameEnum.Sigillum.value: RestartParam(check_text=None, run_seconds=None, cycle=20, step=2),
+        check_text=None, direction=None, cycle=20, step=2, check_health_bar=True),
+    # BossNameEnum.Sigillum.value: RestartParam(check_text=None, direction=None, cycle=20, step=2),
+    BossNameEnum.NamelessExplorer.value: RestartParam(
+        check_text=None, direction=Direction.LEFT, cycle=10, step=2, check_health_bar=True),
+}
+
+# 点击重新挑战后的移动方式配置，适用于个别boss刷新位置离重新挑战点较远的情况，有才写
+AFTER_RESTART_ROUTES: dict[str, list[RouteStep]] = {
+    BossNameEnum.Fenrico.value: [RouteStep(direction=Direction.FORWARD, mode=MoveMode.RUN, duration=(3.4 - 1.5))],
+    BossNameEnum.NamelessExplorer.value: [
+        RouteStep(direction=Direction.LEFT, mode=MoveMode.RUN, duration=1.0),
+        RouteStep(direction=Direction.FORWARD, mode=MoveMode.WALK, steps=6),
+        RouteStep(direction=Direction.RIGHT, mode=MoveMode.WALK, steps=3)],
 }
 
 
@@ -162,6 +176,7 @@ class BossInfoServiceImpl(BossInfoService):
             BossNameEnum.TheFalseSovereign.value,
             BossNameEnum.Hyvatia.value,
             BossNameEnum.ReactorHusk.value,
+            BossNameEnum.Sigillum.value,
             BossNameEnum.NamelessExplorer.value,
         ]:
             return True
@@ -174,3 +189,8 @@ class BossInfoServiceImpl(BossInfoService):
     def get_restart_params(self) -> dict[str, RestartParam]:
         """ 获取重新挑战相关移动参数 """
         return RESTART_PARAMS
+
+    def get_after_restart_routes(self) -> dict[str, list[RouteStep]]:
+        """ 获取点击重新挑战后需要再次移动的参数 """
+        return AFTER_RESTART_ROUTES
+
