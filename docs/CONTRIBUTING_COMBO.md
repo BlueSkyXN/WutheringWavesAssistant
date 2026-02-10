@@ -332,7 +332,7 @@ def combo(self):
     is_echo_skill_ready = self.is_echo_skill_ready(img)
     is_resonance_liberation_ready = self.is_resonance_liberation_ready(img)
     is_concerto_energy_ready = self.is_concerto_energy_ready(img)
-    energy_count = self.energy_count(img)  # 如果有能量系统
+    energy_count = self.energy_count(img)  # 需要在 Base 类中覆写此方法
     boss_hp = self.boss_hp(img)  # Boss 血量检测
 
     # 2. 释放声骸技能（通常优先级较低，提前释放用于合轴）
