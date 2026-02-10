@@ -224,14 +224,21 @@ class Win32ExtendedControlServiceImpl(ExtendedControlService, BaseControlService
         keymouse_util.mouse_right_up(self._window_service.window)
         keymouse_util.key_up(self._window_service.window, key)
 
-    def forward_walk(self, forward_walk_times: int, key: str | None = None, sleep_seconds: float = None):
+    def _forward_walk(self, forward_walk_times: int, sleep_seconds: float = None, key: str = None):
         if key is None:
             key = "w"
-        elif key not in ["w", "a", "s", "d"]:
-            raise KeyError("Unknown key {}".format(key))
         for _ in range(forward_walk_times):
             keymouse_util.tap_key(self._window_service.window, key, 0.1)
             time.sleep(0.05 if sleep_seconds is None else sleep_seconds)
+
+    def forward_walk(self, forward_walk_times: int, sleep_seconds: float = None):
+        self._forward_walk(forward_walk_times, sleep_seconds, key="w")
+
+    def left_forward_walk(self, forward_walk_times: int, sleep_seconds: float = None):
+        self._forward_walk(forward_walk_times, sleep_seconds, key="a")
+
+    def right_forward_walk(self, forward_walk_times: int, sleep_seconds: float = None):
+        self._forward_walk(forward_walk_times, sleep_seconds, key="d")
 
     def get_mouse_position(self):
         pos = keymouse_util.get_mouse_position()

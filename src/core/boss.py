@@ -57,15 +57,6 @@ class Direction(Enum):
     FORWARD = "forward"
     BACKWARD = "backward"
 
-    @staticmethod
-    def get_key(direction: "Direction"):
-        if direction == Direction.LEFT:
-            return "a"
-        elif direction == Direction.RIGHT:
-            return "d"
-        elif direction == Direction.BACKWARD:
-            return "s"
-        return "w"
 
 class RouteStep(BaseModel):
     """
@@ -97,7 +88,7 @@ class RestartParam(BaseModel):
     # 1、先原地查找boss相关的关键字（仅部分boss有击败等字样）
     check_text: str | None = Field(None, description="检查文本，None为不检查")
     # 2、若有可确定boss存在，直接跑完剩余的距离，到boss跟前即可
-    direction: Direction | None = Field(None, description="移动方向，默认向前")
+    run_seconds: float | None = Field(None, description="奔跑时间，秒，None为不跑")
     # 3、若原地找不到1中的关键字 或 没有可识别的关键字，则按重新挑战来，循环前进查找"重新挑战"文本
     cycle: int | None = Field(None, description="循环次数")
     step: int | None = Field(None, description="循环中每次前进步数")

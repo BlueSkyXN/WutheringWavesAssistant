@@ -2,10 +2,8 @@ import logging
 import threading
 import time
 
-from src.core.combat.combat_core import TeamMemberSelector, BaseResonator, CharClassEnum, ResonatorNameEnum, \
-    ScenarioEnum
+from src.core.combat.combat_core import TeamMemberSelector, BaseResonator, CharClassEnum, ResonatorNameEnum
 from src.core.combat.resonator.camellya import Camellya
-from src.core.combat.resonator.cantarella import Cantarella
 from src.core.combat.resonator.cartethyia import Cartethyia
 from src.core.combat.resonator.changli import Changli
 from src.core.combat.resonator.ciaccona import Ciaccona
@@ -59,7 +57,6 @@ class CombatSystem:
         self.phrolova = Phrolova(self.control_service, self.img_service)
         self.lynae = Lynae(self.control_service, self.img_service)
         self.mornye = Mornye(self.control_service, self.img_service)
-        self.cantarella = Cantarella(self.control_service, self.img_service)
 
         self.resonator_map: dict[ResonatorNameEnum, BaseResonator] = {
             ResonatorNameEnum.jinhsi: self.jinhsi,
@@ -74,8 +71,6 @@ class CombatSystem:
             # ResonatorNameEnum.phoebe: self.phoebe,
             ResonatorNameEnum.phrolova: self.phrolova,
             ResonatorNameEnum.lynae: self.lynae,
-            ResonatorNameEnum.mornye: self.mornye,
-            ResonatorNameEnum.cantarella: self.cantarella,
         }
         self.resonators: list[BaseResonator] | None = None
         self._sorted_resonators: list[tuple[BaseResonator, int]] | None = None
@@ -267,7 +262,7 @@ class CombatSystem:
     def is_boss_health_bar_exist(self):
         return BaseResonator.is_boss_health_bar_exist(self.img_service.screenshot())
 
-    def exit_special_state(self, scenario_enum: ScenarioEnum | None = None):
+    def move_prepare(self, camellya_reset: bool = False):
         if self.resonators is None:
             return
         try:
@@ -275,8 +270,21 @@ class CombatSystem:
             if cur_member_number is None:
                 return
             resonator = self.resonators[cur_member_number - 1]
-            resonator.exit_special_state(scenario_enum)
-            # if isinstance(resonator, Camellya):
-            #     return
+            # 检查当前角色
+            if isinstance(resonator, Camellya):
+                resonator.quit_blossom()
+                # 椿落地会前移，后闪复位
+                if camellya_reset:
+                    self.control_service.dash_dodge()
+                    time.sleep(0.3)
+                return
+            elif isinstance(resonator, Phrolova):
+                resonator.quit_R()
+
+            # 检查编队中其他角色
+            # for i in range(len(self.resonators)):
+            #     if isinstance(resonator, Phrolova) and i == cur_member_number:
+            #         # self.resonators[i]
+            #         break
         except IndexError as e:
             logger.exception(e)

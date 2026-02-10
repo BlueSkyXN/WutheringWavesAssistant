@@ -41,9 +41,6 @@ class AutoBossServiceImpl(PageEventAbstractService):
         self._conditional_actions: list[ConditionalAction] = []
         self._build_conditional_actions()
 
-        ## 运行时变量
-        self._login_reset_z_order = False
-
     def get_pages(self) -> list[Page]:
         return self._boss_pages_all
 
@@ -478,21 +475,6 @@ class AutoBossServiceImpl(PageEventAbstractService):
         self._general_pages.append(blank_area_page)
 
         def login_action(positions: dict[str, Position]) -> bool:
-            if not self._login_reset_z_order:
-                from src.util import keymouse_util
-                # 1. 先获取当前鼠标位置
-                original_x, original_y = keymouse_util.get_mouse_position()
-                # 2. 释放鼠标限制（如果有）
-                keymouse_util.set_mouse_unlocked()
-                # 3. 取消游戏窗口的置顶状态
-                hwnd_util.set_window_not_topmost(self._window_service.window)
-                # 4. 移动窗口
-                # gui_win_id = int(kwargs.get("GUI_WIN_ID"))
-                hwnd_util.set_window_left_top_and_below_another(self._window_service.window, self._info.gui_win_id)
-                # 5. 将鼠标移回原位
-                keymouse_util.set_mouse_position(original_x, original_y)
-                self._login_reset_z_order = True
-
             position = positions.get("点击连接")
             self._control_service.click(*position.center)
             time.sleep(0.2)

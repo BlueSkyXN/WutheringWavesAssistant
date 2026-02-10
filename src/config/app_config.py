@@ -35,7 +35,7 @@ class AppConfig(BaseModel):
     )
 
     # 自动战斗及声骸锁定配置
-    MaxFightTime: int = Field(240, title="最大战斗时间")
+    MaxFightTime: int = Field(120, title="最大战斗时间")
     MaxIdleTime: int = Field(10, title="最大空闲时间", ge=5)
     MaxSearchEchoesTime: int = Field(18, title="最大搜索声骸时间")
     SelectRoleInterval: int = Field(2, title="选择角色间隔时间", ge=2)

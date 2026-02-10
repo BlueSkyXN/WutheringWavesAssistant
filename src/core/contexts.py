@@ -49,7 +49,6 @@ class BossTaskContext(BaseModel):
     # challengeSuccess: bool = Field(False, title="是否挑战成功")
     # lastChallengeSuccessTime: datetime = Field(default_factory=datetime.now, title="上次挑战成功的时间")
     challengeFenricoCount: int = Field(0, title="挑战芬莱克次数")
-    gui_win_id: int | None = Field(None, title="gui的pid")
 
     echoIsLockQuantity: int = Field(0, title="检测到连续锁定的声骸数量")
     echoNumber: int = Field(0, title="当前进行的锁定声骸个数")

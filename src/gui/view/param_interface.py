@@ -1022,7 +1022,7 @@ class ParamInterface(ScrollArea):
         self.autoCombatCard = AutoCombatSwitchSettingCard(
             FIF.LABEL,
             self.tr('智能连招Beta'),
-            self.tr('默认开启，支持任意角色，不限人数，建议带一个奶。'),
+            self.tr('默认开启，支持任意角色，建议带一个奶。'),
             configItem=paramConfig.autoCombat,
             parent=self.bossGroup
         )

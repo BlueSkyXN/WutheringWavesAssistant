@@ -151,7 +151,7 @@ class BaseCartethyia(BaseResonator):
         return is_ready
 
     def is_resonance_skill_fleurdelys_2_ready(self, img: np.ndarray) -> bool:
-        is_ready = self._resonance_skill_fleurdelys_checker.check(img)
+        is_ready = self._resonance_skill_fleurdelys_2_checker.check(img)
         logger.debug(f"芙露德莉斯-共鸣技能 E2: {is_ready}")
         return is_ready
 
@@ -684,36 +684,6 @@ class Cartethyia(BaseCartethyia):
             # ["a", 0.05, 0.30],
         ]
 
-    def fleurdelys_a3(self):
-        logger.debug("fleurdelys_a3")
-        return [
-            # 大卡
-            # 普攻5a
-            # ["a", 0.05, 0.32],
-            ["a", 0.05, 0.10],
-            ["a", 0.05, 0.20],
-
-            # ["a", 0.05, 0.65],
-            ["a", 0.05, 0.20],
-            ["a", 0.05, 0.20],
-            ["a", 0.05, 0.15],
-
-            ["a", 0.05, 0.20],
-            ["a", 0.05, 0.20],
-            ["a", 0.05, 0.20],
-
-            # # ["a", 0.05, 1.02],
-            # ["a", 0.05, 0.20],
-            # ["a", 0.05, 0.20],
-            # ["a", 0.05, 0.22],
-            # ["a", 0.05, 0.25],
-            #
-            # # ["a", 0.05, 0.90],
-            # ["a", 0.05, 0.25],
-            # ["a", 0.05, 0.25],
-            # ["a", 0.05, 0.30],
-        ]
-
     def avatar_cartethyia_to_fleurdelys_Ra3(self):
         logger.debug("avatar_cartethyia_to_fleurdelys_Ra3")
         return [
@@ -745,7 +715,7 @@ class Cartethyia(BaseCartethyia):
         ]
 
     def fleurdelys_to_avatar_cartethyia_Ra3(self):
-        logger.debug("avatar_cartethyia_to_fleurdelys_Ra3")
+        logger.debug("fleurdelys_to_avatar_cartethyia_Ra3")
         return [
             # 大卡切化身小卡
             # ["R", 0.05, 1.10],
@@ -1038,13 +1008,9 @@ class Cartethyia(BaseCartethyia):
                 self.combo_action(self.fleurdelys_EaaE(), False)
             else:
                 if boss_hp <= 0.01:
-                    # self.combo_action(self.fleurdelys_a2(), False)
-                    self.combo_action(self.fleurdelys_a3(), False)
+                    self.combo_action(self.fleurdelys_a2(), False)
                     return
-                if self.random_float() < 0.33:
-                    self.combo_action(self.fleurdelys_a5(), False)
-                else:
-                    self.combo_action(self.fleurdelys_ja3(), False)
+                self.combo_action(self.fleurdelys_ja3(), False)
 
             # 检查E、R状态，有E打空中连，没有打普攻，补决意
             img = self.img_service.screenshot()
@@ -1103,8 +1069,12 @@ class Cartethyia(BaseCartethyia):
                 if is_resonance_skill_cartethyia_ready:
                     self.combo_action(self.cartethyia_Eza(), True)
                 else:
+                    if not is_sword_of_divinity_existing:
+                        self.combo_action(self.cartethyia_a4(), False)
+                        is_cartethyia_a4_attack_done = True
                     if not is_sword_of_discord_existing:
                         self.combo_action(self.cartethyia_z(), False)
+                    # self.combo_action(self.cartethyia_ja(), True)
                     need_cartethyia_ja = True  # 先记录状态，有大才收剑
 
             # 检查大招

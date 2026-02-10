@@ -7,9 +7,8 @@ from typing import Callable
 
 import numpy as np
 
-from src.core.boss import BossNameEnum, MoveMode, Direction, RouteStep
-from src.core.combat.combat_core import DynamicPointTransformer, ResonatorNameEnum, AlignEnum, BaseResonator, \
-    ScenarioEnum
+from src.core.boss import BossNameEnum, MoveMode, Direction
+from src.core.combat.combat_core import DynamicPointTransformer, ResonatorNameEnum, AlignEnum, BaseResonator
 from src.core.combat.combat_system import CombatSystem
 from src.core.contexts import Context, Status
 from src.core.interface import ControlService, OCRService, PageEventService, ImgService, WindowService, ODService, \
@@ -902,7 +901,7 @@ class PageEventAbstractService(PageEventService, ABC):
                     time.sleep(1)
                     return True
 
-                self.combat_system.exit_special_state(ScenarioEnum.BeforeEchoSearch)
+                self.combat_system.move_prepare()
                 # logger.info(f"self._info.needAbsorption: {self._info.needAbsorption}")
                 if self._info.needAbsorption:
                     self.search_echo()
@@ -1554,7 +1553,7 @@ class PageEventAbstractService(PageEventService, ABC):
         time.sleep(2)
 
         if self._context.param_config.autoCombatBeta is True:
-            self.combat_system.exit_special_state(ScenarioEnum.BeforeEchoSearch)
+            self.combat_system.move_prepare(camellya_reset=True)
 
         # 是否在副本中
         if self.absorption_and_receive_rewards({}):
@@ -1563,7 +1562,7 @@ class PageEventAbstractService(PageEventService, ABC):
             #     time.sleep(1)
             return
 
-        if self._info.lastBossName in [BossNameEnum.Fleurdelys.value, BossNameEnum.ThrenodianLeviathan.value]:
+        if self._info.lastBossName in [BossNameEnum.Fleurdelys.value, BossNameEnum.ThrenodianLeviathan.value, BossNameEnum.Sigillum.value]:
             self.absorption_action_fleurdelys()
             return
         elif self._info.lastBossName == BossNameEnum.Fenrico.value:
@@ -1604,15 +1603,6 @@ class PageEventAbstractService(PageEventService, ABC):
                     time.sleep(0.2)
                     break
                 echo_box = self._od_service.search_echo(img)
-
-                # # train
-                # img = self._img_service.screenshot()
-                # from src.util import img_util
-                # from src.util import file_util
-                # img_name = self._boss_info_service.get_boss_name_zh_en(self._info.lastBossName)
-                # img_path = file_util.create_img_path(prefix=img_name)
-                # img_util.save_img(img, img_path)
-
                 if echo_box is None:
                     logger.debug("未发现声骸")
                     self._control_service.left(0.1)
@@ -2393,43 +2383,59 @@ class PageEventAbstractService(PageEventService, ABC):
                     self.team_members_ocr()
                 if self.combat_system.resonators is not None:
                     # 移动前检查，如 椿退出红椿状态
-                    self.combat_system.exit_special_state(ScenarioEnum.BeforeGoingToBoss)
+                    self.combat_system.move_prepare(camellya_reset=(bossName == BossNameEnum.NightmareHecate.value))
 
-            def route_step_action(route_step_list: list[RouteStep] | None):
-                if route_step_list is None:
-                    return
-                for _route_step in route_step_list:
-                    if _route_step.mode == MoveMode.WALK:
-                        if _route_step.steps is not None and _route_step.steps > 0:
-                            self._control_service.forward_walk(
-                                _route_step.steps, Direction.get_key(_route_step.direction))
-                        elif _route_step.duration is not None and _route_step.duration > 0:
-                            pass
-                    elif _route_step.mode == MoveMode.RUN:
-                        if _route_step.steps is not None and _route_step.steps > 0:
-                            pass
-                        elif _route_step.duration is not None and _route_step.duration > 0:
-                            self._control_service.forward_run(
-                                _route_step.duration, Direction.get_key(_route_step.direction))
-
-            # 1 走/跑向boss
+            # 走/跑向boss
             fast_travel_routes = self._boss_info_service.get_fast_travel_routes()
-            route_step_action(fast_travel_routes.get(bossName))
+            route_step_list = fast_travel_routes.get(bossName)
+            for route_step in route_step_list:
+                if route_step.mode == MoveMode.WALK:
+                    if route_step.steps is not None and route_step.steps > 0:
+                        if route_step.direction == Direction.FORWARD:
+                            self._control_service.forward_walk(route_step.steps)
+                        elif route_step.direction == Direction.LEFT:
+                            self._control_service.left_forward_walk(route_step.steps)
+                        elif route_step.direction == Direction.RIGHT:
+                            self._control_service.right_forward_walk(route_step.steps)
+                        else:  # Direction.BACKWARD
+                            pass
+                    elif route_step.duration is not None and route_step.duration > 0:
+                        pass
+                elif route_step.mode == MoveMode.RUN:
+                    if route_step.steps is not None and route_step.steps > 0:
+                        pass
+                    elif route_step.duration is not None and route_step.duration > 0:
+                        if route_step.direction == Direction.FORWARD:
+                            self._control_service.forward_run(route_step.duration)
+                        elif route_step.direction == Direction.LEFT:
+                            pass
+                        elif route_step.direction == Direction.RIGHT:
+                            pass
+                        else:  # Direction.BACKWARD
+                            pass
 
-            # 2 点击重新挑战
             restart_params = self._boss_info_service.get_restart_params()
+
             if bossName in restart_params.keys():
                 is_ocr_restart = False
+                is_run_to_boss = False
 
                 restart_param = restart_params.get(bossName)
-                direction_key = Direction.get_key(restart_param.direction)
-
                 # 需要原地查找boss相关的关键字
-                # 首次 无需找关键字（有些boss左侧没有关键字可找） 或 关键字（击败等）未找到
-                # 标记为需要循环前移查找，否则直奔boss
-                if not restart_param.check_text or not self._ocr_service.find_text(restart_param.check_text):
+                if restart_param.check_text is not None:
+                    # 找到了，直奔boss
+                    if self._ocr_service.find_text(restart_param.check_text):
+                        is_run_to_boss = True
+                    else:
+                        # 没找到，就再走去找重新挑战
+                        is_ocr_restart = True
+                else:
+                    # 不找boss就走去找重新挑战
                     is_ocr_restart = True
 
+                if is_run_to_boss:
+                    if restart_param.run_seconds is not None and restart_param.run_seconds > 0:
+                        self._control_service.forward_run(restart_param.run_seconds)
                 if is_ocr_restart:
                     search_region = self.get_dialogue_region()
                     i = 0
@@ -2477,7 +2483,7 @@ class PageEventAbstractService(PageEventService, ABC):
                                 time.sleep(0.3)
 
                         if not restart:
-                            self._control_service.forward_walk(2, direction_key)
+                            self._control_service.forward_walk(2)
                             i += 1
                             continue
                         time.sleep(0.6)
@@ -2487,10 +2493,6 @@ class PageEventAbstractService(PageEventService, ABC):
                         self._control_service.pick_up()
                         time.sleep(3.0)
                         break
-
-                # 3 走向boss刷新点
-                after_restart_routes = self._boss_info_service.get_after_restart_routes()
-                route_step_action(after_restart_routes.get(bossName))
 
             now = datetime.now()
             self._info.idleTime = now  # 重置空闲时间

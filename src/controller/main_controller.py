@@ -169,6 +169,17 @@ class TaskMonitor:
                     if hwnd:
                         logger.info("游戏已重启")
                         self._sleep(10)
+                        try:
+                            from src.util import keymouse_util
+                            # 1. 先获取当前鼠标位置
+                            original_x, original_y = keymouse_util.get_mouse_position()
+                            # 2. 释放鼠标限制（如果有）
+                            keymouse_util.set_mouse_unlocked()
+                            hwnd_util.set_window_left_top_and_below_another(hwnd, self.gui_win_id)
+                            # 5. 将鼠标移回原位
+                            keymouse_util.set_mouse_position(original_x, original_y)
+                        except Exception:
+                            pass
                         return True
                 except KeyboardInterrupt:
                     logger.warning("KeyboardInterrupt")

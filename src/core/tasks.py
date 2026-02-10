@@ -198,7 +198,7 @@ def mouse_reset_task_run(event: Event, **kwargs):
     hwnd = None
     try:
         while event.is_set():
-            time.sleep(0.02)
+            time.sleep(0.05)
             try:
                 if not hwnd or not win32gui.IsWindow(hwnd):
                     time.sleep(0.5)
@@ -264,16 +264,13 @@ def auto_boss_task_run(event: Event, **kwargs):
         original_x, original_y = keymouse_util.get_mouse_position()
         # 2. 释放鼠标限制（如果有）
         keymouse_util.set_mouse_unlocked()
-        # # 3. 取消游戏窗口的置顶状态
-        # hwnd_util.set_window_not_topmost(window_service.window)
-        # # 4. 移动窗口
+        # 3. 取消游戏窗口的置顶状态
+        hwnd_util.set_window_not_topmost(window_service.window)
+        # 4. 移动窗口
         gui_win_id = int(kwargs.get("GUI_WIN_ID"))
-        # hwnd_util.set_window_left_top_and_below_another(window_service.window, gui_win_id)
-        hwnd_util.set_window_left_top(window_service.window)
+        hwnd_util.set_window_left_top_and_below_another(window_service.window, gui_win_id)
         # 5. 将鼠标移回原位
         keymouse_util.set_mouse_position(original_x, original_y)
-
-        context.boss_task_ctx.gui_win_id = gui_win_id
 
         time.sleep(0.2)
         logger.debug(game_path)
@@ -311,9 +308,8 @@ def auto_boss_task_run(event: Event, **kwargs):
             logger.exception(e)
         finally:
             try:
-                keymouse_util.mouse_left_up(window_service.window, 0, 0)
-                keymouse_util.mouse_right_up(window_service.window, 0, 0)
                 keymouse_util.key_up(window_service.window, "W")
+                keymouse_util.key_up(window_service.window, "LSHIFT")
             except Exception:
                 pass
             logger.info("刷boss任务进程结束")
@@ -374,9 +370,8 @@ def auto_pickup_task_run(event: Event, **kwargs):
         logger.exception(e)
     finally:
         try:
-            keymouse_util.mouse_left_up(window_service.window, 0, 0)
-            keymouse_util.mouse_right_up(window_service.window, 0, 0)
             keymouse_util.key_up(window_service.window, "W")
+            keymouse_util.key_up(window_service.window, "LSHIFT")
         except Exception:
             pass
 
@@ -437,9 +432,8 @@ def auto_story_task_run(event: Event, **kwargs):
         logger.exception(e)
     finally:
         try:
-            keymouse_util.mouse_left_up(window_service.window, 0, 0)
-            keymouse_util.mouse_right_up(window_service.window, 0, 0)
             keymouse_util.key_up(window_service.window, "W")
+            keymouse_util.key_up(window_service.window, "LSHIFT")
         except Exception:
             pass
 
@@ -493,9 +487,8 @@ def daily_activity_task_run(event: Event, **kwargs):
         logger.exception(e)
     finally:
         try:
-            keymouse_util.mouse_left_up(window_service.window, 0, 0)
-            keymouse_util.mouse_right_up(window_service.window, 0, 0)
             keymouse_util.key_up(window_service.window, "W")
+            keymouse_util.key_up(window_service.window, "LSHIFT")
         except Exception:
             pass
 

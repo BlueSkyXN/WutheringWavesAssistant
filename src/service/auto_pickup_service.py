@@ -183,7 +183,6 @@ class AutoPickupServiceImpl(PageEventAbstractService):
             "时苔茧": "时苔茧",
             "狐尾蒲藻": "狐尾蒲藻",
             "寒星地苔": "寒星地苔",
-            "寒地星苔": "寒地星苔",
             # 补充药材
             "银环蜥": "银环蜥",
             "蓝棘蜥": "蓝棘蜥",

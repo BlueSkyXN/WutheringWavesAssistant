@@ -131,7 +131,7 @@ class BossNameEnum(Enum):
     Hyvatia = "海维夏"
     ReactorHusk = "炉芯机骸"
     Sigillum = "辛吉勒姆"
-    NamelessExplorer = "无铭探索者"
+    # NamelessExplorer = "无铭探索者"
 
     # Dreamless = ("无妄者", "Dreamless")
     # FallacyOfNoReturn = ("无归的谬误", "Fallacy of No Return")
