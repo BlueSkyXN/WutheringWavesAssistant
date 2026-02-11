@@ -23,84 +23,62 @@
 
 | 方法 | 描述 | 说明 |
 |------|------|------|
-| `custom_combo_action(fight_tactic)` | 自定义连招 | 解析 FightTactics 配置中的连招字符串 |
-| `default_combo()` | 默认连招 | 简单的 E + Q + R + 普攻循环 |
+| `a4()` | 4段普攻 | 4次快速普攻 |
+| `Eaa()` | E+2段普攻 | E技能接两段普攻 |
+| `E()` | E技能 | 单独的E技能 |
+| `z()` | 重击 | 长按0.50秒 |
+| `Q()` | 声骸技能 | 声骸释放 |
+| `R()` | 共鸣解放 | 大招 |
 
-### 自定义连招语法
-
-通过 `config.yaml` 中的 `FightTactics` 配置，可以为通用角色定义连招：
-
-```yaml
-FightTactics:
-    - "q~0.1,e~0.1,a"
-    - "r,q~0.1,e,a,a,a,a~,e"
-    - "q~0.1,e,r,e,a,a,a,a,a,e,a,a,a,a,a,e"
-```
-
-**语法解析**：
-
-| 指令 | 说明 | 动作 |
-|------|------|------|
-| `a` | 普攻 | 连点 0.3 秒 |
-| `a~0.5` | 普攻指定时长 | 按下 0.5 秒 |
-| `a(0.5)` | 持续普攻 | 连续普攻 0.5 秒 |
-| `e` | 技能 | 按下 0.3 秒 |
-| `e~0.1` | 技能指定时长 | 按下 0.1 秒 |
-| `q` | 声骸 | 按下 0.3 秒 |
-| `q~0.1` | 声骸短按 | 按下 0.1 秒 |
-| `r` | 大招 | 按下 0.3 秒 |
-| `s` | 重击 | 长按左键 |
-| `l` | 向后闪避 | 后退+闪避 |
-| 数字 | 等待 | 等待 N 秒 |
-
-### 默认连招
-
-当 `FightTactics` 为空时使用：
+### COMBO_SEQ（训练场连段参考）
 
 ```python
-def default_combo(self):
-    return [
-        ["E", 0.05, 0.50],  # E技能
-        ["Q", 0.05, 0.50],  # 声骸
-        ["R", 0.05, 0.50],  # 大招
-        ["a", 0.05, 0.30],  # 普攻×5
-        ["a", 0.05, 0.30],
-        ["a", 0.05, 0.30],
-        ["a", 0.05, 0.30],
-        ["a", 0.05, 0.50],
-    ]
+COMBO_SEQ = [
+    ["a", 0.05, 0.30],  # 普攻×4
+    ["a", 0.05, 0.30],
+    ["a", 0.05, 0.30],
+    ["a", 0.05, 0.30],
+    ["z", 0.50, 0.50],  # 重击
+    ["R", 0.05, 0.50],  # 大招
+    ["Q", 0.05, 0.50],  # 声骸
+]
 ```
 
 ## 连招决策逻辑 (`combo()`)
 
 ```python
 def combo(self):
-    if self._fight_tactic:
-        self.custom_combo_action(self._fight_tactic)
-    else:
-        self.combo_action(self.default_combo(), False)
+    self.combo_action(self.a4(), False)
+
+    combo_list = [self.Eaa(), self.R(), self.z()]
+    random.shuffle(combo_list)
+    for i in combo_list:
+        self.combo_action(i, False)
+        time.sleep(0.15)
+
+    self.combo_action(self.Q(), False)
 ```
 
-1. 有自定义连招配置 → 解析并执行
-2. 无配置 → 使用默认连招（E → Q → R → 5a）
+1. 先打 a4() 四段普攻
+2. 随机打乱 [Eaa, R, z] 的顺序并依次执行
+3. 最后释放声骸 Q()
 
 ## 适用角色
 
 以下角色在编队中使用通用连招：
 
-- 弗洛洛 (Phrolova) - 虽有 BasePhrolova，但继承了 GenericResonator
-- 菲比 (Phoebe) - 虽有 BasePhoebe，但未注册到 resonator_map
-- 莫宁 (Mornye) - 虽有 BaseMornye，但未注册到 resonator_map
-- 漂泊者 (Rover) - 虽有 BaseRover，但未注册到 resonator_map
+- 菲比 (Phoebe) - 虽有 BasePhoebe，但未注册到 `resonator_map`，且 `combo()` 为空实现
 - 所有其他未注册角色
+
+> **注意**：漂泊者 (Rover) 虽不在 `resonator_map` 中，但 `set_resonators()` 对其做了特殊处理，直接使用 `Rover` 实例及其自身的 `combo()`，不会回退到 GenericResonator。详见 [rover.md](rover.md)。
 
 ## 设计特点
 
 1. **通用兼容** - 对所有角色都能工作的最简连招
-2. **可配置** - 通过 FightTactics 配置自定义连招序列
+2. **随机打乱** - Eaa/R/z 三个技能随机排列，避免固定模式
 3. **安全回退** - 作为所有未定制角色的后备方案
 4. **无状态检测** - 不截图不检测，纯固定序列执行
 
 ---
 
-*最后更新: 2026-02-06*
+*最后更新: 2026-02-07*

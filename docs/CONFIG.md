@@ -70,7 +70,7 @@ FightTactics:
 | `l` | 向后闪避（小写 L） |
 | 数字 | 间隔时间（秒） |
 
-> **注意**：当角色已在 `resonator_map` 中注册定制连招时，`FightTactics` 配置不生效，系统会自动使用该角色 `combo()` 方法中的智能连招逻辑。未注册的角色会使用 `GenericResonator` 并遵循 `FightTactics` 配置。
+> **注意**：`FightTactics` 是由 `page_event_service.py` 解析和执行的独立战斗路径。当角色已在 `resonator_map` 中注册定制连招时，系统使用该角色 `combo()` 方法中的连招逻辑，`FightTactics` 不参与。
 
 ## 6. 战斗顺序 (FightOrder)
 
