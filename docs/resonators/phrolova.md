@@ -6,7 +6,7 @@
 |------|------|
 | 角色名称 | 弗洛洛 (Phrolova) |
 | 角色定位 | MainDPS（主输出） |
-| 元素属性 | 熔融 (Fusion) |
+| 元素属性 | 湮灭 (Havoc) |
 | 协奏类型 | 紫圈 (concerto_havoc) |
 | 版本 | v2.5 |
 | 源文件 | `src/core/combat/resonator/phrolova.py` |
