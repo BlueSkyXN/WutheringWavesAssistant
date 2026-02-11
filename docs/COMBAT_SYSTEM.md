@@ -40,8 +40,10 @@ class CombatSystem:
 | ciaccona | 夏空 | Ciaccona |
 | phrolova | 弗洛洛 | Phrolova |
 | lynae | 琳奈 | Lynae |
+| mornye | 莫宁 | Mornye |
+| cantarella | 坎特蕾拉 | Cantarella |
 
-> **注意**：Phoebe（菲比）和 Mornye（莫宁）虽有类定义但尚未注册到 `resonator_map`。菲比的 `combo()` 方法为空实现（`pass`），莫宁的 `combo()` 中调用了未实现的 `energy_count()` 和 `is_resonance_skill_ready()`（应分别使用 `rest_mass_energy_count()` 和 `is_resonance_skill_optimal_solution_ready()`）。
+> **注意**：Phoebe（菲比）虽有类定义但尚未注册到 `resonator_map`（注册行被注释掉）。菲比的 `combo()` 方法为空实现（`pass`），实际使用时回退到 `GenericResonator` 通用连招。莫宁和弗洛洛虽已注册，但其 `combo()` 当前使用与 `GenericResonator` 相同的简单随机打乱逻辑，尚未利用各自 Base 类中的状态检测功能。
 
 未注册定制连招的角色将使用 `GenericResonator` 通用连招。
 
@@ -170,12 +172,13 @@ while True:
     6. 释放鼠标按键（安全清理）
 ```
 
-### 4.3 move_prepare 机制
+### 4.3 exit_special_state 机制
 
 在战斗结束后移动前，需要处理特殊角色状态：
 
 - **椿 (Camellya)** - 调用 `quit_blossom()` 退出盛绽状态，可能需要后闪复位
-- **弗洛洛 (Phrolova)** - 调用 `quit_R()` 退出大招状态
+- **弗洛洛 (Phrolova)** - 检测谢幕指令状态，按 R 退出大招状态
+- **莫宁 (Mornye)** - 检测广域观测模式，按跳跃退出蝴蝶形态
 
 ## 5. 角色连招设计模式
 
@@ -218,4 +221,4 @@ class Xxx(BaseXxx):
 
 ---
 
-*最后更新: 2026-02-06*
+*最后更新: 2026-02-07*

@@ -42,7 +42,7 @@ WutheringWavesAssistant/
 ├── config.yaml                # 用户配置文件
 ├── pyproject.toml             # 项目依赖与构建配置
 ├── WWA.exe                    # Windows 启动器
-├── WWA_updater.exe            # 更新器
+├── WWA一键更新.bat            # 一键更新脚本
 │
 ├── src/                       # 源代码根目录
 │   ├── __init__.py            # 版本号定义
@@ -68,6 +68,7 @@ WutheringWavesAssistant/
 │   │   │   └── resonator/     # 角色连招实现
 │   │   │       ├── generic.py      # 通用角色
 │   │   │       ├── camellya.py     # 椿
+│   │   │       ├── cantarella.py   # 坎特蕾拉
 │   │   │       ├── cartethyia.py   # 卡提希娅
 │   │   │       ├── changli.py      # 长离
 │   │   │       ├── ciaccona.py     # 夏空
@@ -309,4 +310,4 @@ resonator.combo()
 
 ---
 
-*最后更新: 2026-02-06*
+*最后更新: 2026-02-07*

@@ -61,6 +61,7 @@
 | 角色 | 文档 | 定位 | 属性 |
 |------|------|------|------|
 | 椿 (Camellya) | [camellya.md](./resonators/camellya.md) | 主C | 湮灭 |
+| 坎特蕾拉 (Cantarella) | [cantarella.md](./resonators/cantarella.md) | 辅助 | 湮灭 |
 | 卡提希娅 (Cartethyia) | [cartethyia.md](./resonators/cartethyia.md) | 主C | 气动 |
 | 长离 (Changli) | [changli.md](./resonators/changli.md) | 副C | 熔融 |
 | 夏空 (Ciaccona) | [ciaccona.md](./resonators/ciaccona.md) | 辅助 | 气动 |

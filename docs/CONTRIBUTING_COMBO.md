@@ -644,10 +644,10 @@ def a4E(self):
 3. 临时在 `combo()` 中输出检测结果
 4. 使用断点调试查看 `img` 数组的像素值
 
-### Q7: Mornye 的 energy_count 问题是什么？
+### Q7: Mornye 的 combo() 现状是什么？
 
 **A**:
-Mornye 角色有特殊的能量系统叫"静质量能"，但在 `combo()` 中错误地调用了 `self.energy_count(img)`。应该调用 `self.rest_mass_energy_count(img)`。这是一个已知 bug。
+Mornye（莫宁）的 `BaseMornye` 实现了完整的双模式能量检测（静质量能 `rest_mass_energy_count()` 和相对动能 `relative_momentum_count()`），但当前 `combo()` 使用与 `GenericResonator` 相同的简单随机打乱逻辑（a4 + random [Eaa, R, z] + Q），尚未利用这些检测功能。定制连招逻辑待后续开发。
 
 ---
 

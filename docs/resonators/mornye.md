@@ -66,54 +66,55 @@
 
 | 方法 | 描述 | 说明 |
 |------|------|------|
-| `a3()` | 3段普攻 | 攒能量，拆分了长等待 |
-| `a2()` | 2段普攻 | 快速普攻 |
-| `a3Ea()` | 3普攻+E+普攻 | E后接a防止E没好发呆 |
-| `zaEja()` | 进阶轴核心 | 重击进蝴蝶+E退出+跳+普攻清能量 |
-| `zE()` | 重击+E | 重击进蝴蝶+E退出 |
-| `Eja()` | E+跳+普攻 | E退出+清能量 |
-| `ja()` | 跳+普攻 | 清空能量 |
-| `za()` | 重击+普攻 | 常规重击+打断防飞 |
-| `E()` | E技能 | 仅E |
+| `a4()` | 4段普攻 | 4次快速普攻 |
+| `Eaa()` | E+2段普攻 | E技能接两段普攻 |
+| `E()` | E技能 | 单独的E技能 |
+| `z()` | 重击 | 长按0.50秒 |
 | `Q()` | 声骸技能 | 声骸释放 |
-| `R()` | 共鸣解放 | 大招，等待3.08秒 |
+| `R()` | 共鸣解放 | 大招 |
 
 ## 连招决策逻辑 (`combo()`)
 
+```python
+def combo(self):
+    self.combo_action(self.a4(), False)
+
+    combo_list = [self.Eaa(), self.R(), self.z()]
+    random.shuffle(combo_list)
+    for i in combo_list:
+        self.combo_action(i, False)
+        time.sleep(0.15)
+
+    self.combo_action(self.Q(), False)
 ```
-截图检测大招状态
 
-入场: a3() 性价比3段普攻
+1. 先打 a4() 四段普攻
+2. 随机打乱 [Eaa, R, z] 的顺序并依次执行
+3. 最后释放声骸 Q()
 
-1. 有R（协星调律）:
-   ├─ E()
-   ├─ R()
-   └─ return
+> **注意**：虽然 `BaseMornye` 中实现了完整的状态检测方法（静质量能、相对动能、广域观测模式等），但当前 `combo()` 并未使用这些检测功能，而是采用与 `GenericResonator` 相同的简单随机打乱逻辑。定制连招逻辑尚待开发。
 
-2. 再次截图检测:
-   检查能量、E技能、R、Boss血量
+## exit_special_state()
 
-3. 能量3格 且 有E 且 Boss未击败:
-   ├─ zaEja() 进阶轴核心循环
-   ├─ Q()
-   └─ return
+`exit_special_state()` 方法用于在声骸搜索前退出广域观测模式（蝴蝶形态）：
 
-4. 通用处理:
-   ├─ E() (无R时等待合轴)
-   ├─ R() (有R时释放)
-   ├─ 能量5格 → ja() 清能量
-   └─ Q()
-
-异常处理:
-└─ StopError → jump() 打断蝴蝶变身防止飞出场外
+```python
+def exit_special_state(self, scenario_enum):
+    if scenario_enum != ScenarioEnum.BeforeEchoSearch:
+        return
+    if not self.is_wide_field_observation_mode_ready(img):
+        return
+    # 跳跃退出蝴蝶形态
+    quit_seq = [["j", 0.05, 2.00]]
+    self.combo_action(quit_seq, True, ignore_event=True)
 ```
 
 ## 设计特点
 
-1. **蝴蝶飞出防护** - `combo()` 使用 try-except 捕获 `StopError`，调用 `jump()` 打断蝴蝶变身，防止击败 Boss 时蝴蝶飞出场外
-2. **能量5格特殊处理** - 5格能量时改用 `ja()` 而非 `za()`，防止按键卡掉导致蝴蝶飞出
-3. **性价比优先** - 入场先打 a3 性价比攻击，再判断是否有大招
-4. **Boss 血量判断** - 进阶轴需要 Boss 血量 > 0.01 才执行
+1. **丰富的状态检测** - `BaseMornye` 实现了完整的双模式能量检测，为后续定制连招做准备
+2. **简单的连招执行** - 当前 `combo()` 使用简单随机打乱，与 GenericResonator 逻辑相同
+3. **蝴蝶退出保护** - `exit_special_state()` 在声骸搜索前检测并退出广域观测模式
+4. **已注册** - 莫宁已注册到 `resonator_map`，使用自己的 `combo()` 方法
 
 ---
 
