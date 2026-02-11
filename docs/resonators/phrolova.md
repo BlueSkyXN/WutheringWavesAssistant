@@ -90,6 +90,7 @@ def combo(self):
 def exit_special_state(self, scenario_enum):
     if scenario_enum != ScenarioEnum.BeforeEchoSearch:
         return
+    img = self.img_service.screenshot()
     if not self.is_cue_curtain_call_ready(img):
         return
     # 按R退出大招状态（R落地 2.37秒）

@@ -102,6 +102,7 @@ def combo(self):
 def exit_special_state(self, scenario_enum):
     if scenario_enum != ScenarioEnum.BeforeEchoSearch:
         return
+    img = self.img_service.screenshot()
     if not self.is_wide_field_observation_mode_ready(img):
         return
     # 跳跃退出蝴蝶形态

@@ -68,8 +68,9 @@ def combo(self):
 以下角色在编队中使用通用连招：
 
 - 菲比 (Phoebe) - 虽有 BasePhoebe，但未注册到 `resonator_map`，且 `combo()` 为空实现
-- 漂泊者 (Rover) - 虽有 BaseRover 和自己的 `combo()`，但未注册到 `resonator_map`
 - 所有其他未注册角色
+
+> **注意**：漂泊者 (Rover) 虽不在 `resonator_map` 中，但 `set_resonators()` 对其做了特殊处理，直接使用 `Rover` 实例及其自身的 `combo()`，不会回退到 GenericResonator。详见 [rover.md](rover.md)。
 
 ## 设计特点
 
