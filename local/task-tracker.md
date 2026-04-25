@@ -47,6 +47,26 @@
 - [x] 修复后全验证：33 文件 AST 通过、关键 import 正常、8 测试全过
 - [x] 完成汇报
 
+### 阶段六：双模型评审后修复（Round 2）
+- [x] P0#1: fish_count 累计归零 → start(reset_stats=False) re-arm（Opus 4.7）
+- [x] P0#2: SimpleNamespace 回退 → dataclass 字段过滤 + 直接抛错（Opus 4.7）
+- [x] P0#3: QuestState 重复定义 → 统一到 models.py（Opus 4.7）
+- [x] P0#4: FishingState 14→6 可达状态，移除 8 个死枚举（Opus 4.7）
+- [x] P1#5: humanize_ms 淹没 pulse → tap_key(humanize=False) 旁路（GPT-5.5）
+- [x] P1#6: stop_hotkey 死配置 → 移除 + TODO 注释（Opus 4.7）
+- [x] P1#7: setup_logging 接入 main.py（Opus 4.7）
+- [x] P1#8: 双重 setCentralWidget → 移除死调用（GPT-5.5）
+- [x] P1#9: _cast_seen 动态属性 → __init__ 初始化（Opus 4.7）
+- [x] P1#10: hwnd_util 平台守卫（GPT-5.5）
+- [x] P1#11: quest wait 响应 stop 事件（GPT-5.5）
+- [x] P1#12: FishingConfig 同义字段清理（Opus 4.7）
+- [x] P1#13: inter_pulse_sleep_ms 透传（Opus 4.7）
+- [x] P2#14-16: 移除 loguru/pydantic 依赖、标注 OCR 实验性、清理死缓存（Opus 4.7）
+- [x] P2#17: ActionType 重复定义统一（Opus 4.7）
+- [x] P2#18+20: 清理不可达 import 回退、DPI 去重（GPT-5.5）
+- [x] P2#19: ruff 0 errors（Opus 4.7）
+- [x] 全量验证：33 文件 AST、8 测试、ruff 0 errors、关键 import 正常
+
 ## 关键决策记录
 1. 合并冲突解决策略：cartethyia.py 中 upstream 移除了 debug log，我们的 fork 添加了 debug log，选择保留 upstream 的清理版本
 2. 项目架构：采用 WWA 的四层架构（Core/Service/Util/UI），Core 层零平台依赖
