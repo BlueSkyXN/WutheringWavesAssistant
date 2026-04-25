@@ -81,9 +81,9 @@ paddleocr = [
     "paddleocr (==3.3.2)",
 ]
 dev = [
-    "pytest",
+    "pytest (>=9.0.3)",
     "matplotlib",
-    "python-dotenv",
+    "python-dotenv (>=1.2.2)",
 ]
 
 

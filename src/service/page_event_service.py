@@ -8,15 +8,14 @@ from typing import Callable
 import numpy as np
 
 from src.core.boss import BossNameEnum, MoveMode, Direction, RouteStep
-from src.core.combat.combat_core import DynamicPointTransformer, ResonatorNameEnum, AlignEnum, BaseResonator, \
-    ScenarioEnum
+from src.core.combat.combat_core import ResonatorNameEnum, BaseResonator, ScenarioEnum
 from src.core.combat.combat_system import CombatSystem
 from src.core.contexts import Context, Status
 from src.core.interface import ControlService, OCRService, PageEventService, ImgService, WindowService, ODService, \
     BossInfoService
 from src.core.languages import Languages
 from src.core.pages import ConditionalAction, TextMatch, Page
-from src.core.regions import TextPosition, DynamicPosition, Position
+from src.core.regions import TextPosition, DynamicPosition, Position, DynamicPointTransformer, AlignEnum
 
 logger = logging.getLogger(__name__)
 
@@ -2356,6 +2355,7 @@ class PageEventAbstractService(PageEventService, ABC):
                 if re.match(find_boss_name_reg, findBossTemp.text):
                     # logger.info(f"匹配坐标：{findBossTemp}")
                     findBoss = findBossTemp
+                    break
 
         if not findBoss:
             self._control_service.esc()
@@ -2775,7 +2775,6 @@ class PageEventAbstractService(PageEventService, ABC):
                     # name text is_exist
                     [None, None, None], [None, None, None], [None, None, None]
                 ]
-                member_names_zh = ResonatorNameEnum.get_names_zh()
                 # logger.info(f"ocr_results: {ocr_results}")
                 for ocr_position in ocr_results:
                     if ocr_position.y1 < member1[0][1] or ocr_position.y1 > member1[1][1]:
@@ -2793,15 +2792,9 @@ class PageEventAbstractService(PageEventService, ABC):
                         members_info[member_index][2] = True
                         continue
                     members_info[member_index][1] = ocr_position
-                    for name_zh in member_names_zh:
-                        if not ocr_position.text:
-                            continue
-                        ocr_name_text = ocr_position.text.strip()
-                        if 1 <= len(ocr_name_text) <= 2 and ocr_name_text.startswith(ResonatorNameEnum.chisa.value[0]):
-                            ocr_name_text = ResonatorNameEnum.chisa.value
-                        if name_zh == ocr_name_text:
-                            members_info[member_index][0] = name_zh
-                            break
+                    enum_obj = ResonatorNameEnum.get_enum_by_ocr_text(ocr_position.text)
+                    if enum_obj:
+                        members_info[member_index][0] = enum_obj.value
                 # logger.info(f"members_info: {members_info}")
                 team_members = [None, None, None]
                 for index, member_info in enumerate(members_info):

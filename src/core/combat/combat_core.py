@@ -3,12 +3,14 @@ import random
 import threading
 import time
 from enum import Enum
-from typing import Sequence
+from functools import wraps
+from typing import Sequence, Optional
 
 import numpy as np
 
 from src.core.exceptions import StopError
 from src.core.interface import ControlService, ImgService
+from src.core.regions import AlignEnum, DynamicPointTransformer
 
 logger = logging.getLogger(__name__)
 
@@ -98,9 +100,17 @@ class ResonatorNameEnum(Enum):
     aemeath = "爱弥斯"
     luukherssen = "陆赫斯"
 
-    # v3.x
-    lucilla = "洛瑟菈"
+    # v3.2
     sigrika = "西格莉卡"
+
+    # v3.3
+    hiyuki = "绯雪"
+    denia = "达妮娅"
+
+    # v3.x
+    lucy = "露西"
+    rebecca = "丽贝卡"
+    lucilla = "洛瑟菈"
 
     # 缓存
     __value_map = None
@@ -129,6 +139,26 @@ class ResonatorNameEnum(Enum):
     def get_enum_by_value(cls, value):
         return cls.get_enum_map().get(value)
 
+    @classmethod
+    def get_enum_by_ocr_text(cls, ocr_text) -> Optional["ResonatorNameEnum"]:
+        """
+        ocr文本匹配角色名，部分角色有生僻字或特殊字符，需要特殊处理
+        :param ocr_text:
+        :return: 枚举或None
+        """
+        if not ocr_text:
+            return None
+        ocr_text = ocr_text.strip()
+        enum_map = cls.get_enum_map()
+        for name_zh, enum_obj in enum_map.items():
+            if name_zh == ocr_text:
+                return enum_obj
+            if 1 <= len(ocr_text) <= 2 and ocr_text.startswith(cls.chisa.value[0]):
+                return cls.chisa
+            if len(ocr_text) >= 3 and ocr_text.startswith(cls.luukherssen.value[0]) and ocr_text.endswith(cls.luukherssen.value[-2:]):
+                return cls.luukherssen
+        return None
+
 
 class BaseChecker:
 
@@ -147,172 +177,40 @@ class LogicEnum(Enum):
     AND = "and"  # 当一个技能有多种变化，比如今汐E，则需要多点联合点位，使用与
 
 
-class AlignEnum(Enum):
+def combat_cache(func):
     """
-    对齐方式，默认底端对齐，右对齐
+    仅用于缓存连招
+    :param func:
+    :return:
     """
-    BUTTON_RIGHT = "button_right"  # 底端对齐，右对齐，如角色的技能
-    BUTTON_CENTER = "button_center"  # 底端对齐，水平居中，如角色的血条、能量条
-    BUTTON_LEFT = "button_left"  # 底端对齐，左对齐
 
-    TOP_RIGHT = "top_right"  # 顶端对齐，右对齐，右侧的角色头像
-    TOP_CENTER = "top_center"  # 顶端对齐，水平居中，如boss血条
-    TOP_LEFT = "top_left"  # 顶端对齐，左对齐，如编队左上角队伍
+    storage = {}
 
-    CENTER = "center"  # 中心对齐，如编队
-    CENTER_LEFT = "center_left"  # 垂直居中，左对齐
-    CENTER_RIGHT = "center_right"  # 垂直居中，右对齐
+    @wraps(func)
+    def wrapper(*args, **kwargs):
 
+        key = (args, tuple(kwargs.items()))
 
-class ResolutionEnum(Enum):
-    """
-    分辨率类型
-    """
-    STANDARD = 0  # 标准16:9
-    TALL = 1  # 更高，如16:10等
-    WIDE = 2  # 更宽，如21:9等
+        if logger.isEnabledFor(logging.DEBUG):
+            cls_name = None
+            if args:
+                obj = args[0]
+                if hasattr(obj, '__class__'):
+                    cls_name = obj.__class__.__name__  # 实例方法
+                elif isinstance(obj, type):
+                    cls_name = obj.__name__  # 类方法
 
+            if cls_name:
+                logger.debug(f"{cls_name}.{func.__name__}")
+            else:
+                logger.debug(func.__name__)
 
-class DynamicPointTransformer:
+        if key not in storage:
+            storage[key] = func(*args, **kwargs)
 
-    def __init__(self, img_or_wh: np.ndarray | tuple[int, int]):
-        if isinstance(img_or_wh, tuple):
-            w, h = img_or_wh
-        elif isinstance(img_or_wh, np.ndarray):
-            h, w = img_or_wh.shape[:2]
-        else:
-            raise TypeError("h_w must be either a ndarray or a tuple")
-        if w == 0 or h == 0:
-            raise ValueError("宽高异常，不能为0")
+        return storage[key]
 
-        self.h = h
-        self.w = w
-        self.ratio_16_9 = 16 / 9
-        self.ratio_w_h = w / h
-        self.ratio_w_1280 = w / 1280
-        self.ratio_h_720 = h / 720
-        self.w_diff = w - 1280 * h / 720
-        self.h_diff = h - 720 * w / 1280
-
-        if abs(self.ratio_w_h - self.ratio_16_9) <= 0.01:
-            # 16:9
-            resolution = ResolutionEnum.STANDARD
-            # logger.debug(f"比例: 16:9")
-        elif self.ratio_w_h < self.ratio_16_9:
-            # 16:10等，高度更高
-            resolution = ResolutionEnum.TALL
-            # logger.debug(f"比例: 16:{16 * h / w:.2f}")
-        else:  # self.ratio_w_h > self.ratio_16_9:
-            # 21:9等，宽度更宽
-            resolution = ResolutionEnum.WIDE
-            # logger.debug(f"比例: 16:{16 * h / w:.2f}")
-        self.resolution = resolution
-
-    def transform(self, point: tuple[int, int], align: AlignEnum | None = None) -> tuple[int, int]:
-        """ 将1280x720下的坐标转换成当前分辨率下的坐标点 """
-
-        # 标准分辨率直接等比缩放
-        if self.resolution == ResolutionEnum.STANDARD:
-            return int(point[0] * self.ratio_w_1280), int(point[1] * self.ratio_w_1280)
-
-        # 非标准分辨率，按对齐方式选择映射方式
-        new_x = None
-        new_y = None
-
-        # x
-        if align is None or align in [AlignEnum.BUTTON_RIGHT, AlignEnum.TOP_RIGHT, AlignEnum.CENTER_RIGHT]:  # 右对齐
-            if self.resolution == ResolutionEnum.TALL:
-                new_x = point[0] * self.ratio_w_1280
-            elif self.resolution == ResolutionEnum.WIDE:
-                new_x = self.w_diff + point[0] * self.ratio_h_720
-        elif align in [AlignEnum.BUTTON_CENTER, AlignEnum.TOP_CENTER, AlignEnum.CENTER]:  # 水平居中
-            if self.resolution == ResolutionEnum.TALL:
-                new_x = point[0] * self.ratio_w_1280
-            elif self.resolution == ResolutionEnum.WIDE:
-                new_x = self.w_diff / 2 + point[0] * self.ratio_h_720
-        elif align in [AlignEnum.BUTTON_LEFT, AlignEnum.TOP_LEFT, AlignEnum.CENTER_LEFT]:  # 左对齐
-            if self.resolution == ResolutionEnum.TALL:
-                new_x = point[0] * self.ratio_w_1280
-            elif self.resolution == ResolutionEnum.WIDE:
-                new_x = point[0] * self.ratio_h_720
-
-        # y
-        if align is None or align in [AlignEnum.BUTTON_RIGHT, AlignEnum.BUTTON_LEFT, AlignEnum.BUTTON_CENTER]:  # 底端对齐
-            if self.resolution == ResolutionEnum.TALL:
-                new_y = self.h_diff + point[1] * self.ratio_w_1280
-            elif self.resolution == ResolutionEnum.WIDE:
-                new_y = point[1] * self.ratio_h_720
-        elif align in [AlignEnum.TOP_RIGHT, AlignEnum.TOP_LEFT, AlignEnum.TOP_CENTER]:  # 顶端对齐
-            if self.resolution == ResolutionEnum.TALL:
-                new_y = point[1] * self.ratio_w_1280
-            elif self.resolution == ResolutionEnum.WIDE:
-                new_y = point[1] * self.ratio_h_720
-        elif align in [AlignEnum.CENTER, AlignEnum.CENTER_LEFT, AlignEnum.CENTER_RIGHT]:  # 垂直居中
-            if self.resolution == ResolutionEnum.TALL:
-                new_y = self.h_diff / 2 + point[1] * self.ratio_w_1280
-            elif self.resolution == ResolutionEnum.WIDE:
-                new_y = point[1] * self.ratio_h_720
-
-        if new_x is None or new_y is None:
-            logger.debug(f"new_x: {new_x}, new_y: {new_y}")
-            raise ValueError("未知的枚举值")
-
-        new_point = (int(new_x), int(new_y))
-        # logger.debug(f"point: {point}, new_point: {new_point}")
-        return new_point
-
-    def untransform(self, point: tuple[int, int], align: AlignEnum | None = None) -> tuple[int, int]:
-        """ 将当前分辨率下的坐标点转换成1280x720下的坐标 """
-
-        # 标准分辨率直接等比缩放
-        if self.resolution == ResolutionEnum.STANDARD:
-            return int(point[0] / self.ratio_w_1280), int(point[1] / self.ratio_w_1280)
-
-        # 非标准分辨率，按对齐方式选择映射方式
-        new_x = None
-        new_y = None
-
-        # x
-        if align is None or align in [AlignEnum.BUTTON_RIGHT, AlignEnum.TOP_RIGHT, AlignEnum.CENTER_RIGHT]:  # 右对齐
-            if self.resolution == ResolutionEnum.TALL:
-                new_x = point[0] / self.ratio_w_1280
-            elif self.resolution == ResolutionEnum.WIDE:
-                new_x = (point[0] - self.w_diff) / self.ratio_h_720
-        elif align in [AlignEnum.BUTTON_CENTER, AlignEnum.TOP_CENTER, AlignEnum.CENTER]:  # 水平居中
-            if self.resolution == ResolutionEnum.TALL:
-                new_x = point[0] / self.ratio_w_1280
-            elif self.resolution == ResolutionEnum.WIDE:
-                new_x = (point[0] - self.w_diff / 2) * self.ratio_h_720
-        elif align in [AlignEnum.BUTTON_LEFT, AlignEnum.TOP_LEFT, AlignEnum.CENTER_LEFT]:  # 左对齐
-            if self.resolution == ResolutionEnum.TALL:
-                new_x = point[0] / self.ratio_w_1280
-            elif self.resolution == ResolutionEnum.WIDE:
-                new_x = point[0] / self.ratio_h_720
-
-        # y
-        if align is None or align in [AlignEnum.BUTTON_RIGHT, AlignEnum.BUTTON_LEFT, AlignEnum.BUTTON_CENTER]:  # 底端对齐
-            if self.resolution == ResolutionEnum.TALL:
-                new_y = (point[1] - self.h_diff) / self.ratio_w_1280
-            elif self.resolution == ResolutionEnum.WIDE:
-                new_y = point[1] / self.ratio_h_720
-        elif align in [AlignEnum.TOP_RIGHT, AlignEnum.TOP_LEFT, AlignEnum.TOP_CENTER]:  # 顶端对齐
-            if self.resolution == ResolutionEnum.TALL:
-                new_y = point[1] / self.ratio_w_1280
-            elif self.resolution == ResolutionEnum.WIDE:
-                new_y = point[1] / self.ratio_h_720
-        elif align in [AlignEnum.CENTER, AlignEnum.CENTER_LEFT, AlignEnum.CENTER_RIGHT]:  # 垂直居中
-            if self.resolution == ResolutionEnum.TALL:
-                new_y = (point[1] - self.h_diff / 2) / self.ratio_w_1280
-            elif self.resolution == ResolutionEnum.WIDE:
-                new_y = point[1] / self.ratio_h_720
-
-        if new_x is None or new_y is None:
-            logger.debug(f"new_x: {new_x}, new_y: {new_y}")
-            raise ValueError("未知的枚举值")
-
-        new_point = (int(new_x), int(new_y))
-        # logger.debug(f"point: {point}, new_point: {new_point}")
-        return new_point
+    return wrapper
 
 
 class ColorChecker(BaseChecker):
@@ -526,7 +424,7 @@ class ScenarioEnum(Enum):
 
 
 class BaseResonator(BaseCombo):
-    """ 共鸣者 """
+    """ 共鸣者基类，定义了一些常用函数，可按需实现 """
 
     ## boss hp
     # 血条为黄到红的渐变色
@@ -613,9 +511,14 @@ class BaseResonator(BaseCombo):
         raise NotImplementedError()
 
     def exit_special_state(self, scenario_enum: ScenarioEnum | None = None):
+        """
+        脱离特殊状态，部分角色可变身飞天等，影响移动，需实现此函数
+        :param scenario_enum: 调用此函数时的场景，可根据场景做不同实现
+        :return:
+        """
         pass
 
-    def combo(self) -> bool:
+    def combo(self):
         raise NotImplementedError()
 
     @classmethod
@@ -868,7 +771,7 @@ class TeamMemberSelector:
                 return None
             logger.debug("切换角色: %s", member)
             self.control_service.toggle_team_member(member)
-            time.sleep(0.15)
+            time.sleep(0.5)
             img = self.img_service.screenshot()
             is_toggled = team_member_checker.check(img)
 

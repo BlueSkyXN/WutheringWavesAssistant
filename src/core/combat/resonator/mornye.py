@@ -5,7 +5,7 @@ import time
 import numpy as np
 
 from src.core.combat.combat_core import ColorChecker, BaseResonator, CharClassEnum, ResonatorNameEnum, LogicEnum, \
-    ScenarioEnum
+    ScenarioEnum, combat_cache
 from src.core.exceptions import StopError
 from src.core.interface import ControlService, ImgService
 
@@ -195,8 +195,8 @@ class Mornye(BaseMornye):
     def __init__(self, control_service: ControlService, img_service: ImgService):
         super().__init__(control_service, img_service)
 
+    @combat_cache
     def a4(self):
-        logger.debug("a4")
         return [
             ["a", 0.05, 0.30],
             ["a", 0.05, 0.30],
@@ -204,35 +204,35 @@ class Mornye(BaseMornye):
             ["a", 0.05, 0.30],
         ]
 
+    @combat_cache
     def Eaa(self):
-        logger.debug("Eaa")
         return [
             ["E", 0.05, 0.50],
             ["a", 0.05, 0.30],
             ["a", 0.05, 0.30],
         ]
 
+    @combat_cache
     def E(self):
-        logger.debug("E")
         return [
             # 共鸣技能 E
             ["E", 0.05, 0.50],
         ]
 
+    @combat_cache
     def z(self):
-        logger.debug("z")
         return [
             ["z", 0.50, 0.50],
         ]
 
+    @combat_cache
     def Q(self):
-        logger.debug("Q")
         return [
             ["Q", 0.05, 0.50],
         ]
 
+    @combat_cache
     def R(self):
-        logger.debug("R")
         return [
             ["R", 0.05, 0.50],
         ]
@@ -244,10 +244,10 @@ class Mornye(BaseMornye):
     def exit_special_state(self, scenario_enum: ScenarioEnum | None = None):
         if scenario_enum != ScenarioEnum.BeforeEchoSearch:
             return
+        logger.debug("exit_special_state")
         img = self.img_service.screenshot()
         if not self.is_wide_field_observation_mode_ready(img):
             return
-        logger.debug("quit_wide_field_observation_mode")
         quit_seq = [
             ["j", 0.05, 2.00],
         ]

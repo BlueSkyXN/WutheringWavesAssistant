@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
-# from asyncio import Task
 from enum import Enum
+from typing import Optional, overload
 
 import numpy as np
 
 from src.core.boss import RouteStep, RestartParam
-from src.core.pages import Page, ConditionalAction
+from src.core.geometry import BBox, Scaler, TextBox
+from src.core.languages import Languages
+from src.core.pages import Page, ConditionalAction, OcrResult, I18nTr
 from src.core.regions import Position, TextPosition, DynamicPosition
 
 
@@ -17,8 +19,22 @@ class WindowService(ABC):
     def window(self):
         pass
 
+    @property
+    @abstractmethod
+    def scaler(self) -> Scaler:
+        pass
+
+    @property
+    @abstractmethod
+    def tr(self) -> I18nTr:
+        pass
+
     @abstractmethod
     def refresh(self) -> bool:
+        pass
+
+    @abstractmethod
+    def get_lang(self) -> Languages:
         pass
 
     @abstractmethod
@@ -109,12 +125,8 @@ class ODService(ABC):
     """Object Detection（目标检测）"""
 
     @abstractmethod
-    def search_echo(self, img: np.ndarray | None = None) -> list[int, int, int, int] | None:
+    def search_echo(self, img: np.ndarray | None = None) -> tuple[int, int, int, int] | None:
         pass
-
-    # @abstractmethod
-    # def async_search_echo(self, img: np.ndarray | None = None) -> Task:
-    #     pass
 
     @abstractmethod
     def search_reward(self, img: np.ndarray | None = None) -> tuple[int, int, int, int] | None:
@@ -137,11 +149,6 @@ class OCRService(ABC):
                   position: Position | DynamicPosition | None = None) -> TextPosition | None:
         pass
 
-    # @abstractmethod
-    # def async_find_text(self, targets: str | list[str], img: np.ndarray | None = None,
-    #                     position: Position | DynamicPosition | None = None) -> Task:
-    #     pass
-
     @abstractmethod
     def wait_text(self, targets: str | list[str], timeout: float = 3.0,
                   position: Position | DynamicPosition | None = None, wait_time: float = 0.1) -> TextPosition | None:
@@ -150,6 +157,17 @@ class OCRService(ABC):
     @abstractmethod
     def ocr(self, img: np.ndarray, position: Position | DynamicPosition | None = None,
             det=True, rec=True, cls=False) -> list[TextPosition]:
+        pass
+
+    @abstractmethod
+    def query(
+            self,
+            img: np.ndarray,
+            bbox: BBox | None = None,
+            det=True,
+            rec=True,
+            cls=False,
+    ) -> OcrResult:
         pass
 
     @abstractmethod
@@ -170,6 +188,33 @@ class PageEventService(ABC):
     @abstractmethod
     def get_conditional_actions(self) -> list[ConditionalAction]:
         pass
+
+
+class PageService(ABC):
+
+    @abstractmethod
+    def matches(self, ocr_result: OcrResult) -> dict[str, dict[str, TextBox]]:
+        pass
+
+    @abstractmethod
+    def match(self, ocr_result: OcrResult) -> Optional[tuple[str, dict[str, TextBox]]]:
+        pass
+
+    @abstractmethod
+    def is_match(self, ocr_result: OcrResult, page_key: str) -> Optional[dict[str, TextBox]]:
+        pass
+
+
+class GlobalPageService(PageService):
+
+    @abstractmethod
+    def global_page_action(self, ocr_result: OcrResult, **kwargs) -> bool:
+        pass
+
+
+class EchoMergeService(PageService, ABC):
+
+    pass
 
 
 class GameControlService(ABC):
@@ -195,8 +240,14 @@ class GameControlService(ABC):
     def attack(self):
         pass
 
+    @overload
+    def click(self, x: int, y: int): ...
+
+    @overload
+    def click(self, point: tuple[int, int]): ...
+
     @abstractmethod
-    def click(self, x: int = 0, y: int = 0):
+    def click(self, *args):
         pass
 
     @abstractmethod
@@ -426,3 +477,9 @@ class BossInfoService(ABC):
     def get_after_restart_routes(self) -> dict[str, list[RouteStep]]:
         pass
 
+
+class CombatService(ABC):
+
+    @abstractmethod
+    def combat_system(self):
+        pass
