@@ -92,3 +92,18 @@
 - 33 Python 文件，全部 AST 验证通过
 - 8 个单元测试通过
 - 完整四层架构：Core → Service → Util → UI
+
+### 阶段七：全面改进（Round 3）
+- [x] 🟥 关键修复：humanize=False 接线到 _apply_pulse（Opus 4.7）
+- [x] FishingConfig 移除 8 个死字段（Opus 4.7）
+- [x] AppContext 移除孤儿运行态方法（Opus 4.7）
+- [x] QuestRuntimeConfig 合并到 QuestConfig（GPT-5.5）
+- [x] 清理 config.yaml 死键，接入 session/failure 限制（GPT-5.5）
+- [x] LazyTaskService 类型强化（GPT-5.5）
+- [x] center_click 客户区坐标修复（GPT-5.5）
+- [x] FishingService 线程安全加锁（GPT-5.5）
+- [x] 删除死 util 模块：cv_util/hwnd_util/resource_util 共 ~458 行（Opus 4.7）
+- [x] 更新 README/architecture.md/development.md/CHANGELOG（Opus 4.7）
+- [x] 清理 __init__.py 导出（Opus 4.7）
+- [x] 新增 45 个测试（共 53 个）：fishing_core 21 + quest_core 17 + models 7 + geometry 8（Opus 4.7）
+- [x] 全量验证：30 文件 AST、53 测试、ruff 0 errors
