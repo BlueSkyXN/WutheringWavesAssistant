@@ -131,3 +131,23 @@
   - __init__.py 干净导出 + __all__
   - pyproject.toml 完善
 - [x] 全量验证：44 文件 AST、126 测试、ruff 0 errors
+
+### 阶段九：Windows 运行时审计修复（Round 5）
+- [x] Windows runtime 审计：38 条发现（GPT-5.5）→ `local/windows_runtime_audit.md`
+- [x] CRITICAL#2: 启用 UnrealWindow 类过滤，空值 fallback + WARNING
+- [x] CRITICAL#3: 接入 validate_process + config 配置
+- [x] HIGH#4: PostMessage 封装 _post_message()，捕获 UIPI/UAC 错误
+- [x] HIGH#5: ctypes argtypes/restype 声明（64-bit HWND 安全）
+- [x] HIGH#7: GDI 全分配纳入 try/finally，防泄漏
+- [x] HIGH#8: 最小化窗口检查（IsIconic）
+- [x] HIGH#10: DPI awareness 提前到 Qt import 之前
+- [x] HIGH#11: FishingService tick() 移出锁范围
+- [x] HIGH#12: Recognition LRU cache 加线程锁
+- [x] MEDIUM#14: EnumWindows callback 显式 return True
+- [x] MEDIUM#15: 进程验证 fail-closed
+- [x] MEDIUM#17: 坐标 jitter 后 clamp 防负数
+- [x] MEDIUM#19: _pressed set 加锁
+- [x] MEDIUM#20: thread.start() 移入锁内
+- [x] MEDIUM#22: PrintWindow 返回值改 `if not ok:`
+- [x] MEDIUM#26: confirm_timeout → cast_timeout 字段对齐
+- [x] 全量验证：44 文件 AST、126 测试、ruff 0 errors
