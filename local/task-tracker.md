@@ -107,3 +107,27 @@
 - [x] 清理 __init__.py 导出（Opus 4.7）
 - [x] 新增 45 个测试（共 53 个）：fishing_core 21 + quest_core 17 + models 7 + geometry 8（Opus 4.7）
 - [x] 全量验证：30 文件 AST、53 测试、ruff 0 errors
+
+### 阶段八：完美实现（Round 4）
+- [x] 🧪 测试：8→53→**126** 个测试全过（Opus 4.7）
+  - control_service 14 tests（PostMessage mock）
+  - window_service 10 tests（EnumWindows mock）
+  - capture_service 7 tests（GDI mock）
+  - fishing_service 11 tests（线程生命周期+并发）
+  - recognition 16 tests（模板匹配+LRU缓存）
+  - main.py 15 tests（config加载+DI wiring）
+- [x] 🛡️ 安全加固（GPT-5.5）
+  - PostMessage lparam 增加 KF_EXTENDED 标志
+  - click 前发送 WM_MOUSEMOVE
+  - 输入时序随机化
+  - 窗口进程名验证
+  - 截图黑屏检测
+  - 创建 docs/security.md
+- [x] 🏗️ 架构打磨（Opus 4.7）
+  - 启动时 config 校验（validate_config）
+  - main() 完整 try/except/finally 错误处理
+  - 全服务统一 logging.getLogger(__name__)
+  - py.typed 类型标记
+  - __init__.py 干净导出 + __all__
+  - pyproject.toml 完善
+- [x] 全量验证：44 文件 AST、126 测试、ruff 0 errors
